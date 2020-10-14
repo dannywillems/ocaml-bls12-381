@@ -254,6 +254,33 @@ module Constructors = struct
         test_case "test vectors add" `Quick test_vectors_add ] )
 end
 
+module UncompressedRepresentation = struct
+  let test_uncompressed_zero_has_first_byte_at_64 () =
+    assert (
+      int_of_char (Bytes.get Bls12_381.G1.Uncompressed.(to_bytes zero) 0) = 64
+    )
+
+  let test_uncompressed_random_has_first_byte_strictly_lower_than_64 () =
+    assert (
+      int_of_char (Bytes.get Bls12_381.G1.Uncompressed.(to_bytes (random ())) 0)
+      < 64 )
+
+  let get_tests () =
+    let open Alcotest in
+    ( "Representation of G1 uncompressed",
+      [ test_case
+          "zero has first byte at 64"
+          `Quick
+          test_uncompressed_zero_has_first_byte_at_64;
+        test_case
+          "random has first byte strictly lower than 64"
+          `Quick
+          (Test_ec_make.repeat
+             1000
+             test_uncompressed_random_has_first_byte_strictly_lower_than_64) ]
+    )
+end
+
 let () =
   let open Alcotest in
   run
@@ -262,6 +289,7 @@ let () =
       ValueGeneration.get_tests ();
       Equality.get_tests ();
       ECProperties.get_tests ();
+      UncompressedRepresentation.get_tests ();
       Constructors.get_tests () ] ;
   run
     "G1 Compressed"
