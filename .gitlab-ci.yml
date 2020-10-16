@@ -14,6 +14,9 @@ lint:
 .build-test: &build_definition
   stage: build
   before_script:
+    # Required to get the right Rust version.
+    - . $HOME/.cargo/env
+    - rustc --version
     # Always update system package manager + setup OPAM env
     - sudo apt-get update
     - opam repository set-url default https://opam.ocaml.org
