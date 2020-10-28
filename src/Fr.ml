@@ -129,6 +129,8 @@ let double g =
 let eq x y =
   (* IMPORTANT: DO NOT USE THE BYTES representation because we use 384 bits
      instead of 381 bits. We trust the binding offered by the library *)
+  assert (Bytes.length x = size_in_bytes) ;
+  assert (Bytes.length y = size_in_bytes) ;
   Fr_stubs.eq (Ctypes.ocaml_bytes_start x) (Ctypes.ocaml_bytes_start y)
 
 let ( = ) = eq
