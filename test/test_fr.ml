@@ -90,6 +90,25 @@ module ZRepresentation = struct
       (fun x -> assert (Z.equal (Bls12_381.Fr.to_z (Bls12_381.Fr.of_z x)) x))
       test_vectors
 
+  let test_bytes_repr_is_zarith_encoding_using_to_bits () =
+    (* Pad zarith repr *)
+    let str = string_of_int (Random.int 2_000_000) in
+    let z = Bytes.of_string (Z.to_bits (Z.of_string str)) in
+    let bytes = Bytes.make Bls12_381.Fr.size_in_bytes '\000' in
+    Bytes.blit z 0 bytes 0 (min (Bytes.length z) Bls12_381.Fr.size_in_bytes) ;
+    assert (
+      Bls12_381.Fr.eq
+        (Bls12_381.Fr.of_bytes_exn bytes)
+        (Bls12_381.Fr.of_string str) ) ;
+    let r = Bls12_381.Fr.random () in
+    (* Use Fr repr *)
+    let bytes_r = Bls12_381.Fr.to_bytes r in
+    (* Use the Fr repr to convert in a Z element *)
+    let z_r = Z.of_bits (Bytes.to_string bytes_r) in
+    (* We should get the same value, using both ways *)
+    assert (Z.equal z_r (Bls12_381.Fr.to_z r)) ;
+    assert (Bls12_381.Fr.(eq (of_z z_r) r))
+
   let get_tests () =
     let open Alcotest in
     ( "Z representation",
@@ -103,6 +122,10 @@ module ZRepresentation = struct
           "to z and of z with test vectors"
           `Quick
           test_vectors_to_z_and_of_z;
+        test_case
+          "bytes representation is the same than zarith using Z.to_bits"
+          `Quick
+          (repeat 1000 test_bytes_repr_is_zarith_encoding_using_to_bits);
         test_case
           "to z and of z with random small numbers"
           `Quick
@@ -301,4 +324,5 @@ let () =
       Equality.get_tests ();
       FieldProperties.get_tests ();
       TestVector.get_tests ();
+      ZRepresentation.get_tests ();
       StringRepresentation.get_tests () ]
