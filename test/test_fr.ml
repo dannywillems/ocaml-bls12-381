@@ -90,6 +90,26 @@ module ZRepresentation = struct
       (fun x -> assert (Z.equal (Bls12_381.Fr.to_z (Bls12_381.Fr.of_z x)) x))
       test_vectors
 
+  let get_tests () =
+    let open Alcotest in
+    ( "Z representation",
+      [ test_case "one" `Quick test_of_z_one;
+        test_case "zero" `Quick test_of_z_zero;
+        test_case
+          "of z and to z with random small numbers"
+          `Quick
+          (repeat 1000 test_random_of_z_and_to_z);
+        test_case
+          "to z and of z with test vectors"
+          `Quick
+          test_vectors_to_z_and_of_z;
+        test_case
+          "to z and of z with random small numbers"
+          `Quick
+          (repeat 1000 test_random_to_z_and_of_z) ] )
+end
+
+module BytesRepresentation = struct
   let test_bytes_repr_is_zarith_encoding_using_to_bits () =
     (* Pad zarith repr *)
     let str = string_of_int (Random.int 2_000_000) in
@@ -109,27 +129,34 @@ module ZRepresentation = struct
     assert (Z.equal z_r (Bls12_381.Fr.to_z r)) ;
     assert (Bls12_381.Fr.(eq (of_z z_r) r))
 
+  let test_padding_is_done_automatically_with_of_bytes () =
+    let z = Z.of_string "32343543534" in
+    let z_bytes = Bytes.of_string (Z.to_bits z) in
+    (* Checking we are in the case requiring a padding *)
+    assert (Bytes.length z_bytes < Bls12_381.Fr.size_in_bytes) ;
+    (* Should not raise an exception *)
+    let e = Bls12_381.Fr.of_bytes_exn z_bytes in
+    (* Should not be an option *)
+    assert (Option.is_some (Bls12_381.Fr.of_bytes_opt z_bytes)) ;
+    (* Equality in Fr should be fine (require to check to verify the
+       internal representation is the same). In the current implementation, we
+       verify the internal representation is the padded version.
+    *)
+    assert (Bls12_381.Fr.(eq (of_z z) e)) ;
+    (* And as zarith elements, we also have the equality *)
+    assert (Z.equal (Bls12_381.Fr.to_z e) z)
+
   let get_tests () =
     let open Alcotest in
-    ( "Z representation",
-      [ test_case "one" `Quick test_of_z_one;
-        test_case "zero" `Quick test_of_z_zero;
-        test_case
-          "of z and to z with random small numbers"
-          `Quick
-          (repeat 1000 test_random_of_z_and_to_z);
-        test_case
-          "to z and of z with test vectors"
-          `Quick
-          test_vectors_to_z_and_of_z;
-        test_case
+    ( "Bytes representation",
+      [ test_case
           "bytes representation is the same than zarith using Z.to_bits"
           `Quick
           (repeat 1000 test_bytes_repr_is_zarith_encoding_using_to_bits);
         test_case
-          "to z and of z with random small numbers"
+          "Padding is done automatically with of_bytes"
           `Quick
-          (repeat 1000 test_random_to_z_and_of_z) ] )
+          test_padding_is_done_automatically_with_of_bytes ] )
 end
 
 module TestVector = struct
@@ -325,4 +352,5 @@ let () =
       FieldProperties.get_tests ();
       TestVector.get_tests ();
       ZRepresentation.get_tests ();
+      BytesRepresentation.get_tests ();
       StringRepresentation.get_tests () ]
