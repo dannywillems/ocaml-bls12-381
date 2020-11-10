@@ -17,6 +17,13 @@ let test_vectors =
     "65363576374567456780984059630856836098740965874094860978";
     "546574608450909809809809824360345639808560937" ]
 
+let rec random_z () =
+  let size = Random.int Bls12_381.Fr.size_in_bytes in
+  if size = 0 then random_z ()
+  else
+    let r = Bytes.init size (fun _ -> char_of_int (Random.int 256)) in
+    Z.erem (Z.of_bits (Bytes.to_string r)) Bls12_381.Fr.order
+
 let rec repeat n f =
   if n <= 0 then
     let f () = () in
@@ -81,7 +88,7 @@ module ZRepresentation = struct
     assert (Bls12_381.Fr.eq x (Bls12_381.Fr.of_z (Bls12_381.Fr.to_z x)))
 
   let test_random_to_z_and_of_z () =
-    let x = Z.of_int (Random.int 2_000_000) in
+    let x = random_z () in
     assert (Z.equal (Bls12_381.Fr.to_z (Bls12_381.Fr.of_z x)) x)
 
   let test_vectors_to_z_and_of_z () =
@@ -112,14 +119,19 @@ end
 module BytesRepresentation = struct
   let test_bytes_repr_is_zarith_encoding_using_to_bits () =
     (* Pad zarith repr *)
-    let str = string_of_int (Random.int 2_000_000) in
-    let z = Bytes.of_string (Z.to_bits (Z.of_string str)) in
+    let r_z = random_z () in
+    let bytes_z = Bytes.of_string (Z.to_bits r_z) in
     let bytes = Bytes.make Bls12_381.Fr.size_in_bytes '\000' in
-    Bytes.blit z 0 bytes 0 (min (Bytes.length z) Bls12_381.Fr.size_in_bytes) ;
+    Bytes.blit
+      bytes_z
+      0
+      bytes
+      0
+      (min (Bytes.length bytes_z) Bls12_381.Fr.size_in_bytes) ;
     assert (
       Bls12_381.Fr.eq
         (Bls12_381.Fr.of_bytes_exn bytes)
-        (Bls12_381.Fr.of_string str) ) ;
+        (Bls12_381.Fr.of_string (Z.to_string r_z)) ) ;
     let r = Bls12_381.Fr.random () in
     (* Use Fr repr *)
     let bytes_r = Bls12_381.Fr.to_bytes r in
