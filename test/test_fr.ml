@@ -122,12 +122,7 @@ module BytesRepresentation = struct
     let r_z = random_z () in
     let bytes_z = Bytes.of_string (Z.to_bits r_z) in
     let bytes = Bytes.make Bls12_381.Fr.size_in_bytes '\000' in
-    Bytes.blit
-      bytes_z
-      0
-      bytes
-      0
-      (min (Bytes.length bytes_z) Bls12_381.Fr.size_in_bytes) ;
+    Bytes.blit bytes_z 0 bytes 0 (Bytes.length bytes_z) ;
     assert (
       Bls12_381.Fr.eq
         (Bls12_381.Fr.of_bytes_exn bytes)
