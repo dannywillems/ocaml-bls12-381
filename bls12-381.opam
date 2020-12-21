@@ -1,6 +1,5 @@
 opam-version: "2.0"
 name: "bls12-381"
-version: "0.3.13"
 authors: [ "Danny Willems <be.danny.willems@gmail.com>" ]
 maintainer: [ "Danny Willems <be.danny.willems@gmail.com>" ]
 synopsis: "OCaml binding for bls12-381 from librustzcash"
@@ -16,6 +15,7 @@ depends: [
   "zarith" {>= "1.10" & < "2.0"}
   "ctypes" {= "0.17.1"}
   "ctypes-foreign" {= "0.4.0"}
+  "tezos-rust-libs" {= "1.0" }
   "alcotest" {with-test}
 ]
 build: [[ "dune" "build" "-j" jobs "-p" name "@install" ]]
