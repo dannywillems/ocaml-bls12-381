@@ -54,3 +54,6 @@ build-ocaml-4.09-rust-1.40.0:
   <<: *build_definition
   image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.40.0
 
+build-ocaml-4.09-rust-1.44.0:
+  <<: *build_definition
+  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.44.0
