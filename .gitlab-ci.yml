@@ -30,30 +30,6 @@ lint:
     - cd ${CI_PROJECT_DIR}
     - dune runtest
  
-build-ocaml-4.07-rust-1.36.0:
-  <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.07-1.36.0
-
-build-ocaml-4.08-rust-1.36.0:
-  <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.08-1.36.0
-
-build-ocaml-4.09-rust-1.36.0:
-  <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.36.0
-
-build-ocaml-4.07-rust-1.40.0:
-  <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.07-1.40.0
-
-build-ocaml-4.08-rust-1.40.0:
-  <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.08-1.40.0
-
-build-ocaml-4.09-rust-1.40.0:
-  <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.40.0
-
 build-ocaml-4.09-rust-1.44.0:
   <<: *build_definition
   image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.44.0
