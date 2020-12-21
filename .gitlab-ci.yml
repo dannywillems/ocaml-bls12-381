@@ -16,7 +16,7 @@ lint:
   before_script:
     # Always update system package manager + setup OPAM env
     - sudo apt-get update
-    - eval $(opam env)
+    - opam repository set-url default https://opam.ocaml.org
     - opam update
     - opam depext -i -y conf-pkg-config conf-libffi
   script:
