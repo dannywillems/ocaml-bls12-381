@@ -23,8 +23,6 @@ lint:
     # Install external dependencies
     - opam depext -i -y zarith
     - opam install --deps-only --with-test -y .
-    # Install the static library from rustc
-    - ./build_deps.sh
     # Install the package
     - opam install . -y
     # Run test
