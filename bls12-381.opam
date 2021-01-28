@@ -9,8 +9,8 @@ bug-reports: "https://gitlab.com/dannywillems/ocaml-bls12-381/issues"
 license: "MIT"
 depends: [
   "conf-rust" {build}
-  "ocaml" { >= "4.07"}
   "dune" {>= "1.7"}
+  "ocaml" {>= "4.08"}
   "dune-configurator" {build}
   "ff" {>= "0.4.0" & < "0.5.0"}
   "zarith" {>= "1.10" & < "2.0"}
