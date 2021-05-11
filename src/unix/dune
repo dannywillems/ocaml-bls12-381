@@ -8,7 +8,7 @@
  (instrumentation (backend bisect_ppx))
  (private_modules Rustc_bls12_381_stubs Rustc_bls12_381_bindings)
  (libraries zarith ctypes ctypes.foreign bls12-381-gen bls12-381)
- (library_flags :standard -linkall -ccopt -pthread)
+ (library_flags :standard -linkall -ccopt -lpthread)
  (foreign_stubs
   (language c)
   (names rustc_bls12_381_ctypes_c_stubs)
