@@ -93,70 +93,8 @@ module Uncompressed_Stubs = struct
     if res = false then None else Some buffer
 end
 
-module Compressed_Stubs = struct
-  let size_in_bytes = 48
-
-  let empty () = Bytes.make size_in_bytes '\000'
-
-  let check_bytes bs =
-    G1_stubs.compressed_check_bytes (Ctypes.ocaml_bytes_start bs)
-
-  let is_zero bs = G1_stubs.compressed_is_zero (Ctypes.ocaml_bytes_start bs)
-
-  let zero () =
-    let bs = empty () in
-    G1_stubs.compressed_zero (Ctypes.ocaml_bytes_start bs) ;
-    bs
-
-  let one () =
-    let bs = empty () in
-    G1_stubs.compressed_one (Ctypes.ocaml_bytes_start bs) ;
-    bs
-
-  let random () =
-    let bs = empty () in
-    G1_stubs.compressed_random (Ctypes.ocaml_bytes_start bs) ;
-    bs
-
-  let add x y =
-    let buffer = empty () in
-    G1_stubs.compressed_add
-      (Ctypes.ocaml_bytes_start buffer)
-      (Ctypes.ocaml_bytes_start x)
-      (Ctypes.ocaml_bytes_start y) ;
-    buffer
-
-  let mul x y =
-    let buffer = empty () in
-    G1_stubs.compressed_mul
-      (Ctypes.ocaml_bytes_start buffer)
-      (Ctypes.ocaml_bytes_start x)
-      (Ctypes.ocaml_bytes_start y) ;
-    buffer
-
-  let eq x y =
-    G1_stubs.compressed_eq
-      (Ctypes.ocaml_bytes_start x)
-      (Ctypes.ocaml_bytes_start y)
-
-  let negate x =
-    let buffer = empty () in
-    G1_stubs.compressed_negate
-      (Ctypes.ocaml_bytes_start buffer)
-      (Ctypes.ocaml_bytes_start x) ;
-    buffer
-
-  let double x =
-    let buffer = empty () in
-    G1_stubs.compressed_double
-      (Ctypes.ocaml_bytes_start buffer)
-      (Ctypes.ocaml_bytes_start x) ;
-    buffer
-end
-
 module Uncompressed =
   Bls12_381_gen.G1.MakeUncompressed (Fr) (Uncompressed_Stubs)
-module Compressed = Bls12_381_gen.G1.MakeCompressed (Fr) (Compressed_Stubs)
 
 (* let compressed_of_uncompressed g =
  *   let buffer = Compressed.empty () in

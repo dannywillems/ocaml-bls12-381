@@ -25,15 +25,10 @@
 (** Check the routine generators do not raise any exception *)
 
 module G1U = Bls12_381.G1.Uncompressed
-module G1C = Bls12_381.G1.Compressed
 module ValueGeneration = Test_ec_make.MakeValueGeneration (G1U)
 module IsZero = Test_ec_make.MakeIsZero (G1U)
 module Equality = Test_ec_make.MakeEquality (G1U)
 module ECProperties = Test_ec_make.MakeECProperties (G1U)
-module ValueGenerationCompressed = Test_ec_make.MakeValueGeneration (G1C)
-module IsZeroCompressed = Test_ec_make.MakeIsZero (G1C)
-module EqualityCompressed = Test_ec_make.MakeEquality (G1C)
-module ECPropertiesCompressed = Test_ec_make.MakeECProperties (G1C)
 
 module Constructors = struct
   let test_of_z_one () =
@@ -342,10 +337,4 @@ let () =
       Equality.get_tests ();
       ECProperties.get_tests ();
       UncompressedRepresentation.get_tests ();
-      Constructors.get_tests () ] ;
-  run
-    "G1 Compressed"
-    [ IsZeroCompressed.get_tests ();
-      ValueGenerationCompressed.get_tests ();
-      EqualityCompressed.get_tests ();
-      ECPropertiesCompressed.get_tests () ]
+      Constructors.get_tests () ]

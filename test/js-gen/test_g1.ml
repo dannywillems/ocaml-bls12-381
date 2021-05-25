@@ -28,24 +28,13 @@ let () =
   let module Fr = Bls12_381_gen.Fr.MakeFr (StubsFr) in
   let module StubsG1Uncompressed =
     Bls12_381_js_gen.G1.MakeUncompressedStubs (Stubs_node) in
-  let module StubsG1Compressed =
-    Bls12_381_js_gen.G1.MakeCompressedStubs (Stubs_node) in
   let module G1Uncompressed =
     Bls12_381_gen.G1.MakeUncompressed (Fr) (StubsG1Uncompressed)
-  in
-  let module G1Compressed =
-    Bls12_381_gen.G1.MakeCompressed (Fr) (StubsG1Compressed)
   in
   let module ValueGeneration = Test_ec_make.MakeValueGeneration (G1Uncompressed) in
   let module IsZero = Test_ec_make.MakeIsZero (G1Uncompressed) in
   let module Equality = Test_ec_make.MakeEquality (G1Uncompressed) in
   let module ECProperties = Test_ec_make.MakeECProperties (G1Uncompressed) in
-  let module ValueGenerationCompressed =
-    Test_ec_make.MakeValueGeneration (G1Compressed) in
-  let module IsZeroCompressed = Test_ec_make.MakeIsZero (G1Compressed) in
-  let module EqualityCompressed = Test_ec_make.MakeEquality (G1Compressed) in
-  let module ECPropertiesCompressed =
-    Test_ec_make.MakeECProperties (G1Compressed) in
   let module Constructors = struct
     let test_of_z_one () =
       (* https://github.com/zcash/librustzcash/blob/0.1.0/pairing/src/bls12_381/fq.rs#L18 *)
@@ -178,10 +167,4 @@ let () =
       ValueGeneration.get_tests ();
       Equality.get_tests ();
       ECProperties.get_tests ();
-      Constructors.get_tests () ] ;
-  run
-    "G1 Compressed"
-    [ IsZeroCompressed.get_tests ();
-      ValueGenerationCompressed.get_tests ();
-      EqualityCompressed.get_tests ();
-      ECPropertiesCompressed.get_tests () ]
+      Constructors.get_tests () ]

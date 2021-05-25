@@ -28,14 +28,10 @@ module Fr : Bls12_381_gen.Fr.T
 
 module G1 : sig
   module Uncompressed : Bls12_381_gen.G1.UNCOMPRESSED with type Scalar.t = Fr.t
-
-  module Compressed : Bls12_381_gen.G1.COMPRESSED with type Scalar.t = Fr.t
 end
 
 module G2 : sig
   module Uncompressed : Bls12_381_gen.G2.UNCOMPRESSED with type Scalar.t = Fr.t
-
-  module Compressed : Bls12_381_gen.G2.COMPRESSED with type Scalar.t = Fr.t
 end
 
 module Pairing : sig

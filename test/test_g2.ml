@@ -22,15 +22,10 @@
 (*                                                                           *)
 (*****************************************************************************)
 module G2U = Bls12_381.G2.Uncompressed
-module G2C = Bls12_381.G2.Compressed
 module ValueGeneration = Test_ec_make.MakeValueGeneration (G2U)
 module IsZero = Test_ec_make.MakeIsZero (G2U)
 module Equality = Test_ec_make.MakeEquality (G2U)
 module ECProperties = Test_ec_make.MakeECProperties (G2U)
-module ValueGenerationCompressed = Test_ec_make.MakeValueGeneration (G2C)
-module IsZeroCompressed = Test_ec_make.MakeIsZero (G2C)
-module EqualityCompressed = Test_ec_make.MakeEquality (G2C)
-module ECPropertiesCompressed = Test_ec_make.MakeECProperties (G2C)
 
 module Constructors = struct
   let test_of_z_one () =
@@ -101,10 +96,4 @@ let () =
       Equality.get_tests ();
       ECProperties.get_tests ();
       UncompressedRepresentation.get_tests ();
-      Constructors.get_tests () ] ;
-  run
-    "G2 Compressed"
-    [ IsZeroCompressed.get_tests ();
-      ValueGenerationCompressed.get_tests ();
-      EqualityCompressed.get_tests ();
-      ECPropertiesCompressed.get_tests () ]
+      Constructors.get_tests () ]

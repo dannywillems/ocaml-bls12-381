@@ -26,7 +26,3 @@ module Uncompressed =
   Bls12_381_gen.G2.MakeUncompressed
     (Fr)
     (Bls12_381_js_gen.G2.MakeUncompressedStubs (Stubs))
-module Compressed =
-  Bls12_381_gen.G2.MakeCompressed
-    (Fr)
-    (Bls12_381_js_gen.G2.MakeCompressedStubs (Stubs))

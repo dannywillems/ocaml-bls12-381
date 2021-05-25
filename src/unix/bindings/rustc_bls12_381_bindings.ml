@@ -173,65 +173,6 @@ struct
     foreign
       (Printf.sprintf "rustc_bls12_381_%s_mul" S.group_name)
       (ocaml_bytes @-> ocaml_bytes @-> ocaml_bytes @-> returning void)
-
-  let compressed_one =
-    foreign
-      (Printf.sprintf "rustc_bls12_381_%s_compressed_one" S.group_name)
-      (ocaml_bytes @-> returning void)
-
-  let compressed_zero =
-    foreign
-      (Printf.sprintf "rustc_bls12_381_%s_compressed_zero" S.group_name)
-      (ocaml_bytes @-> returning void)
-
-  let compressed_random =
-    foreign
-      (Printf.sprintf "rustc_bls12_381_%s_compressed_random" S.group_name)
-      (ocaml_bytes @-> returning void)
-
-  let compressed_add =
-    foreign
-      (Printf.sprintf "rustc_bls12_381_%s_compressed_add" S.group_name)
-      (ocaml_bytes @-> ocaml_bytes @-> ocaml_bytes @-> returning void)
-
-  let compressed_negate =
-    foreign
-      (Printf.sprintf "rustc_bls12_381_%s_compressed_negate" S.group_name)
-      (ocaml_bytes @-> ocaml_bytes @-> returning void)
-
-  let compressed_eq =
-    foreign
-      (Printf.sprintf "rustc_bls12_381_%s_compressed_eq" S.group_name)
-      (ocaml_bytes @-> ocaml_bytes @-> returning bool)
-
-  let compressed_is_zero =
-    foreign
-      (Printf.sprintf "rustc_bls12_381_%s_compressed_is_zero" S.group_name)
-      (ocaml_bytes @-> returning bool)
-
-  let compressed_double =
-    foreign
-      (Printf.sprintf "rustc_bls12_381_%s_compressed_double" S.group_name)
-      (ocaml_bytes @-> ocaml_bytes @-> returning void)
-
-  let compressed_mul =
-    foreign
-      (Printf.sprintf "rustc_bls12_381_%s_compressed_mul" S.group_name)
-      (ocaml_bytes @-> ocaml_bytes @-> ocaml_bytes @-> returning void)
-
-  let compressed_of_uncompressed =
-    foreign
-      (Printf.sprintf
-         "rustc_bls12_381_%s_compressed_of_uncompressed"
-         S.group_name)
-      (ocaml_bytes @-> ocaml_bytes @-> returning void)
-
-  let uncompressed_of_compressed =
-    foreign
-      (Printf.sprintf
-         "rustc_bls12_381_%s_uncompressed_of_compressed"
-         S.group_name)
-      (ocaml_bytes @-> ocaml_bytes @-> returning void)
 end
 
 module G1 (F : Cstubs.FOREIGN) = struct
