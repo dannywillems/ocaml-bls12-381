@@ -21,11 +21,12 @@
 (* DEALINGS IN THE SOFTWARE.                                                 *)
 (*                                                                           *)
 (*****************************************************************************)
-module G2U = Bls12_381.G2.Uncompressed
-module ValueGeneration = Test_ec_make.MakeValueGeneration (G2U)
-module IsZero = Test_ec_make.MakeIsZero (G2U)
-module Equality = Test_ec_make.MakeEquality (G2U)
-module ECProperties = Test_ec_make.MakeECProperties (G2U)
+
+module G2 = Bls12_381.G2
+module ValueGeneration = Test_ec_make.MakeValueGeneration (G2)
+module IsZero = Test_ec_make.MakeIsZero (G2)
+module Equality = Test_ec_make.MakeEquality (G2)
+module ECProperties = Test_ec_make.MakeECProperties (G2)
 
 module Constructors = struct
   let test_of_z_one () =
@@ -44,15 +45,15 @@ module Constructors = struct
           "927553665492332455747201965776037880757740193453592970025027978793976877002675564980949289727957565575433344219582"
       )
     in
-    let g = G2U.of_z_opt ~x ~y in
-    match g with Some g -> assert (G2U.eq G2U.one g) | None -> assert false
+    let g = G2.of_z_opt ~x ~y in
+    match g with Some g -> assert (G2.eq G2.one g) | None -> assert false
 
   let test_vectors_random_points_not_on_curve () =
     let x = (Z.of_string "90809235435", Z.of_string "09809345809345809") in
     let y =
       (Z.of_string "8090843059809345", Z.of_string "908098039459089345")
     in
-    match G2U.of_z_opt ~x ~y with Some _ -> assert false | None -> assert true
+    match G2.of_z_opt ~x ~y with Some _ -> assert false | None -> assert true
 
   let get_tests () =
     let open Alcotest in
@@ -66,10 +67,10 @@ end
 
 module UncompressedRepresentation = struct
   let test_uncompressed_zero_has_first_byte_at_64 () =
-    assert (int_of_char (Bytes.get G2U.(to_bytes zero) 0) = 64)
+    assert (int_of_char (Bytes.get G2.(to_bytes zero) 0) = 64)
 
   let test_uncompressed_random_has_first_byte_strictly_lower_than_64 () =
-    assert (int_of_char (Bytes.get G2U.(to_bytes (random ())) 0) < 64)
+    assert (int_of_char (Bytes.get G2.(to_bytes (random ())) 0) < 64)
 
   let get_tests () =
     let open Alcotest in

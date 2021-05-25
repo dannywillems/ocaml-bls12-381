@@ -22,7 +22,4 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-module Uncompressed =
-  Bls12_381_gen.G1.MakeUncompressed
-    (Fr)
-    (Bls12_381_js_gen.G1.MakeUncompressedStubs (Stubs))
+include Bls12_381_gen.G1.Make (Fr) (Bls12_381_js_gen.G1.MakeStubs (Stubs))

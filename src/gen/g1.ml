@@ -22,13 +22,13 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-module type RAW_UNCOMPRESSED = sig
+module type RAW = sig
   include Elliptic_curve_sig.RAW_BASE
 
   val build_from_components : Bytes.t -> Bytes.t -> Bytes.t option
 end
 
-module type UNCOMPRESSED = sig
+module type T = sig
   include Elliptic_curve_sig.T
 
   (** Create a point from the coordinates. If the point is not on the curve,
@@ -37,8 +37,8 @@ module type UNCOMPRESSED = sig
   val of_z_opt : x:Z.t -> y:Z.t -> t option
 end
 
-module MakeUncompressed (Scalar : Fr.T) (Stubs : RAW_UNCOMPRESSED) :
-  UNCOMPRESSED with module Scalar = Scalar = struct
+module Make (Scalar : Fr.T) (Stubs : RAW) : T with module Scalar = Scalar =
+struct
   exception Not_on_curve of Bytes.t
 
   type t = Bytes.t

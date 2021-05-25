@@ -26,24 +26,20 @@ module Fq12 : Bls12_381_gen.Fq12.T
 
 module Fr : Bls12_381_gen.Fr.T
 
-module G1 : sig
-  module Uncompressed : Bls12_381_gen.G1.UNCOMPRESSED with type Scalar.t = Fr.t
-end
+module G1 : Bls12_381_gen.G1.T with type Scalar.t = Fr.t
 
-module G2 : sig
-  module Uncompressed : Bls12_381_gen.G2.UNCOMPRESSED with type Scalar.t = Fr.t
-end
+module G2 : Bls12_381_gen.G2.T with type Scalar.t = Fr.t
 
 module Pairing : sig
   exception FailToComputeFinalExponentiation of Fq12.t
 
-  val miller_loop : (G1.Uncompressed.t * G2.Uncompressed.t) list -> Fq12.t
+  val miller_loop : (G1.t * G2.t) list -> Fq12.t
 
   (** Compute the miller loop on a single tuple of point *)
-  val miller_loop_simple : G1.Uncompressed.t -> G2.Uncompressed.t -> Fq12.t
+  val miller_loop_simple : G1.t -> G2.t -> Fq12.t
 
   (** Compute a pairing result of a list of points *)
-  val pairing : G1.Uncompressed.t -> G2.Uncompressed.t -> Fq12.t
+  val pairing : G1.t -> G2.t -> Fq12.t
 
   (** Compute the final exponentiation of the given point. Returns a [None] if
         the point is null *)

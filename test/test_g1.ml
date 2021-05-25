@@ -24,11 +24,11 @@
 
 (** Check the routine generators do not raise any exception *)
 
-module G1U = Bls12_381.G1.Uncompressed
-module ValueGeneration = Test_ec_make.MakeValueGeneration (G1U)
-module IsZero = Test_ec_make.MakeIsZero (G1U)
-module Equality = Test_ec_make.MakeEquality (G1U)
-module ECProperties = Test_ec_make.MakeECProperties (G1U)
+module G1 = Bls12_381.G1
+module ValueGeneration = Test_ec_make.MakeValueGeneration (G1)
+module IsZero = Test_ec_make.MakeIsZero (G1)
+module Equality = Test_ec_make.MakeEquality (G1)
+module ECProperties = Test_ec_make.MakeECProperties (G1)
 
 module Constructors = struct
   let test_of_z_one () =
@@ -41,8 +41,8 @@ module Constructors = struct
       Z.of_string
         "1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569"
     in
-    let g = G1U.of_z_opt ~x ~y in
-    match g with Some g -> assert (G1U.eq G1U.one g) | None -> assert false
+    let g = G1.of_z_opt ~x ~y in
+    match g with Some g -> assert (G1.eq G1.one g) | None -> assert false
 
   (* https://github.com/zcash/librustzcash/blob/0.1.0/pairing/src/bls12_381/ec.rs#L1196 *)
   (* https://github.com/zcash/librustzcash/blob/0.1.0/pairing/src/bls12_381/ec.rs#L1245 *)
@@ -55,7 +55,7 @@ module Constructors = struct
       Z.of_string
         "1711275103908443722918766889652776216989264073722543507596490456144926139887096946237734327757134898380852225872709"
     in
-    let g = G1U.of_z_opt ~x ~y in
+    let g = G1.of_z_opt ~x ~y in
     match g with Some _ -> assert true | None -> assert false
 
   let test_vectors_2 () =
@@ -67,7 +67,7 @@ module Constructors = struct
       Z.of_string
         "2291134451313223670499022936083127939567618746216464377735567679979105510603740918204953301371880765657042046687078"
     in
-    let g = G1U.of_z_opt ~x ~y in
+    let g = G1.of_z_opt ~x ~y in
     match g with Some _ -> assert true | None -> assert false
 
   let test_vectors_3 () =
@@ -79,7 +79,7 @@ module Constructors = struct
       Z.of_string
         "2291134451313223670499022936083127939567618746216464377735567679979105510603740918204953301371880765657042046687078"
     in
-    let g = G1U.of_z_opt ~x ~y in
+    let g = G1.of_z_opt ~x ~y in
     match g with Some _ -> assert true | None -> assert false
 
   let test_vectors_add () =
@@ -91,12 +91,12 @@ module Constructors = struct
       Z.of_string
         "2291134451313223670499022936083127939567618746216464377735567679979105510603740918204953301371880765657042046687078"
     in
-    let p1 = G1U.of_z_opt ~x:x_1 ~y in
+    let p1 = G1.of_z_opt ~x:x_1 ~y in
     let x_2 =
       Z.of_string
         "3821408151224848222394078037104966877485040835569514006839342061575586899845797797516352881516922679872117658572470"
     in
-    let p2 = G1U.of_z_opt ~x:x_2 ~y in
+    let p2 = G1.of_z_opt ~x:x_2 ~y in
     let x_res =
       Z.of_string
         "52901198670373960614757979459866672334163627229195745167587898707663026648445040826329033206551534205133090753192"
@@ -105,25 +105,25 @@ module Constructors = struct
       Z.of_string
         "1711275103908443722918766889652776216989264073722543507596490456144926139887096946237734327757134898380852225872709"
     in
-    let res = G1U.of_z_opt ~x:x_res ~y:y_res in
+    let res = G1.of_z_opt ~x:x_res ~y:y_res in
     match (res, p1, p2) with
-    | (Some res, Some p1, Some p2) -> assert (G1U.eq res (G1U.add p1 p2))
+    | (Some res, Some p1, Some p2) -> assert (G1.eq res (G1.add p1 p2))
     | _ -> assert false
 
   let test_vectors_zero_and_2_not_on_curve () =
     let x = Z.of_string "0" in
     let y = Z.of_string "2" in
-    match G1U.of_z_opt ~x ~y with Some _ -> assert false | None -> assert true
+    match G1.of_z_opt ~x ~y with Some _ -> assert false | None -> assert true
 
   let test_vectors_zero_and_minus_2_not_on_curve () =
     let x = Z.of_string "0" in
     let y = Z.neg @@ Z.of_string "2" in
-    match G1U.of_z_opt ~x ~y with Some _ -> assert false | None -> assert true
+    match G1.of_z_opt ~x ~y with Some _ -> assert false | None -> assert true
 
   let test_vectors_random_points_not_on_curve () =
     let x = Z.of_string "90809235435" in
     let y = Z.neg @@ Z.of_string "8090843059809345" in
-    match G1U.of_z_opt ~x ~y with Some _ -> assert false | None -> assert true
+    match G1.of_z_opt ~x ~y with Some _ -> assert false | None -> assert true
 
   let test_vectors_generator_from_bytes () =
     let x_cs =
@@ -234,7 +234,7 @@ module Constructors = struct
     let _y = Bytes.init 48 (fun i -> y_cs.(i)) in
     let x = Z.of_bits (Bytes.to_string _x) in
     let y = Z.of_string (Bytes.to_string _y) in
-    let g = G1U.of_z_opt ~x ~y in
+    let g = G1.of_z_opt ~x ~y in
     match g with Some _ -> assert true | None -> assert false
 
   let get_tests () =
@@ -262,40 +262,40 @@ end
 
 module UncompressedRepresentation = struct
   let test_uncompressed_zero_has_first_byte_at_64 () =
-    assert (int_of_char (Bytes.get G1U.(to_bytes zero) 0) = 64)
+    assert (int_of_char (Bytes.get G1.(to_bytes zero) 0) = 64)
 
   let test_uncompressed_random_has_first_byte_strictly_lower_than_64 () =
-    assert (int_of_char (Bytes.get G1U.(to_bytes (random ())) 0) < 64)
+    assert (int_of_char (Bytes.get G1.(to_bytes (random ())) 0) < 64)
 
   let test_of_bytes_exn_to_bytes_consistent_on_random () =
-    let r = G1U.random () in
-    assert (G1U.(eq (of_bytes_exn (to_bytes r)) r))
+    let r = G1.random () in
+    assert (G1.(eq (of_bytes_exn (to_bytes r)) r))
 
   let test_bytes () =
     let test_vectors =
-      [ ( G1U.one,
+      [ ( G1.one,
           Bytes.of_string
             "\023\241\211\1671\151\215\148&\149c\140O\169\172\015\195h\140O\151t\185\005\161N:?\023\027\172XlU\232?\249z\026\239\251:\240\n\
              \219\"\198\187\b\179\244\129\227\170\160\241\160\1580\237t\029\138\228\252\245\224\149\213\208\n\
              \246\000\219\024\203,\004\179\237\208<\199D\162\136\138\228\012\170#)F\197\231\225"
         );
-        ( G1U.zero,
+        ( G1.zero,
           Bytes.of_string
             "@\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000\000"
         ) ]
     in
     List.iter
       (fun (v, expected_value) ->
-        assert (G1U.(eq v (G1U.of_bytes_exn expected_value))))
+        assert (G1.(eq v (G1.of_bytes_exn expected_value))))
       test_vectors
 
   let test_of_bytes_exn_to_bytes_consistent_on_one () =
-    let r = G1U.one in
-    assert (G1U.(eq (of_bytes_exn (to_bytes r)) r))
+    let r = G1.one in
+    assert (G1.(eq (of_bytes_exn (to_bytes r)) r))
 
   let test_of_bytes_exn_to_bytes_consistent_on_zero () =
-    let r = G1U.zero in
-    assert (G1U.(eq (of_bytes_exn (to_bytes r)) r))
+    let r = G1.zero in
+    assert (G1.(eq (of_bytes_exn (to_bytes r)) r))
 
   let get_tests () =
     let open Alcotest in

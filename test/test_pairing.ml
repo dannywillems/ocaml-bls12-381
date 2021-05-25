@@ -34,133 +34,114 @@ let rec repeat n f =
 
 module Properties = struct
   let with_zero_as_first_component () =
-    assert (
-      Fq12.eq
-        (Pairing.pairing G1.Uncompressed.zero (G2.Uncompressed.random ()))
-        Fq12.one )
+    assert (Fq12.eq (Pairing.pairing G1.zero (G2.random ())) Fq12.one)
 
   let with_zero_as_second_component () =
-    assert (
-      Fq12.eq
-        (Pairing.pairing (G1.Uncompressed.random ()) G2.Uncompressed.zero)
-        Fq12.one )
+    assert (Fq12.eq (Pairing.pairing (G1.random ()) G2.zero) Fq12.one)
 
   let linearity_commutativity_scalar () =
     (* pairing(a * g_{1}, b * g_{2}) = pairing(b * g_{1}, a * g_{2})*)
     let a = Fr.random () in
     let b = Fr.random () in
-    let g1 = G1.Uncompressed.random () in
-    let g2 = G2.Uncompressed.random () in
+    let g1 = G1.random () in
+    let g2 = G2.random () in
     assert (
       Fq12.eq
-        (Pairing.pairing (G1.Uncompressed.mul g1 a) (G2.Uncompressed.mul g2 b))
-        (Pairing.pairing (G1.Uncompressed.mul g1 b) (G2.Uncompressed.mul g2 a))
-    ) ;
-    assert (
-      Fq12.eq
-        (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple
-              (G1.Uncompressed.mul g1 a)
-              (G2.Uncompressed.mul g2 b)))
-        (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple
-              (G1.Uncompressed.mul g1 b)
-              (G2.Uncompressed.mul g2 a))) ) ;
+        (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
+        (Pairing.pairing (G1.mul g1 b) (G2.mul g2 a)) ) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop
-              [(G1.Uncompressed.mul g1 a, G2.Uncompressed.mul g2 b)]))
+           (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop
-              [(G1.Uncompressed.mul g1 b, G2.Uncompressed.mul g2 a)])) )
+           (Pairing.miller_loop_simple (G1.mul g1 b) (G2.mul g2 a))) ) ;
+    assert (
+      Fq12.eq
+        (Pairing.final_exponentiation_exn
+           (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)]))
+        (Pairing.final_exponentiation_exn
+           (Pairing.miller_loop [(G1.mul g1 b, G2.mul g2 a)])) )
 
   let linearity_commutativity_scalar_with_only_one_scalar () =
     (* pairing(a * g_{1}, g_{2}) = pairing(a * g_{1}, g_{2})*)
     let a = Fr.random () in
-    let g1 = G1.Uncompressed.random () in
-    let g2 = G2.Uncompressed.random () in
+    let g1 = G1.random () in
+    let g2 = G2.random () in
     assert (
       Fq12.eq
-        (Pairing.pairing g1 (G2.Uncompressed.mul g2 a))
-        (Pairing.pairing (G1.Uncompressed.mul g1 a) g2) ) ;
-    assert (
-      Fq12.eq
-        (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple g1 (G2.Uncompressed.mul g2 a)))
-        (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple (G1.Uncompressed.mul g1 a) g2)) ) ;
+        (Pairing.pairing g1 (G2.mul g2 a))
+        (Pairing.pairing (G1.mul g1 a) g2) ) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop [(g1, G2.Uncompressed.mul g2 a)]))
+           (Pairing.miller_loop_simple g1 (G2.mul g2 a)))
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop [(G1.Uncompressed.mul g1 a, g2)])) )
+           (Pairing.miller_loop_simple (G1.mul g1 a) g2)) ) ;
+    assert (
+      Fq12.eq
+        (Pairing.final_exponentiation_exn
+           (Pairing.miller_loop [(g1, G2.mul g2 a)]))
+        (Pairing.final_exponentiation_exn
+           (Pairing.miller_loop [(G1.mul g1 a, g2)])) )
 
   let linearity_scalar_in_scalar_with_only_one_scalar () =
     (* pairing(a * g_{1}, g_{2}) = pairing(g_{1}, g_{2}) ^ a*)
     let a = Fr.random () in
-    let g1 = G1.Uncompressed.random () in
-    let g2 = G2.Uncompressed.random () in
+    let g1 = G1.random () in
+    let g2 = G2.random () in
     assert (
       Fq12.eq
-        (Pairing.pairing g1 (G2.Uncompressed.mul g2 a))
+        (Pairing.pairing g1 (G2.mul g2 a))
         (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a)) ) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple g1 (G2.Uncompressed.mul g2 a)))
+           (Pairing.miller_loop_simple g1 (G2.mul g2 a)))
         (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a)) ) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop [(g1, G2.Uncompressed.mul g2 a)]))
+           (Pairing.miller_loop [(g1, G2.mul g2 a)]))
         (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a)) )
 
   let full_linearity () =
     let a = Fr.random () in
     let b = Fr.random () in
-    let g1 = G1.Uncompressed.random () in
-    let g2 = G2.Uncompressed.random () in
+    let g1 = G1.random () in
+    let g2 = G2.random () in
     assert (
       Fq12.eq
-        (Pairing.pairing (G1.Uncompressed.mul g1 a) (G2.Uncompressed.mul g2 b))
+        (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
         (Fq12.pow (Pairing.pairing g1 g2) (Z.mul (Fr.to_z a) (Fr.to_z b))) ) ;
     assert (
       Fq12.eq
-        (Pairing.pairing (G1.Uncompressed.mul g1 a) (G2.Uncompressed.mul g2 b))
+        (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
         (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z (Fr.mul a b))) ) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple
-              (G1.Uncompressed.mul g1 a)
-              (G2.Uncompressed.mul g2 b)))
+           (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))
         (Fq12.pow
            (Pairing.final_exponentiation_exn (Pairing.miller_loop_simple g1 g2))
            (Z.mul (Fr.to_z a) (Fr.to_z b))) ) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple
-              (G1.Uncompressed.mul g1 a)
-              (G2.Uncompressed.mul g2 b)))
+           (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))
         (Fq12.pow
            (Pairing.final_exponentiation_exn (Pairing.miller_loop_simple g1 g2))
            (Fr.to_z (Fr.mul a b))) ) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop
-              [(G1.Uncompressed.mul g1 a, G2.Uncompressed.mul g2 b)]))
+           (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)]))
         (Fq12.pow
            (Pairing.final_exponentiation_exn (Pairing.miller_loop [(g1, g2)]))
            (Z.mul (Fr.to_z a) (Fr.to_z b))) ) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop
-              [(G1.Uncompressed.mul g1 a, G2.Uncompressed.mul g2 b)]))
+           (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)]))
         (Fq12.pow
            (Pairing.final_exponentiation_exn (Pairing.miller_loop [(g1, g2)]))
            (Fr.to_z (Fr.mul a b))) )
@@ -168,21 +149,18 @@ module Properties = struct
   let result_pairing_with_miller_loop_followed_by_final_exponentiation () =
     let a = Fr.random () in
     let b = Fr.random () in
-    let g1 = G1.Uncompressed.random () in
-    let g2 = G2.Uncompressed.random () in
+    let g1 = G1.random () in
+    let g2 = G2.random () in
     assert (
       Fq12.eq
-        (Pairing.pairing (G1.Uncompressed.mul g1 a) (G2.Uncompressed.mul g2 b))
+        (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple
-              (G1.Uncompressed.mul g1 a)
-              (G2.Uncompressed.mul g2 b))) ) ;
+           (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b))) ) ;
     assert (
       Fq12.eq
-        (Pairing.pairing (G1.Uncompressed.mul g1 a) (G2.Uncompressed.mul g2 b))
+        (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop
-              [(G1.Uncompressed.mul g1 a, G2.Uncompressed.mul g2 b)])) )
+           (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)])) )
 end
 
 let result_pairing_one_one =
@@ -201,26 +179,22 @@ let result_pairing_one_one =
     "2348330098288556420918672502923664952620152483128593484301759394583320358354186482723629999370241674973832318248497"
 
 let test_vectors_one_one () =
-  assert (
-    Fq12.eq
-      (Pairing.pairing G1.Uncompressed.one G2.Uncompressed.one)
-      result_pairing_one_one ) ;
+  assert (Fq12.eq (Pairing.pairing G1.one G2.one) result_pairing_one_one) ;
   assert (
     Fq12.eq
       (Pairing.final_exponentiation_exn
-         (Pairing.miller_loop_simple G1.Uncompressed.one G2.Uncompressed.one))
+         (Pairing.miller_loop_simple G1.one G2.one))
       result_pairing_one_one ) ;
   (* We check the final exponentiation is not done already *)
   assert (
     not
       (Fq12.eq
-         (Pairing.miller_loop_simple G1.Uncompressed.one G2.Uncompressed.one)
+         (Pairing.miller_loop_simple G1.one G2.one)
          result_pairing_one_one) ) ;
   assert (
     not
-      (Fq12.eq
-         (Pairing.miller_loop [(G1.Uncompressed.one, G2.Uncompressed.one)])
-         result_pairing_one_one) )
+      (Fq12.eq (Pairing.miller_loop [(G1.one, G2.one)]) result_pairing_one_one)
+  )
 
 let test_vectors_one_one_two_miller_loop () =
   (* Compute P(1, 1) * P(1, 1) using miller loop and check it is equal to the
@@ -232,9 +206,7 @@ let test_vectors_one_one_two_miller_loop () =
   assert (
     Fq12.eq
       (Pairing.final_exponentiation_exn
-         (Pairing.miller_loop
-            [ (G1.Uncompressed.one, G2.Uncompressed.one);
-              (G1.Uncompressed.one, G2.Uncompressed.one) ]))
+         (Pairing.miller_loop [(G1.one, G2.one); (G1.one, G2.one)]))
       expected_result )
 
 let test_vectors_one_one_random_times_miller_loop () =
@@ -248,9 +220,7 @@ let test_vectors_one_one_random_times_miller_loop () =
       Fq12.one
       (List.init n (fun _i -> result_pairing_one_one))
   in
-  let point_list =
-    List.init n (fun _i -> (G1.Uncompressed.one, G2.Uncompressed.one))
-  in
+  let point_list = List.init n (fun _i -> (G1.one, G2.one)) in
   assert (
     Fq12.eq
       (Pairing.final_exponentiation_exn (Pairing.miller_loop point_list))
@@ -269,8 +239,7 @@ let rec test_miller_loop_pairing_random_number_of_points () =
   else
     (* Generate random points *)
     let points =
-      List.init number_of_points (fun _i ->
-          (G1.Uncompressed.random (), G2.Uncompressed.random ()))
+      List.init number_of_points (fun _i -> (G1.random (), G2.random ()))
     in
     (* Generate random scalars *)
     let scalars =
@@ -279,8 +248,7 @@ let rec test_miller_loop_pairing_random_number_of_points () =
     (* Compute a * g1 and b * g2 for the pairing *)
     let points =
       List.map
-        (fun ((g1, g2), (a, b)) ->
-          (G1.Uncompressed.mul g1 a, G2.Uncompressed.mul g2 b))
+        (fun ((g1, g2), (a, b)) -> (G1.mul g1 a, G2.mul g2 b))
         (List.combine points scalars)
     in
     (* Compute the result using miller loop followed by the final exponentiation *)

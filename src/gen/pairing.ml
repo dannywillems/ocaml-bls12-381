@@ -74,11 +74,7 @@ module type RAW_STUBS = sig
     Bytes.t
 end
 
-module Make
-    (G1 : G1.UNCOMPRESSED)
-    (G2 : G2.UNCOMPRESSED)
-    (GT : Fq12.T)
-    (Stubs : RAW_STUBS) : sig
+module Make (G1 : G1.T) (G2 : G2.T) (GT : Fq12.T) (Stubs : RAW_STUBS) : sig
   exception FailToComputeFinalExponentiation of GT.t
 
   val miller_loop : (G1.t * G2.t) list -> GT.t

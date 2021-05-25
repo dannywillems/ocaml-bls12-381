@@ -24,7 +24,7 @@
 
 module G1_stubs = Rustc_bls12_381_bindings.G1 (Rustc_bls12_381_stubs)
 
-module Uncompressed_Stubs = struct
+module Stubs = struct
   let size_in_bytes = 96
 
   let empty () = Bytes.make size_in_bytes '\000'
@@ -93,9 +93,6 @@ module Uncompressed_Stubs = struct
     if res = false then None else Some buffer
 end
 
-module Uncompressed =
-  Bls12_381_gen.G1.MakeUncompressed (Fr) (Uncompressed_Stubs)
-
 (* let compressed_of_uncompressed g =
  *   let buffer = Compressed.empty () in
  *   G1_stubs.compressed_of_uncompressed
@@ -109,3 +106,4 @@ module Uncompressed =
  *     (Ctypes.ocaml_bytes_start (Uncompressed.to_bytes buffer))
  *     (Ctypes.ocaml_bytes_start (Compressed.to_bytes g)) ;
  *   Uncompressed.of_bytes_exn (Uncompressed.to_bytes buffer) *)
+include Bls12_381_gen.G1.Make (Fr) (Stubs)

@@ -22,7 +22,7 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-module G1U = Bls12_381.G1.Uncompressed
+module G1 = Bls12_381.G1
 
 module FFT = struct
   let rec power2 x = if x = 0 then 1 else 2 * power2 (x - 1)
@@ -45,9 +45,9 @@ module FFT = struct
     let ic = open_in_bin f in
     let group_elements =
       List.init n (fun _i ->
-          let bytes_buf = Bytes.create G1U.size_in_bytes in
-          Stdlib.really_input ic bytes_buf 0 G1U.size_in_bytes ;
-          G1U.of_bytes_exn bytes_buf)
+          let bytes_buf = Bytes.create G1.size_in_bytes in
+          Stdlib.really_input ic bytes_buf 0 G1.size_in_bytes ;
+          G1.of_bytes_exn bytes_buf)
     in
     close_in ic ;
     group_elements
@@ -57,7 +57,7 @@ module FFT = struct
     let m = power2 power in
     let omega_domain = generate_domain 2 m false in
     let g1_elements = parse_group_elements_from_file m "test_vector_g1_2" in
-    let result = G1U.fft ~domain:omega_domain ~points:g1_elements in
+    let result = G1.fft ~domain:omega_domain ~points:g1_elements in
     let expected_result =
       parse_group_elements_from_file m "fft_test_vector_g1_2"
     in
@@ -68,7 +68,7 @@ module FFT = struct
     let m = power2 power in
     let omega_domain = generate_domain power m true in
     let g1_elements = parse_group_elements_from_file m "test_vector_g1_2" in
-    let result = G1U.ifft ~domain:omega_domain ~points:g1_elements in
+    let result = G1.ifft ~domain:omega_domain ~points:g1_elements in
     let expected_result =
       parse_group_elements_from_file m "ifft_test_vector_g1_2"
     in

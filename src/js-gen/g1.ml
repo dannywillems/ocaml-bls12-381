@@ -22,11 +22,11 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-module MakeUncompressedStubs (M : sig
+module MakeStubs (M : sig
   val rust_module : unit -> Jsoo_lib.ESModule.t
 
   val get_wasm_memory_buffer : unit -> Jsoo_lib.Memory.Buffer.t
-end) : Bls12_381_gen.G1.RAW_UNCOMPRESSED = struct
+end) : Bls12_381_gen.G1.RAW = struct
   open Js_of_ocaml
   open Js_of_ocaml.Js.Unsafe
 

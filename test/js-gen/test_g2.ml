@@ -26,15 +26,12 @@ let () =
   (* let on_resolved m = *)
   let module StubsFr = Bls12_381_js_gen.Fr.MakeStubs (Stubs_node) in
   let module Fr = Bls12_381_gen.Fr.MakeFr (StubsFr) in
-  let module StubsG2Uncompressed =
-    Bls12_381_js_gen.G2.MakeUncompressedStubs (Stubs_node) in
-  let module G2Uncompressed =
-    Bls12_381_gen.G2.MakeUncompressed (Fr) (StubsG2Uncompressed)
-  in
-  let module ValueGeneration = Test_ec_make.MakeValueGeneration (G2Uncompressed) in
-  let module IsZero = Test_ec_make.MakeIsZero (G2Uncompressed) in
-  let module Equality = Test_ec_make.MakeEquality (G2Uncompressed) in
-  let module ECProperties = Test_ec_make.MakeECProperties (G2Uncompressed) in
+  let module StubsG2 = Bls12_381_js_gen.G2.MakeStubs (Stubs_node) in
+  let module G2 = Bls12_381_gen.G2.Make (Fr) (StubsG2) in
+  let module ValueGeneration = Test_ec_make.MakeValueGeneration (G2) in
+  let module IsZero = Test_ec_make.MakeIsZero (G2) in
+  let module Equality = Test_ec_make.MakeEquality (G2) in
+  let module ECProperties = Test_ec_make.MakeECProperties (G2) in
   let module Constructors = struct
     let test_of_z_one () =
       (* https://github.com/zcash/librustzcash/blob/0.1.0/pairing/src/bls12_381/fq.rs#L18 *)
@@ -52,17 +49,15 @@ let () =
             "927553665492332455747201965776037880757740193453592970025027978793976877002675564980949289727957565575433344219582"
         )
       in
-      let g = G2Uncompressed.of_z_opt ~x ~y in
-      match g with
-      | Some g -> assert (G2Uncompressed.eq G2Uncompressed.one g)
-      | None -> assert false
+      let g = G2.of_z_opt ~x ~y in
+      match g with Some g -> assert (G2.eq G2.one g) | None -> assert false
 
     let test_vectors_random_points_not_on_curve () =
       let x = (Z.of_string "90809235435", Z.of_string "09809345809345809") in
       let y =
         (Z.of_string "8090843059809345", Z.of_string "908098039459089345")
       in
-      match G2Uncompressed.of_z_opt ~x ~y with
+      match G2.of_z_opt ~x ~y with
       | Some _ -> assert false
       | None -> assert true
 
