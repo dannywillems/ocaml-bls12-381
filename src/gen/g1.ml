@@ -57,7 +57,23 @@ struct
   let of_bytes_exn (g : Bytes.t) : t =
     if check_bytes g then Bytes.copy g else raise (Not_on_curve g)
 
+  let of_compressed_bytes_opt b =
+    if Stubs.check_compressed_bytes b then
+      let b = Stubs.uncompressed_of_compressed_unsafe b in
+      Some b
+    else None
+
+  let of_compressed_bytes_exn b =
+    if Stubs.check_compressed_bytes b then
+      let b = Stubs.uncompressed_of_compressed_unsafe b in
+      b
+    else raise (Not_on_curve b)
+
   let to_bytes g = g
+
+  let to_compressed_bytes b =
+    let res = Stubs.compressed_of_uncompressed b in
+    res
 
   let zero =
     let res = Stubs.zero () in

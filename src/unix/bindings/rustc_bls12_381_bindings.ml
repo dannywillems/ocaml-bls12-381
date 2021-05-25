@@ -124,6 +124,20 @@ struct
          S.group_name)
       (ocaml_bytes @-> returning bool)
 
+  let compressed_of_uncompressed =
+    foreign
+      (Printf.sprintf
+         "rustc_bls12_381_%s_compressed_of_uncompressed"
+         S.group_name)
+      (ocaml_bytes @-> ocaml_bytes @-> returning void)
+
+  let uncompressed_of_compressed_unsafe =
+    foreign
+      (Printf.sprintf
+         "rustc_bls12_381_%s_uncompressed_of_compressed"
+         S.group_name)
+      (ocaml_bytes @-> ocaml_bytes @-> returning void)
+
   let compressed_check_bytes =
     foreign
       (Printf.sprintf "rustc_bls12_381_%s_compressed_check_bytes" S.group_name)

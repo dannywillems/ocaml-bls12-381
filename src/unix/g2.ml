@@ -32,6 +32,23 @@ module Stubs = struct
   let check_bytes bs =
     G2_stubs.uncompressed_check_bytes (Ctypes.ocaml_bytes_start bs)
 
+  let check_compressed_bytes bs =
+    G2_stubs.compressed_check_bytes (Ctypes.ocaml_bytes_start bs)
+
+  let compressed_of_uncompressed bs =
+    let res = Bytes.make (size_in_bytes / 2) '\000' in
+    G2_stubs.compressed_of_uncompressed
+      (Ctypes.ocaml_bytes_start res)
+      (Ctypes.ocaml_bytes_start bs) ;
+    res
+
+  let uncompressed_of_compressed_unsafe bs =
+    let res = empty () in
+    G2_stubs.uncompressed_of_compressed_unsafe
+      (Ctypes.ocaml_bytes_start res)
+      (Ctypes.ocaml_bytes_start bs) ;
+    res
+
   let is_zero bs = G2_stubs.is_zero (Ctypes.ocaml_bytes_start bs)
 
   let zero () =

@@ -44,6 +44,62 @@ end) : Bls12_381_gen.G2.RAW = struct
          (get (M.rust_module ()) "rustc_bls12_381_g2_uncompressed_check_bytes")
          [| inject 0 |]
 
+  let check_compressed_bytes bs =
+    Jsoo_lib.Memory.copy_in_buffer
+      (M.get_wasm_memory_buffer ())
+      bs
+      0
+      0
+      (* compressed version -> divided by 2 *)
+      (size_in_bytes / 2) ;
+    Js.to_bool
+    @@ fun_call
+         (get (M.rust_module ()) "rustc_bls12_381_g2_compressed_check_bytes")
+         [| inject 0 |]
+
+  let compressed_of_uncompressed bs =
+    Jsoo_lib.Memory.copy_in_buffer
+      (M.get_wasm_memory_buffer ())
+      bs
+      0
+      (* compressed version -> divided by 2 *)
+      (size_in_bytes / 2)
+      size_in_bytes ;
+    ignore
+    @@ fun_call
+         (get
+            (M.rust_module ())
+            "rustc_bls12_381_g2_compressed_of_uncompressed")
+         (* compressed version -> divided by 2 *)
+         [| inject 0; inject (size_in_bytes / 2) |] ;
+    let res =
+      Jsoo_lib.Memory.Buffer.slice
+        (M.get_wasm_memory_buffer ())
+        0
+        (* compressed version -> divided by 2 *)
+        (size_in_bytes / 2)
+    in
+    Jsoo_lib.Memory.Buffer.to_bytes res
+
+  let uncompressed_of_compressed_unsafe bs =
+    Jsoo_lib.Memory.copy_in_buffer
+      (M.get_wasm_memory_buffer ())
+      bs
+      0
+      size_in_bytes
+      (* compressed version -> divided by 2 *)
+      (size_in_bytes / 2) ;
+    ignore
+    @@ fun_call
+         (get
+            (M.rust_module ())
+            "rustc_bls12_381_g2_uncompressed_of_compressed")
+         [| inject 0; inject size_in_bytes |] ;
+    let res =
+      Jsoo_lib.Memory.Buffer.slice (M.get_wasm_memory_buffer ()) 0 size_in_bytes
+    in
+    Jsoo_lib.Memory.Buffer.to_bytes res
+
   let is_zero bs =
     Jsoo_lib.Memory.copy_in_buffer
       (M.get_wasm_memory_buffer ())

@@ -48,8 +48,22 @@ module type T = sig
   *)
   val of_bytes_exn : Bytes.t -> t
 
+  (** Allocates a new point from a byte array representing a point in
+      compressed form.
+  *)
+  val of_compressed_bytes_opt : Bytes.t -> t option
+
+  (** Allocates a new point from a byte array representing a point in
+      compressed form.
+      Raise [Not_on_curve] if the point is not on the curve.
+  *)
+  val of_compressed_bytes_exn : Bytes.t -> t
+
   (** Return a representation in bytes *)
   val to_bytes : t -> Bytes.t
+
+  (** Return a compressed bytes representation *)
+  val to_compressed_bytes : t -> Bytes.t
 
   (** Zero of the elliptic curve *)
   val zero : t
@@ -106,6 +120,26 @@ module type RAW_BASE = sig
   val size_in_bytes : int
 
   val check_bytes : Bytes.t -> bool
+
+  (** [check_compressed_bytes bs] checks if the given bytes [bs] represents a
+      point on the curve
+  *)
+  val check_compressed_bytes : Bytes.t -> bool
+
+  (** [compressed_of_uncompressed bs] allocates (size_in_bytes / 2) bytes to
+      copy the compressed version of the point represented by the [size_in_bytes]
+      bytes (i.e. the « uncompressed » version).
+  *)
+  val compressed_of_uncompressed : Bytes.t -> Bytes.t
+
+  (** [uncompressed_of_compressed bs] allocates [size_in_bytes] bytes to
+      copy the uncompressed version of the point represented by the
+      [(size_in_bytes / 2)]
+      bytes (i.e. the « compressed » version). The method is signed as « unsafe
+      » because it does not verify the point is on the curve. Therefore,
+      [check_compressed_bytes] must be used to get a safe version.
+  *)
+  val uncompressed_of_compressed_unsafe : Bytes.t -> Bytes.t
 
   val is_zero : Bytes.t -> bool
 
