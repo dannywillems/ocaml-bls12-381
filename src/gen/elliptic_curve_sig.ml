@@ -40,21 +40,21 @@ module type T = sig
   (** Check if a point, represented as a byte array, is on the curve **)
   val check_bytes : Bytes.t -> bool
 
-  (** Attempt to construct a point from a byte array *)
+  (** Attempt to construct a point from a byte array of length [size_in_bytes]. *)
   val of_bytes_opt : Bytes.t -> t option
 
-  (** Attempt to construct a point from a byte array.
+  (** Attempt to construct a point from a byte array of length [size_in_bytes].
       Raise [Not_on_curve] if the point is not on the curve
   *)
   val of_bytes_exn : Bytes.t -> t
 
-  (** Allocates a new point from a byte array representing a point in
-      compressed form.
+  (** Allocates a new point from a byte of length [size_in_bytes / 2] array
+      representing a point in compressed form.
   *)
   val of_compressed_bytes_opt : Bytes.t -> t option
 
-  (** Allocates a new point from a byte array representing a point in
-      compressed form.
+  (** Allocates a new point from a byte array of length [size_in_bytes / 2]
+      representing a point in compressed form.
       Raise [Not_on_curve] if the point is not on the curve.
   *)
   val of_compressed_bytes_exn : Bytes.t -> t
