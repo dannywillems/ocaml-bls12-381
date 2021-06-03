@@ -26,5 +26,6 @@ depends: [
   # Restricted to 1.12 because of https://github.com/janestreet/zarith_stubs_js/pull/8
   "zarith" {>= "1.10" & < "1.12" & with-test}
   "zarith_stubs_js" {with-test}
+  "hex" {with-test}
 ]
 build: [[ "dune" "build" "-j" jobs "-p" name "@install" ]]

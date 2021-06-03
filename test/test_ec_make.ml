@@ -314,3 +314,75 @@ module MakeECProperties (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
           `Quick
           (repeat 100 additive_associativity) ] )
 end
+
+module MakeCompressedRepresentation (G : Bls12_381_gen.Elliptic_curve_sig.T) =
+struct
+  let test_recover_correct_point_uncompressed () =
+    let g = G.random () in
+    let compressed_bytes = G.to_compressed_bytes g in
+    let uncompressed_g = G.of_compressed_bytes_exn compressed_bytes in
+    assert (G.eq g uncompressed_g)
+
+  (* it is correct to test this for BLS12-381 *)
+  let test_compressed_version_is_half_the_size () =
+    let g = G.random () in
+    assert (Bytes.length (G.to_compressed_bytes g) = G.size_in_bytes / 2)
+
+  let test_most_significant_bit_is_set_to_1 () =
+    let g = G.random () in
+    let compressed_g_bytes = G.to_compressed_bytes g in
+    let first_byte = int_of_char @@ Bytes.get compressed_g_bytes 0 in
+    assert (first_byte land 0b10000000 = 0b10000000)
+
+  let test_check_second_most_significant_bit_is_set_to_1_for_zero () =
+    let g = G.zero in
+    let compressed_g_bytes = G.to_compressed_bytes g in
+    let first_byte = int_of_char @@ Bytes.get compressed_g_bytes 0 in
+    assert (first_byte land 0b01000000 = 0b01000000)
+
+  let test_compressed_version_x_in_big_endian () =
+    (* The compressed version fully carries the x coordinate. For G1, the
+       compressed
+       version is 384 bits with the 3 most significant bits being used to carry
+       information to compute the y coordinate.
+       For G2, as it is built on Fp2, the compressed version is (384 * 2) bits
+       and the most significant 3 bits carries the same information. The bits
+       385, 386 and 387 (i.e. the last 3 bits of the constant coefficient of the
+       x coordinate) are set to zero/unused.
+    *)
+    let g = G.random () in
+    let g_bytes = G.to_bytes g in
+    let x_bytes_be = Bytes.sub g_bytes 0 (G.size_in_bytes / 2) in
+    let compressed_g_bytes = G.to_compressed_bytes g in
+    let compressed_g_bytes_first_byte = Bytes.get compressed_g_bytes 0 in
+    (* Get rid of the last 3 bits as it carries information unrelated to x *)
+    let compressed_g_bytes_first_byte =
+      int_of_char compressed_g_bytes_first_byte land 0b00011111
+    in
+    Bytes.set compressed_g_bytes 0 (char_of_int compressed_g_bytes_first_byte) ;
+    assert (Bytes.equal x_bytes_be compressed_g_bytes)
+
+  let get_tests () =
+    let open Alcotest in
+    ( "Compressed representation",
+      [ test_case
+          "Recover correct point"
+          `Quick
+          test_recover_correct_point_uncompressed;
+        test_case
+          "Most significant bit is set to 1"
+          `Quick
+          (repeat 100 test_most_significant_bit_is_set_to_1);
+        test_case
+          "Second most significant bit is set to 1 for the identity element"
+          `Quick
+          test_check_second_most_significant_bit_is_set_to_1_for_zero;
+        test_case
+          "Verify x is fully in the compressed version and in big endian"
+          `Quick
+          (repeat 100 test_compressed_version_x_in_big_endian);
+        test_case
+          "Compressed version is half the size"
+          `Quick
+          test_compressed_version_is_half_the_size ] )
+end

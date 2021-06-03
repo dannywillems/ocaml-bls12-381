@@ -9,6 +9,7 @@
             js_of_ocaml-compiler
             js_of_ocaml-ppx
             bls12-381-js
+            hex
             ; ff-pbt # Commenting for the moment because ff-pbt does require
             ; Alcotest, and Alcotest is not JavaScript compatible yet
  )

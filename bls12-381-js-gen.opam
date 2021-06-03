@@ -24,5 +24,6 @@ depends: [
   # Alcotest, and Alcotest is not JavaScript compatible yet
   # "ff-pbt" {>= "0.6.1" & < "0.7.0" & with-test}
   "alcotest" {with-test}
+  "hex" {with-test}
 ]
 build: [[ "dune" "build" "-j" jobs "-p" name "@install" ]]

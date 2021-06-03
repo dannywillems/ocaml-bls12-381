@@ -23,6 +23,7 @@ depends: [
   "tezos-rust-libs" {= "1.1"}
   "alcotest" {with-test}
   "ff-pbt" {>= "0.6.0" & < "0.7.0" & with-test}
+  "hex" {with-test}
 ]
 build: [[ "dune" "build" "-j" jobs "-p" name "@install" ]]
 run-test: [[ "dune" "runtest" "-p" name "-j" jobs ]]

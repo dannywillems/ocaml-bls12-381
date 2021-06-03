@@ -31,4 +31,4 @@
    test_vector_g1_2
    test_vector_g2_2
  )
- (libraries bls12-381-unix alcotest ff-pbt))
+ (libraries bls12-381-unix alcotest ff-pbt hex))
