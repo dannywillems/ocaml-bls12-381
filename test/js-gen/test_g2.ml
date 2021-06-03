@@ -70,6 +70,28 @@ let () =
             `Quick
             test_vectors_random_points_not_on_curve ] )
   end in
+  let module UncompressedRepresentation = struct
+    let test_uncompressed_zero_has_first_byte_at_64 () =
+      assert (int_of_char (Bytes.get G2.(to_bytes zero) 0) = 64)
+
+    let test_uncompressed_random_has_first_byte_strictly_lower_than_64 () =
+      assert (int_of_char (Bytes.get G2.(to_bytes (random ())) 0) < 64)
+
+    let get_tests () =
+      let open Alcotest in
+      ( "Representation of G2 Uncompressed",
+        [ test_case
+            "zero has first byte at 64"
+            `Quick
+            test_uncompressed_zero_has_first_byte_at_64;
+          test_case
+            "random has first byte strictly lower than 64"
+            `Quick
+            (Test_ec_make.repeat
+               1000
+               test_uncompressed_random_has_first_byte_strictly_lower_than_64)
+        ] )
+  end in
   let module CompressedRepresentation = struct
     include Test_ec_make.MakeCompressedRepresentation (G2)
 
@@ -147,5 +169,6 @@ let () =
       ValueGeneration.get_tests ();
       Equality.get_tests ();
       Constructors.get_tests ();
+      UncompressedRepresentation.get_tests ();
       CompressedRepresentation.get_tests ();
       ECProperties.get_tests () ]
