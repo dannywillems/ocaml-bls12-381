@@ -218,7 +218,7 @@ end
 let () =
   let open Alcotest in
   run
-    "G1 Uncompressed"
+    "G1"
     [ IsZero.get_tests ();
       ValueGeneration.get_tests ();
       Equality.get_tests ();
