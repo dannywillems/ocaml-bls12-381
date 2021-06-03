@@ -211,6 +211,13 @@ module MakeECProperties (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
     assert (G.(eq (mul g (Scalar.mul a b)) (mul (mul g a) b))) ;
     assert (G.(eq (mul g (Scalar.mul a b)) (mul (mul g b) a)))
 
+  let random_is_in_prime_subgroup () =
+    let g = G.random () in
+    (* [order] g = 0 *)
+    assert (G.(eq (mul g Scalar.(of_z order)) zero)) ;
+    (* [order - 1 ] g = [-1] g *)
+    assert (G.(eq (mul g Scalar.(of_z (Z.pred order))) (G.negate g)))
+
   (** Verify (-s) * g = s * (-g) *)
   let opposite_of_scalar_is_opposite_of_ec () =
     let s = G.Scalar.random () in
@@ -298,6 +305,10 @@ module MakeECProperties (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
           "additive_associativity_with_scalar"
           `Quick
           (repeat 100 additive_associativity_with_scalar);
+        test_case
+          "random elements are generated in the prime subgroup"
+          `Quick
+          (repeat 100 random_is_in_prime_subgroup);
         test_case
           "additive_associativity"
           `Quick

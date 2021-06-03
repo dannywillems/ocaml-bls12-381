@@ -60,7 +60,9 @@ module type T = sig
   (** Return [true] if the given element is zero *)
   val is_zero : t -> bool
 
-  (** Generate a random element *)
+  (** Generate a random element. The element is on the curve and in the prime
+      subgroup.
+  *)
   val random : ?state:Random.State.t -> unit -> t
 
   (** Return the addition of two element *)
