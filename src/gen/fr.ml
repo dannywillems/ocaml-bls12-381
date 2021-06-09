@@ -27,6 +27,10 @@ module type T = sig
 
   (** Check if a point, represented as a byte array, is in the field **)
   val check_bytes : Bytes.t -> bool
+
+  val fft : domain:t array -> points:t list -> t list
+
+  val ifft : domain:t array -> points:t list -> t list
 end
 
 module MakeFr (Stubs : S.RAW_BASE) : T = struct
@@ -106,4 +110,40 @@ module MakeFr (Stubs : S.RAW_BASE) : T = struct
             aux m c t r
         in
         Some (aux s c (pow x q) (pow x (Z.divexact (Z.succ q) two_z)))
+
+  let fft ~domain ~points =
+    let module M = struct
+      type group = t
+
+      type scalar = t
+
+      let mul = mul
+
+      let add = add
+
+      let sub x y = add x (negate y)
+
+      let inverse_exn_scalar = inverse_exn
+
+      let scalar_of_z = of_z
+    end in
+    Fft.fft (module M) ~domain ~points
+
+  let ifft ~domain ~points =
+    let module M = struct
+      type group = t
+
+      type scalar = t
+
+      let mul = mul
+
+      let add = add
+
+      let sub x y = add x (negate y)
+
+      let inverse_exn_scalar = inverse_exn
+
+      let scalar_of_z = of_z
+    end in
+    Fft.ifft (module M) ~domain ~points
 end
