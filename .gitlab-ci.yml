@@ -240,7 +240,7 @@ doc:
     - opam depext -i -y zarith conf-libffi conf-rust conf-perl conf-pkg-config
     - sudo apt-get install m4 -y
     - opam install odoc -y
-    - opam install . -y
+    - opam install . -y --with-test
   script:
     - dune build @doc
     - cp -r _build/default/_doc/_html _odoc/
