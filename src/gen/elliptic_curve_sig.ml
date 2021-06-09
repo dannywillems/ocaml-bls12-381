@@ -102,7 +102,7 @@ module type T = sig
       complexity is in [O(n log(m))] where [n] is the domain size and [m] the
       number of points.
    *)
-  val fft : domain:Scalar.t list -> points:t list -> t list
+  val fft : domain:Scalar.t array -> points:t list -> t list
 
   (** [ifft ~domain ~points] performs an inverse Fourier transform on [points]
       using [domain].
@@ -113,7 +113,7 @@ module type T = sig
       The domain size must be exactly the same than the number of points. The
       complexity is O(n log(n)) where [n] is the domain size.
   *)
-  val ifft : domain:Scalar.t list -> points:t list -> t list
+  val ifft : domain:Scalar.t array -> points:t list -> t list
 end
 
 module type RAW_BASE = sig
@@ -246,38 +246,53 @@ struct
     assert (Bytes.length res = size_in_bytes) ;
     res
 
+  let bitreverse n l =
+    let r = ref 0 in
+    let n = ref n in
+    for _i = 0 to l - 1 do
+      r := (!r lsl 1) lor (!n land 1) ;
+      n := !n lsr 1
+    done ;
+    !r
+
   let fft ~domain ~points =
-    let n = List.length domain in
-    let m = List.length points in
-    let points = Array.of_list points in
-    (* Using Array to get a better complexity for `get` *)
-    let domain = Array.of_list domain in
-    (* height is the height in the rec call tree *)
-    (* k is the starting index of the branch *)
-    let rec inner height k number_p =
-      let step = 1 lsl height in
-      if number_p = 1 then Array.make (n / step) points.(k)
-      else
-        let q = number_p / 2 and r = number_p mod 2 in
-        let odd_fft = inner (height + 1) (k + step) q in
-        let even_fft = inner (height + 1) k (q + r) in
-        let output_length = n lsr height in
-        let output = Array.make output_length zero in
-        let length_odd = n lsr (height + 1) in
-        for i = 0 to length_odd - 1 do
-          let x = even_fft.(i) in
-          let y = odd_fft.(i) in
-          (* most of the computation should be spent here *)
-          let right = mul y domain.(i * step) in
-          output.(i) <- add x right ;
-          output.(i + length_odd) <- add x (negate right)
-        done ;
-        output
+    (* See
+       https://gitlab.com/dannywillems/ocaml-polynomial/-/blob/8351c266c4eae185823ab87d74ecb34c0ce70afe/src/polynomial.ml#L428
+    *)
+    let reorg_coefficients n logn coefficients =
+      for i = 0 to n - 1 do
+        let reverse_i = bitreverse i logn in
+        if i < reverse_i then (
+          let a_i = coefficients.(i) in
+          let a_ri = coefficients.(reverse_i) in
+          coefficients.(i) <- a_ri ;
+          coefficients.(reverse_i) <- a_i )
+      done
     in
-    Array.to_list (inner 0 0 m)
+    let n = Array.length domain in
+    let logn = Z.log2 (Z.of_int n) in
+    let output = Array.of_list points in
+    reorg_coefficients n logn output ;
+    let m = ref 1 in
+    for _i = 0 to logn - 1 do
+      let exponent = n / (2 * !m) in
+      let k = ref 0 in
+      while !k < n do
+        for j = 0 to !m - 1 do
+          let w = domain.(exponent * j) in
+          (* odd *)
+          let right = mul output.(!k + j + !m) w in
+          output.(!k + j + !m) <- add output.(!k + j) (negate right) ;
+          output.(!k + j) <- add output.(!k + j) right
+        done ;
+        k := !k + (!m * 2)
+      done ;
+      m := !m * 2
+    done ;
+    Array.to_list output
 
   let ifft ~domain ~points =
-    let power = List.length domain in
+    let power = Array.length domain in
     assert (power = List.length points) ;
     let points = fft ~domain ~points in
     let power_inv = Scalar.inverse_exn (Scalar.of_z (Z.of_int power)) in

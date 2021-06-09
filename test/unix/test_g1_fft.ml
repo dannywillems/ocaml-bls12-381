@@ -39,7 +39,7 @@ module FFT = struct
       else Bls12_381.Fr.inverse_exn omega_base
     in
     let omega = get_omega power is_inverse in
-    List.init size (fun i -> Bls12_381.Fr.pow omega (Z.of_int i))
+    Array.init size (fun i -> Bls12_381.Fr.pow omega (Z.of_int i))
 
   let parse_group_elements_from_file n f =
     let ic = open_in_bin f in
