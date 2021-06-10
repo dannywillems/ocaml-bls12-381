@@ -31,8 +31,7 @@ let g2 = Bls12_381.G2.random ()
 let three_g1_and_g2 =
   [ (Bls12_381.G1.random (), Bls12_381.G2.random ());
     (Bls12_381.G1.random (), Bls12_381.G2.random ());
-    (Bls12_381.G1.random (), Bls12_381.G2.random ())
-  ]
+    (Bls12_381.G1.random (), Bls12_381.G2.random ()) ]
 
 let a = Bls12_381.Fq12.random ()
 

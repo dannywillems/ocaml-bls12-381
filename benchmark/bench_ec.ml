@@ -158,9 +158,6 @@ module BenchmarkG2 = ECBenchmark (Bls12_381.G2)
 
 let () =
   let commands =
-    List.concat
-      [ BenchmarkG1.get_benches "G1";
-        BenchmarkG2.get_benches "G2";
-        ]
+    List.concat [BenchmarkG1.get_benches "G1"; BenchmarkG2.get_benches "G2"]
   in
   Core.Command.run (Bench.make_command commands)
