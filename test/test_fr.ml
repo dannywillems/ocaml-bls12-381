@@ -508,7 +508,14 @@ module FFT = struct
           Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int i))
         in
         let fft_results = Bls12_381.Fr.fft ~domain ~points in
-        assert (fft_results = expected_fft_results))
+        assert (fft_results = expected_fft_results) ;
+        let idomain =
+          Array.init n (fun i -> if i = 0 then domain.(0) else domain.(n - i))
+        in
+        let ifft_results =
+          Bls12_381.Fr.ifft ~domain:idomain ~points:fft_results
+        in
+        assert (points = ifft_results))
       vectors
 
   let get_tests () =
