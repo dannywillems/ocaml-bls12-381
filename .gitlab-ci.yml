@@ -164,23 +164,23 @@ opam-install-and-remove:
 
     - opam depext bls12-381-gen -y -v
     - opam install bls12-381-gen -y -v --deps-only
-    - opam install bls12-381-gen -y -v
+    - opam install bls12-381-gen -y -v --with-test
 
     - opam depext bls12-381 -y -v
     - opam install bls12-381 -y -v --deps-only
-    - opam install bls12-381 -y -v
+    - opam install bls12-381 -y -v --with-test
 
     - opam depext bls12-381-js-gen -y -v
     - opam install bls12-381-js-gen -y -v --deps-only
-    - opam install bls12-381-js-gen -y -v
+    - opam install bls12-381-js-gen -y -v --with-test
 
     - opam depext bls12-381-js -y -v
     - opam install bls12-381-js -y -v --deps-only
-    - opam install bls12-381-js -y -v
+    - opam install bls12-381-js -y -v --with-test
 
     - opam depext bls12-381-unix -y -v
     - opam install bls12-381-unix -y -v --deps-only
-    - opam install bls12-381-unix -y -v
+    - opam install bls12-381-unix -y -v --with-test
 
     - opam remove -a -y bls12-381-js
     - opam remove -a -y bls12-381-js-gen
@@ -215,23 +215,23 @@ opam-install-and-remove-local-switch:
 
     - opam depext bls12-381-gen -y -v
     - opam install bls12-381-gen -y -v --deps-only
-    - opam install bls12-381-gen -y -v
+    - opam install bls12-381-gen -y -v --with-test
 
     - opam depext bls12-381 -y -v
     - opam install bls12-381 -y -v --deps-only
-    - opam install bls12-381 -y -v
+    - opam install bls12-381 -y -v --with-test
 
     - opam depext bls12-381-js-gen -y -v
     - opam install bls12-381-js-gen -y -v --deps-only
-    - opam install bls12-381-js-gen -y -v
+    - opam install bls12-381-js-gen -y -v --with-test
 
     - opam depext bls12-381-js -y -v
     - opam install bls12-381-js -y -v --deps-only
-    - opam install bls12-381-js -y -v
+    - opam install bls12-381-js -y -v --with-test
 
     - opam depext bls12-381-unix -y -v
     - opam install bls12-381-unix -y -v --deps-only
-    - opam install bls12-381-unix -y -v
+    - opam install bls12-381-unix -y -v --with-test
 
     - opam remove -a -y bls12-381-js
     - opam remove -a -y bls12-381-js-gen
