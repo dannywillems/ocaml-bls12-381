@@ -23,6 +23,8 @@ lint-ocaml:
     - ocamlformat --check test/*.ml*
     - ocamlformat --check test/js/*.ml*
     - ocamlformat --check test/js-gen/*.ml*
+  rules:
+    - when: always
 
 lint-js:
   image: node:lts
@@ -33,6 +35,8 @@ lint-js:
   script:
     - ./node_modules/eslint/bin/eslint.js -c .eslintrc.js ../test/js/node/run.js
     - ./node_modules/eslint/bin/eslint.js -c .eslintrc.js ../test/js/browser/run.js
+  rules:
+    - when: always
 
 .build-test: &build_definition
   stage: build
@@ -76,7 +80,9 @@ lint-js:
     # Additional test for the browser case of `js`. Tests are not automatic.
     # Only checking the stanza does work
     - dune build @test/js/browser/serve
- 
+  rules:
+    - when: always
+
 build-ocaml-4.08-rust-1.44.0:
   <<: *build_definition
   image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.08-1.44.0
@@ -129,6 +135,8 @@ build-ocaml-4.11-rust-1.44.0:
     - dune build benchmark/bench_ec.exe
     - dune build benchmark/bench_ff.exe
     - dune build benchmark/bench_pairing.exe
+  rules:
+    - when: always
 
 # Core bench 0.12.0 only available for 4.09. FIXME: update to other versions
 benchmark-ocaml-4.09-rust-1.44.0:
@@ -179,6 +187,8 @@ opam-install-and-remove:
     - opam remove -a -y bls12-381-unix
     - opam remove -a -y bls12-381
     - opam remove -a -y bls12-381-gen
+  rules:
+    - when: always
 
 opam-install-and-remove-local-switch:
   stage: install
@@ -228,6 +238,8 @@ opam-install-and-remove-local-switch:
     - opam remove -a -y bls12-381-unix
     - opam remove -a -y bls12-381
     - opam remove -a -y bls12-381-gen
+  rules:
+    - when: always
 
 doc:
   stage: doc
