@@ -118,14 +118,14 @@ build-ocaml-4.11-rust-1.44.0:
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     # Install the packages
-    - opam install bls12-381-gen -y
-    - opam install bls12-381 -y
-    - opam install bls12-381-unix -y
-    - opam install bls12-381-js-gen -y
-    - opam install bls12-381-js -y
+    - opam install bls12-381-gen -y --with-test
+    - opam install bls12-381 -y --with-test
+    - opam install bls12-381-unix -y --with-test
+    - opam install bls12-381-js-gen -y --with-test
+    - opam install bls12-381-js -y --with-test
   script:
     # Benchmark
-    - opam install core_bench.v0.12.0
+    - opam install core_bench
     - dune build benchmark/bench_ec.exe
     - dune build benchmark/bench_ff.exe
     - dune build benchmark/bench_pairing.exe

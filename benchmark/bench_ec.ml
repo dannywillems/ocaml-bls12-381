@@ -22,7 +22,7 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-open Core_bench.Std
+open Core_bench
 
 module ECBenchmark (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
   let g1 = G.random ()
@@ -153,17 +153,14 @@ module ECBenchmark (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
         compute_opposite_of_one ]
 end
 
-module BenchmarkG1Uncompressed = ECBenchmark (Bls12_381.G1.Uncompressed)
-module BenchmarkG1Compressed = ECBenchmark (Bls12_381.G1.Compressed)
-module BenchmarkG2Uncompressed = ECBenchmark (Bls12_381.G2.Uncompressed)
-module BenchmarkG2Compressed = ECBenchmark (Bls12_381.G2.Compressed)
+module BenchmarkG1 = ECBenchmark (Bls12_381.G1)
+module BenchmarkG2 = ECBenchmark (Bls12_381.G2)
 
 let () =
   let commands =
     List.concat
-      [ BenchmarkG1Uncompressed.get_benches "G1 Uncompressed";
-        BenchmarkG1Compressed.get_benches "G1 Compressed";
-        BenchmarkG2Uncompressed.get_benches "G2 Uncompressed";
-        BenchmarkG2Compressed.get_benches "G2 Compressed" ]
+      [ BenchmarkG1.get_benches "G1";
+        BenchmarkG2.get_benches "G2";
+        ]
   in
   Core.Command.run (Bench.make_command commands)

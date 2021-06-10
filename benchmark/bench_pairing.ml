@@ -24,14 +24,14 @@
 
 open Core_bench
 
-let g1 = Bls12_381.G1.Uncompressed.random ()
+let g1 = Bls12_381.G1.random ()
 
-let g2 = Bls12_381.G2.Uncompressed.random ()
+let g2 = Bls12_381.G2.random ()
 
 let three_g1_and_g2 =
-  [ (Bls12_381.G1.Uncompressed.random (), Bls12_381.G2.Uncompressed.random ());
-    (Bls12_381.G1.Uncompressed.random (), Bls12_381.G2.Uncompressed.random ());
-    (Bls12_381.G1.Uncompressed.random (), Bls12_381.G2.Uncompressed.random ())
+  [ (Bls12_381.G1.random (), Bls12_381.G2.random ());
+    (Bls12_381.G1.random (), Bls12_381.G2.random ());
+    (Bls12_381.G1.random (), Bls12_381.G2.random ())
   ]
 
 let a = Bls12_381.Fq12.random ()
