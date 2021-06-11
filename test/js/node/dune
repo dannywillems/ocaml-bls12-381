@@ -17,8 +17,6 @@
  (js_of_ocaml)
  (preprocess (pps js_of_ocaml-ppx))
  (flags (:standard -w -33))
- (public_name test_node)
- (package bls12-381-js)
 )
 
 ;; Stanza to build PrintHello.js, result of the jsoo compilation.

@@ -16,11 +16,9 @@
             ; ff-pbt # Commenting for the moment because ff-pbt does require
             ; Alcotest, and Alcotest is not JavaScript compatible yet
  )
- (public_names test_fq12 test_fr test_g1 test_g2 test_pairing)
  (modes byte)
  (preprocess (pps js_of_ocaml-ppx))
  (flags (:standard ))
- (package bls12-381-js-gen)
 )
 
 (rule
