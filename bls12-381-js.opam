@@ -3,8 +3,6 @@ authors: [ "Danny Willems <be.danny.willems@gmail.com>" ]
 maintainer: [ "Danny Willems <be.danny.willems@gmail.com>" ]
 synopsis: "JavaScript version of BLS12-381 primitives implementing the virtual
 package bls12-381"
-description: "JavaScript version of BLS12-381 primitives implementing the virtual
-package bls12-381"
 homepage: "https://gitlab.com/dannywillems/ocaml-bls12-381"
 dev-repo: "git+https://gitlab.com/dannywillems/ocaml-bls12-381.git"
 bug-reports: "https://gitlab.com/dannywillems/ocaml-bls12-381/issues"
