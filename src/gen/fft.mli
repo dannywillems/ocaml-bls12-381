@@ -17,11 +17,11 @@ end
 val fft :
   (module C with type group = 'group and type scalar = 'scalar) ->
   domain:'scalar array ->
-  points:'group list ->
-  'group list
+  points:'group array ->
+  'group array
 
 val ifft :
   (module C with type group = 'group and type scalar = 'scalar) ->
   domain:'scalar array ->
-  points:'group list ->
-  'group list
+  points:'group array ->
+  'group array

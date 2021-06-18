@@ -102,7 +102,7 @@ module type T = sig
       complexity is in [O(n log(m))] where [n] is the domain size and [m] the
       number of points.
    *)
-  val fft : domain:Scalar.t array -> points:t list -> t list
+  val fft : domain:Scalar.t array -> points:t array -> t array
 
   (** [ifft ~domain ~points] performs an inverse Fourier transform on [points]
       using [domain].
@@ -113,7 +113,7 @@ module type T = sig
       The domain size must be exactly the same than the number of points. The
       complexity is O(n log(n)) where [n] is the domain size.
   *)
-  val ifft : domain:Scalar.t array -> points:t list -> t list
+  val ifft : domain:Scalar.t array -> points:t array -> t array
 end
 
 module type RAW_BASE = sig

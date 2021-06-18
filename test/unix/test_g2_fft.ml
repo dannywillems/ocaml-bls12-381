@@ -57,22 +57,26 @@ module FFT = struct
     let m = power2 power in
     let omega_domain = generate_domain power m false in
     let g2_elements = parse_group_elements_from_file m "test_vector_g2_2" in
-    let result = G2.fft ~domain:omega_domain ~points:g2_elements in
+    let result =
+      G2.fft ~domain:omega_domain ~points:(Array.of_list g2_elements)
+    in
     let expected_result =
       parse_group_elements_from_file m "fft_test_vector_g2_2"
     in
-    assert (result = expected_result)
+    assert (result = Array.of_list expected_result)
 
   let test_ifft () =
     let power = 2 in
     let m = power2 power in
     let omega_domain = generate_domain power m true in
     let g2_elements = parse_group_elements_from_file m "test_vector_g2_2" in
-    let result = G2.ifft ~domain:omega_domain ~points:g2_elements in
+    let result =
+      G2.ifft ~domain:omega_domain ~points:(Array.of_list g2_elements)
+    in
     let expected_result =
       parse_group_elements_from_file m "ifft_test_vector_g2_2"
     in
-    assert (result = expected_result)
+    assert (result = Array.of_list expected_result)
 
   let get_tests () =
     let open Alcotest in

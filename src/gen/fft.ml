@@ -40,7 +40,7 @@ let fft (type a b) (module G : C with type group = a and type scalar = b)
   in
   let n = Array.length domain in
   let logn = Z.log2 (Z.of_int n) in
-  let output = Array.of_list points in
+  let output = Array.copy points in
   reorg_coefficients n logn output ;
   let m = ref 1 in
   for _i = 0 to logn - 1 do
@@ -58,12 +58,12 @@ let fft (type a b) (module G : C with type group = a and type scalar = b)
     done ;
     m := !m * 2
   done ;
-  Array.to_list output
+  output
 
 let ifft (type a b) (module G : C with type group = a and type scalar = b)
     ~domain ~points =
   let power = Array.length domain in
-  assert (power = List.length points) ;
+  assert (power = Array.length points) ;
   let points = fft (module G) ~domain ~points in
   let power_inv = G.inverse_exn_scalar (G.scalar_of_z (Z.of_int power)) in
-  List.map (fun g -> G.mul g power_inv) points
+  Array.map (fun g -> G.mul g power_inv) points

@@ -28,9 +28,9 @@ module type T = sig
   (** Check if a point, represented as a byte array, is in the field **)
   val check_bytes : Bytes.t -> bool
 
-  val fft : domain:t array -> points:t list -> t list
+  val fft : domain:t array -> points:t array -> t array
 
-  val ifft : domain:t array -> points:t list -> t list
+  val ifft : domain:t array -> points:t array -> t array
 end
 
 module MakeFr (Stubs : S.RAW_BASE) : T = struct
