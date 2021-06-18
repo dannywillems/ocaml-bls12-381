@@ -35,6 +35,8 @@ let run_test_group (group_name, tests) =
       test ())
     tests
 
+let failf _ _ _ = assert false
+
 let run name test_suites =
   let open Js_of_ocaml in
   Firebug.console##log (Js.string @@ Printf.sprintf "Running test suite %s" name) ;

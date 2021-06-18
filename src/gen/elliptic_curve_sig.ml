@@ -252,6 +252,8 @@ struct
 
       type scalar = Scalar.t
 
+      let zero = zero
+
       let mul = mul
 
       let add = add
@@ -269,6 +271,8 @@ struct
       type group = t
 
       type scalar = Scalar.t
+
+      let zero = zero
 
       let mul = mul
 

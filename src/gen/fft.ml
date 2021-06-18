@@ -3,6 +3,8 @@ module type C = sig
 
   type scalar
 
+  val zero : group
+
   val mul : group -> scalar -> group
 
   val add : group -> group -> group
@@ -25,8 +27,14 @@ let bitreverse n l =
 
 let fft (type a b) (module G : C with type group = a and type scalar = b)
     ~domain ~points =
-  (* See
-     https://gitlab.com/dannywillems/ocaml-polynomial/-/blob/8351c266c4eae185823ab87d74ecb34c0ce70afe/src/polynomial.ml#L428
+  (* USE WITH PRECAUTION on groups
+     See
+      https://en.wikipedia.org/wiki/Pontryagin_dual
+     inspried by
+      https://github.com/ethereum/research/blob/master/kzg_data_availability/kzg_proofs.py
+      https://github.com/ethereum/research/blob/master/kzg_data_availability/fk20_single.py#L53
+     More generally, see
+      https://gitlab.com/dannywillems/ocaml-polynomial/-/blob/8351c266c4eae185823ab87d74ecb34c0ce70afe/src/polynomial.ml#L428
   *)
   let reorg_coefficients n logn coefficients =
     for i = 0 to n - 1 do
@@ -40,7 +48,14 @@ let fft (type a b) (module G : C with type group = a and type scalar = b)
   in
   let n = Array.length domain in
   let logn = Z.log2 (Z.of_int n) in
-  let output = Array.copy points in
+  let len_points = Array.length points in
+  let output =
+    if n > len_points then
+      Array.append points (Array.make (n - len_points) G.zero)
+    else (
+      assert (n = len_points) ;
+      Array.copy points )
+  in
   reorg_coefficients n logn output ;
   let m = ref 1 in
   for _i = 0 to logn - 1 do

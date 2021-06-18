@@ -117,6 +117,8 @@ module MakeFr (Stubs : S.RAW_BASE) : T = struct
 
       type scalar = t
 
+      let zero = zero
+
       let mul = mul
 
       let add = add
@@ -134,6 +136,8 @@ module MakeFr (Stubs : S.RAW_BASE) : T = struct
       type group = t
 
       type scalar = t
+
+      let zero = zero
 
       let mul = mul
 
