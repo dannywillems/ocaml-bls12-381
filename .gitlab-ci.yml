@@ -99,6 +99,34 @@ build-ocaml-4.11-rust-1.44.0:
   <<: *build_definition
   image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.11-1.44.0
 
+# Not using the same images than the others as it seems 4.12 images are too old
+build-ocaml-4.12-rust-1.44.0:
+  image: ocaml/opam:debian-testing-opam
+  stage: build
+  before_script:
+    - sudo apt-get update
+    - opam repository set-url default https://opam.ocaml.org
+    - opam update
+    - opam switch create ./ ocaml-base-compiler.4.12.0 --no-install
+    - eval $(opam env)
+    - opam install opam-depext odoc -y
+    - opam depext conf-gmp conf-pkg-config conf-libffi conf-rust
+    - opam install . --deps-only --with-test -y
+    # Install NVM for the JS test
+    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+    - export NVM_DIR="$HOME/.nvm"
+    - . "$NVM_DIR/nvm.sh"
+    - nvm install 14.12.0
+    - nvm use 14.12.0
+    # Rust
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    - ${HOME}/.cargo/bin/rustup toolchain install 1.44.0
+    - ${HOME}/.cargo/bin/rustup default 1.44.0
+  script:
+    - dune build @runtest
+  rules:
+    - when: always
+
 # Benchmarks
 .benchmark: &benchmark_definition
   stage: benchmark
