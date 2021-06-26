@@ -1,0 +1,49 @@
+(copy_files bindings/{blst_bindings.ml})
+(copy_files bindings/{blst_stubs.ml})
+(copy_files bindings/blst_ctypes_c_stubs.c)
+
+(library
+ (public_name bls12-381-unix-blst)
+ (name bls12_381_unix_blst)
+ (modules
+   bls12_381
+   fr
+   fq12
+   g1
+   g2
+   pairing
+   ;; private
+   fq
+   fq2
+   Blst_bindings
+   Blst_stubs
+ )
+ (implements bls12-381)
+ (instrumentation (backend bisect_ppx))
+ (private_modules
+   fq
+   fq2
+   Blst_bindings
+   Blst_stubs
+ )
+ (libraries
+   hex
+   zarith
+   ctypes
+   ctypes.foreign
+   bls12-381-gen
+ )
+ (library_flags :standard -linkall -ccopt -lpthread)
+ (foreign_stubs
+  (language c)
+  (names blst_ctypes_c_stubs)
+  (flags (
+    -I%{env:OPAM_SWITCH_PREFIX=}/lib/blst)
+  )
+ )
+ (c_library_flags (
+   -L%{env:OPAM_SWITCH_PREFIX=}/lib/blst
+      -lblst
+      -lpthread)
+ )
+)

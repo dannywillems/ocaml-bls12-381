@@ -34,7 +34,8 @@ let rec repeat n f =
 
 module Properties = struct
   let with_zero_as_first_component () =
-    assert (Fq12.eq (Pairing.pairing G1.zero (G2.random ())) Fq12.one)
+    let res = Pairing.pairing G1.zero (G2.random ()) in
+    assert (Fq12.eq res Fq12.one)
 
   let with_zero_as_second_component () =
     assert (Fq12.eq (Pairing.pairing (G1.random ()) G2.zero) Fq12.one)
