@@ -155,13 +155,15 @@ build-ocaml-4.12-rust-1.44.0:
     - opam install bls12-381-gen -y --with-test
     - opam install bls12-381 -y --with-test
     - opam install bls12-381-unix -y --with-test
+    - opam install bls12-381-unix -y --with-test
     - opam install bls12-381-js-gen -y --with-test
     - opam install bls12-381-js -y --with-test
   script:
     # Benchmark
     - opam install core_bench
-    - dune build benchmark/bench_ec.exe
-    - dune build benchmark/bench_ff.exe
+    - dune build benchmark/bench_fr.exe
+    - dune build benchmark/bench_g1.exe
+    - dune build benchmark/bench_g2.exe
     - dune build benchmark/bench_pairing.exe
   rules:
     - when: always

@@ -22,56 +22,42 @@
 (*                                                                           *)
 (*****************************************************************************)
 
+open Core
 open Core_bench
 
-let g1 = Bls12_381.G1.random ()
+let t1 =
+  let open Bls12_381 in
+  let g1 = G1.random () in
+  let g2 = G2.random () in
+  Bench.Test.create ~name:"Pairing" (fun () ->
+      ignore @@ Bls12_381.Pairing.pairing g1 g2)
 
-let g2 = Bls12_381.G2.random ()
+let t2 =
+  let open Bls12_381 in
+  let g1 = G1.random () in
+  let g2 = G2.random () in
+  Bench.Test.create ~name:"Miller loop simple" (fun () ->
+      ignore @@ Bls12_381.Pairing.pairing g1 g2)
 
-let three_g1_and_g2 =
-  [ (Bls12_381.G1.random (), Bls12_381.G2.random ());
-    (Bls12_381.G1.random (), Bls12_381.G2.random ());
-    (Bls12_381.G1.random (), Bls12_381.G2.random ()) ]
+let t3 =
+  let open Bls12_381 in
+  let x = Fq12.random () in
+  Bench.Test.create ~name:"Final exponentiation" (fun () ->
+      ignore @@ Bls12_381.Pairing.final_exponentiation_exn x)
 
-let a = Bls12_381.Fq12.random ()
+let t4 =
+  let open Bls12_381 in
+  let p = List.init 6 ~f:(fun _i -> (G1.random (), G2.random ())) in
+  Bench.Test.create ~name:"Miller loop on 6 couples of points" (fun () ->
+      ignore @@ Bls12_381.Pairing.miller_loop p)
 
-let compute_pairing_on_pregenerated_random_elements () =
-  Bls12_381.Pairing.pairing g1 g2
+let t5 =
+  let open Bls12_381 in
+  let p = List.init 6 ~f:(fun _i -> (G1.random (), G2.random ())) in
+  Bench.Test.create
+    ~name:
+      "Miller loop on 6 couples of points followed by a final exponentiation"
+    (fun () ->
+      ignore @@ Bls12_381.Pairing.(final_exponentiation_exn (miller_loop p)))
 
-let compute_miller_loop_on_pregenerated_random_elements () =
-  Bls12_381.Pairing.miller_loop_simple g1 g2
-
-let compute_final_exponentiation_on_pregenerated_random_element () =
-  Bls12_381.Pairing.final_exponentiation_opt a
-
-let compute_miller_loop_on_three_pregenerated_couple_of_uncompressed_random_elements
-    () =
-  Bls12_381.Pairing.miller_loop three_g1_and_g2
-
-let compute_miller_loop_on_three_pregenerated_couple_of_uncompressed_random_elements_followed_by_final_exponentiation
-    () =
-  Bls12_381.Pairing.final_exponentiation_opt
-  @@ Bls12_381.Pairing.miller_loop three_g1_and_g2
-
-let () =
-  Core.Command.run
-    (Bench.make_command
-       [ Bench.Test.create
-           ~name:"Pairing on pregenerated uncompressed random elements"
-           compute_pairing_on_pregenerated_random_elements;
-         Bench.Test.create
-           ~name:"Miller loop on pregenerated uncompressed random elements"
-           compute_miller_loop_on_pregenerated_random_elements;
-         Bench.Test.create
-           ~name:
-             "Miller loop on three pregenerated couples of uncompressed random \
-              elements"
-           compute_miller_loop_on_three_pregenerated_couple_of_uncompressed_random_elements;
-         Bench.Test.create
-           ~name:
-             "Miller loop on three pregenerated couples of uncompressed random \
-              elements followed by final exponentiation"
-           compute_miller_loop_on_three_pregenerated_couple_of_uncompressed_random_elements_followed_by_final_exponentiation;
-         Bench.Test.create
-           ~name:"Final exponentiation on pregenerated random element"
-           compute_final_exponentiation_on_pregenerated_random_element ])
+let () = Core.Command.run (Bench.make_command [t1; t2; t3; t4; t5])
