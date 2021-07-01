@@ -63,7 +63,9 @@ module FFT = struct
     let expected_result =
       parse_group_elements_from_file m "fft_test_vector_g1_2"
     in
-    assert (result = Array.of_list expected_result)
+    let result = Array.to_list result in
+    let l = List.combine result expected_result in
+    List.iter (fun (p1, p2) -> assert (G1.eq p1 p2)) l
 
   let test_ifft () =
     let power = 2 in
@@ -76,7 +78,9 @@ module FFT = struct
     let expected_result =
       parse_group_elements_from_file m "ifft_test_vector_g1_2"
     in
-    assert (result = Array.of_list expected_result)
+    let result = Array.to_list result in
+    let l = List.combine result expected_result in
+    List.iter (fun (p1, p2) -> assert (G1.eq p1 p2)) l
 
   let test_fft_with_greater_domain () =
     (* Vectors generated with the following program:
@@ -181,20 +185,16 @@ module FFT = struct
           Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int i))
         in
         let fft_results = G1.fft ~domain ~points in
-        if fft_results <> expected_fft_results then
-          let g1_to_string x = Hex.show (Hex.of_bytes (G1.to_bytes x)) in
-          Alcotest.failf
-            "Expected FFT results are [%s]\nbut the computed values are [%s]"
-            (String.concat
-               "; "
-               (List.map
-                  (fun x -> "\"" ^ g1_to_string x ^ "\"")
-                  (Array.to_list expected_fft_results)))
-            (String.concat
-               "; "
-               (List.map
-                  (fun x -> "\"" ^ g1_to_string x ^ "\"")
-                  (Array.to_list fft_results))))
+        Array.iter2
+          (fun p1 p2 ->
+            let g1_to_string x = Hex.show (Hex.of_bytes (G1.to_bytes x)) in
+            if not (G1.eq p1 p2) then
+              Alcotest.failf
+                "Expected FFT result %s\nbut the computed value is %s\n"
+                (g1_to_string p1)
+                (g1_to_string p2))
+          expected_fft_results
+          fft_results)
       vectors_for_fft_with_greater_domain
 
   let get_tests () =

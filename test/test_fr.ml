@@ -508,14 +508,30 @@ module FFT = struct
           Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int i))
         in
         let fft_results = Bls12_381.Fr.fft ~domain ~points in
-        assert (fft_results = expected_fft_results) ;
+        Array.iter2
+          (fun p1 p2 ->
+            if not (Bls12_381.Fr.eq p1 p2) then
+              Alcotest.failf
+                "Expected FFT result %s\nbut the computed value is %s\n"
+                (Bls12_381.Fr.to_string p1)
+                (Bls12_381.Fr.to_string p2))
+          expected_fft_results
+          fft_results ;
         let idomain =
           Array.init n (fun i -> if i = 0 then domain.(0) else domain.(n - i))
         in
         let ifft_results =
           Bls12_381.Fr.ifft ~domain:idomain ~points:fft_results
         in
-        assert (points = ifft_results))
+        Array.iter2
+          (fun p1 p2 ->
+            if not (Bls12_381.Fr.eq p1 p2) then
+              Alcotest.failf
+                "Expected FFT result %s\nbut the computed value is %s\n"
+                (Bls12_381.Fr.to_string p1)
+                (Bls12_381.Fr.to_string p2))
+          points
+          ifft_results)
       vectors
 
   let test_fft_with_greater_domain_vectors () =
@@ -658,19 +674,15 @@ module FFT = struct
           Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int i))
         in
         let fft_results = Bls12_381.Fr.fft ~domain ~points in
-        if fft_results <> expected_fft_results then
-          Alcotest.failf
-            "Expected FFT results are [%s]\nbut the computed values are [%s]"
-            (String.concat
-               "; "
-               (List.map
-                  (fun x -> "\"" ^ Bls12_381.Fr.to_string x ^ "\"")
-                  (Array.to_list expected_fft_results)))
-            (String.concat
-               "; "
-               (List.map
-                  (fun x -> "\"" ^ Bls12_381.Fr.to_string x ^ "\"")
-                  (Array.to_list fft_results))))
+        Array.iter2
+          (fun p1 p2 ->
+            if not (Bls12_381.Fr.eq p1 p2) then
+              Alcotest.failf
+                "Expected FFT result %s\nbut the computed value is %s\n"
+                (Bls12_381.Fr.to_string p1)
+                (Bls12_381.Fr.to_string p2))
+          expected_fft_results
+          fft_results)
       vectors_for_fft_with_greater_domain
 
   let get_tests () =
