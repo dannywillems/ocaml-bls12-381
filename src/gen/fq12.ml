@@ -23,7 +23,33 @@
 (*****************************************************************************)
 
 module type T = sig
-  include Ff_sig.BASE
+  type t
+
+  val size_in_bytes : int
+
+  exception Not_in_field of Bytes.t
+
+  val one : t
+
+  val is_zero : t -> bool
+
+  val is_one : t -> bool
+
+  val mul : t -> t -> t
+
+  val inverse_opt : t -> t option
+
+  val inverse_exn : t -> t
+
+  val eq : t -> t -> bool
+
+  val pow : t -> Z.t -> t
+
+  val of_bytes_exn : Bytes.t -> t
+
+  val of_bytes_opt : Bytes.t -> t option
+
+  val to_bytes : t -> Bytes.t
 
   (** Construct an element of Fq12 based on the following pattern:
     Fq12 =
@@ -157,11 +183,4 @@ module MakeFq12 (Stubs : S.RAW_BASE) : T = struct
     Bytes.blit x10 0 g 480 (min (Bytes.length x10) 48) ;
     Bytes.blit x11 0 g 528 (min (Bytes.length x11) 48) ;
     of_bytes_exn g
-
-  let div_exn a b =
-    if b = zero then raise Division_by_zero else mul a (inverse_exn b)
-
-  let div_opt a b = if b = zero then None else Some (mul a (inverse_exn b))
-
-  let ( / ) = div_exn
 end

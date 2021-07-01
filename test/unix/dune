@@ -5,7 +5,6 @@
 (tests
  (names
    test_fr
-   test_fq12
    test_g1
    test_g1_fft
    test_g2
@@ -14,7 +13,6 @@
  )
  (modules
    test_fr
-   test_fq12
    test_g1
    test_g1_fft
    test_g2
