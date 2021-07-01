@@ -19,10 +19,13 @@ lint-ocaml:
     - ocamlformat --check src/js-gen/*.ml*
     - ocamlformat --check src/unix/*.ml*
     - ocamlformat --check src/unix/bindings/*.ml*
+    - ocamlformat --check src/blst/bindings/*.ml*
+    - ocamlformat --check src/blst/*.ml*
     - ocamlformat --check src/virtual/*.ml*
     - ocamlformat --check test/*.ml*
     - ocamlformat --check test/js/*.ml*
     - ocamlformat --check test/js-gen/*.ml*
+    - ocamlformat --check test/unix/*.ml*
   rules:
     - when: always
 
@@ -45,6 +48,7 @@ lint-js:
     - . $HOME/.cargo/env
     # Always update system package manager + setup OPAM env
     - sudo apt-get update
+    - sudo apt-get install wget
     - eval $(opam env)
     - opam update
     - opam depext -i -y conf-pkg-config conf-libffi
@@ -60,6 +64,15 @@ lint-js:
     - opam --version
     - node --version
     - echo $OPAM_SWITCH_PREFIX
+    # Install blst. FIXME: THIS IS UGLY, but it is a PoC...
+    - mkdir -p $OPAM_SWITCH_PREFIX/lib/blst
+    - wget https://github.com/supranational/blst/archive/095a8c53787d6c91b725152ebfbbf33acf05a931.zip
+    - unzip 095a8c53787d6c91b725152ebfbbf33acf05a931.zip
+    - cd blst-095a8c53787d6c91b725152ebfbbf33acf05a931
+    - ./build.sh
+    - cp libblst.a $OPAM_SWITCH_PREFIX/lib/blst
+    - cp bindings/*.h $OPAM_SWITCH_PREFIX/lib/blst
+    - cd ../
   script:
     # Install external dependencies
     - opam depext -i -y zarith
@@ -67,12 +80,14 @@ lint-js:
     - opam pin add bls12-381-gen.dev . --no-action
     - opam pin add bls12-381.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
+    - opam pin add bls12-381-unix-blst.dev . --no-action
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     # Install the packages
     - opam install bls12-381-gen -y --with-test
     - opam install bls12-381 -y --with-test
     - opam install bls12-381-unix -y --with-test
+    - opam install bls12-381-unix-blst -y --with-test
     - opam install bls12-381-js-gen -y --with-test
     - opam install bls12-381-js -y --with-test
     - dune build @install
@@ -105,6 +120,7 @@ build-ocaml-4.12-rust-1.44.0:
   stage: build
   before_script:
     - sudo apt-get update
+    - sudo apt-get install wget -y
     - opam repository set-url default https://opam.ocaml.org
     - opam update
     - opam switch create ./ ocaml-base-compiler.4.12.0 --no-install
@@ -122,6 +138,15 @@ build-ocaml-4.12-rust-1.44.0:
     - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - ${HOME}/.cargo/bin/rustup toolchain install 1.44.0
     - ${HOME}/.cargo/bin/rustup default 1.44.0
+    # Install blst. FIXME: THIS IS UGLY, but it is a PoC...
+    - mkdir -p $OPAM_SWITCH_PREFIX/lib/blst
+    - wget https://github.com/supranational/blst/archive/095a8c53787d6c91b725152ebfbbf33acf05a931.zip
+    - unzip 095a8c53787d6c91b725152ebfbbf33acf05a931.zip
+    - cd blst-095a8c53787d6c91b725152ebfbbf33acf05a931
+    - ./build.sh
+    - cp libblst.a $OPAM_SWITCH_PREFIX/lib/blst
+    - cp bindings/*.h $OPAM_SWITCH_PREFIX/lib/blst
+    - cd ../
   script:
     - dune build @runtest
   rules:
@@ -175,6 +200,7 @@ opam-install-and-remove:
   stage: install
   image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.44.0
   before_script:
+    - sudo apt-get install wget -y
     - . $HOME/.cargo/env
     # List versions and environments
     - rustc --version
@@ -183,12 +209,22 @@ opam-install-and-remove:
     - echo $OPAM_SWITCH_PREFIX
     - opam repository set-url default https://opam.ocaml.org
     - opam update
+    # Install blst. FIXME: THIS IS UGLY, but it is a PoC...
+    - mkdir -p $OPAM_SWITCH_PREFIX/lib/blst
+    - wget https://github.com/supranational/blst/archive/095a8c53787d6c91b725152ebfbbf33acf05a931.zip
+    - unzip 095a8c53787d6c91b725152ebfbbf33acf05a931.zip
+    - cd blst-095a8c53787d6c91b725152ebfbbf33acf05a931
+    - ./build.sh
+    - cp libblst.a $OPAM_SWITCH_PREFIX/lib/blst
+    - cp bindings/*.h $OPAM_SWITCH_PREFIX/lib/blst
+    - cd ../
   script:
     - opam pin add bls12-381-gen.dev . --no-action
     - opam pin add bls12-381.dev . --no-action
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
+    - opam pin add bls12-381-unix-blst.dev . --no-action
 
     - opam depext bls12-381-gen -y -v
     - opam install bls12-381-gen -y -v --deps-only
@@ -210,9 +246,14 @@ opam-install-and-remove:
     - opam install bls12-381-unix -y -v --deps-only
     - opam install bls12-381-unix -y -v
 
+    - opam depext bls12-381-unix-blst -y -v
+    - opam install bls12-381-unix-blst -y -v --deps-only
+    - opam install bls12-381-unix-blst -y -v
+
     - opam remove -a -y bls12-381-js
     - opam remove -a -y bls12-381-js-gen
     - opam remove -a -y bls12-381-unix
+    - opam remove -a -y bls12-381-unix-blst
     - opam remove -a -y bls12-381
     - opam remove -a -y bls12-381-gen
   rules:
@@ -222,6 +263,7 @@ opam-install-and-remove-local-switch:
   stage: install
   image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.44.0
   before_script:
+    - sudo apt-get install wget -y
     # Run everything in a local switch
     - opam switch create ./ 4.09.1 --no-install
     - eval $(opam config env)
@@ -234,12 +276,22 @@ opam-install-and-remove-local-switch:
     - echo $OPAM_SWITCH_PREFIX
     - opam repository set-url default https://opam.ocaml.org
     - opam update
+    # Install blst. FIXME: THIS IS UGLY, but it is a PoC...
+    - mkdir -p $OPAM_SWITCH_PREFIX/lib/blst
+    - wget https://github.com/supranational/blst/archive/095a8c53787d6c91b725152ebfbbf33acf05a931.zip
+    - unzip 095a8c53787d6c91b725152ebfbbf33acf05a931.zip
+    - cd blst-095a8c53787d6c91b725152ebfbbf33acf05a931
+    - ./build.sh
+    - cp libblst.a $OPAM_SWITCH_PREFIX/lib/blst
+    - cp bindings/*.h $OPAM_SWITCH_PREFIX/lib/blst
+    - cd ../
   script:
     - opam pin add bls12-381-gen.dev . --no-action
     - opam pin add bls12-381.dev . --no-action
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
+    - opam pin add bls12-381-unix-blst.dev . --no-action
 
     - opam depext bls12-381-gen -y -v
     - opam install bls12-381-gen -y -v --deps-only
@@ -261,9 +313,14 @@ opam-install-and-remove-local-switch:
     - opam install bls12-381-unix -y -v --deps-only
     - opam install bls12-381-unix -y -v
 
+    - opam depext bls12-381-unix-blst -y -v
+    - opam install bls12-381-unix-blst -y -v --deps-only
+    - opam install bls12-381-unix-blst -y -v
+
     - opam remove -a -y bls12-381-js
     - opam remove -a -y bls12-381-js-gen
     - opam remove -a -y bls12-381-unix
+    - opam remove -a -y bls12-381-unix-blst
     - opam remove -a -y bls12-381
     - opam remove -a -y bls12-381-gen
   rules:
@@ -274,12 +331,22 @@ doc:
   image: ocaml/opam2:4.09
   before_script:
     - sudo apt-get update && sudo apt-get upgrade -y
+    - sudo apt-get install wget -y
     - eval $(opam env)
     - opam repository set-url default https://opam.ocaml.org
     - opam update
     - opam depext -i -y zarith conf-libffi conf-rust conf-perl conf-pkg-config
     - sudo apt-get install m4 -y
     - opam install odoc -y
+    # Install blst. FIXME: THIS IS UGLY, but it is a PoC...
+    - mkdir -p $OPAM_SWITCH_PREFIX/lib/blst
+    - wget https://github.com/supranational/blst/archive/095a8c53787d6c91b725152ebfbbf33acf05a931.zip
+    - unzip 095a8c53787d6c91b725152ebfbbf33acf05a931.zip
+    - cd blst-095a8c53787d6c91b725152ebfbbf33acf05a931
+    - ./build.sh
+    - cp libblst.a $OPAM_SWITCH_PREFIX/lib/blst
+    - cp bindings/*.h $OPAM_SWITCH_PREFIX/lib/blst
+    - cd ../
     - opam install . -y --with-test
   script:
     - dune build @doc
