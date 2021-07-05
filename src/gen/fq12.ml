@@ -43,6 +43,8 @@ module type T = sig
 
   val eq : t -> t -> bool
 
+  val random : ?state:Random.State.t -> unit -> t
+
   val pow : t -> Z.t -> t
 
   val of_bytes_exn : Bytes.t -> t
