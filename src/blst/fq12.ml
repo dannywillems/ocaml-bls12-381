@@ -76,6 +76,15 @@ module Fq12 = struct
       done ;
       Some buffer
 
+  let random ?state () =
+    ignore state ;
+    let buffer = Blst_bindings.Types.allocate_fq12 () in
+    for i = 0 to 11 do
+      let x = Fq.random () in
+      Blst_bindings.Types.fq12_assign_fq_component buffer i x
+    done ;
+    buffer
+
   let of_bytes_exn bs =
     match of_bytes_opt bs with None -> raise (Not_in_field bs) | Some p -> p
 
