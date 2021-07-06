@@ -25,6 +25,10 @@
 module type T = sig
   include Ff_sig.PRIME
 
+  val add_inplace : t -> t -> unit
+
+  val mul_inplace : t -> t -> unit
+
   (** Check if a point, represented as a byte array, is in the field **)
   val check_bytes : Bytes.t -> bool
 
@@ -33,7 +37,13 @@ module type T = sig
   val ifft : domain:t array -> points:t array -> t array
 end
 
-module MakeFr (Stubs : S.RAW_BASE) : T = struct
+module MakeFr (Stubs : sig
+  include S.RAW_BASE
+
+  val add_inplace : Bytes.t -> Bytes.t -> unit
+
+  val mul_inplace : Bytes.t -> Bytes.t -> unit
+end) : T = struct
   include S.Make (Stubs)
 
   let two_z = Z.succ Z.one

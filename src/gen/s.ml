@@ -39,6 +39,10 @@ module type RAW_BASE = sig
 
   val one : unit -> Bytes.t
 
+  val add_inplace : Bytes.t -> Bytes.t -> unit
+
+  val mul_inplace : Bytes.t -> Bytes.t -> unit
+
   val add : Bytes.t -> Bytes.t -> Bytes.t
 
   val mul : Bytes.t -> Bytes.t -> Bytes.t
@@ -56,7 +60,15 @@ module type RAW_BASE = sig
   val pow : Bytes.t -> Bytes.t -> Bytes.t
 end
 
-module Make (Stubs : RAW_BASE) : Ff_sig.BASE = struct
+module Make (Stubs : sig
+  include RAW_BASE
+end) : sig
+  include Ff_sig.BASE
+
+  val add_inplace : t -> t -> unit
+
+  val mul_inplace : t -> t -> unit
+end = struct
   type t = Bytes.t
 
   exception Not_in_field of Bytes.t
@@ -114,6 +126,10 @@ module Make (Stubs : RAW_BASE) : Ff_sig.BASE = struct
     ignore state ;
     let r = random () in
     if is_zero r then non_null_random () else r
+
+  let add_inplace x y = Stubs.add_inplace x y
+
+  let mul_inplace x y = Stubs.mul_inplace x y
 
   let add x y =
     assert (Bytes.length x = Stubs.size_in_bytes) ;

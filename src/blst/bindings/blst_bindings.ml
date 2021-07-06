@@ -6,6 +6,8 @@ module type TYPES = sig
 
   val allocate_fr : unit -> blst_fr_t Ctypes.ptr
 
+  val copy_fr_inplace : blst_fr_t Ctypes.ptr -> blst_fr_t Ctypes.ptr -> unit
+
   (* Scalar *)
   type blst_scalar_t
 
@@ -121,13 +123,17 @@ module Types : TYPES = struct
 
   type blst_fr_t = blst_fr Ctypes.structure
 
-  let blst_fr_t : blst_fr_t Ctypes.typ =
+  let blst_fr_t_compo =
     let nb_limb = 256 / (8 * sizeof_limb_t) in
     let l = Ctypes.array nb_limb limb_t in
     let anon_structure = Ctypes.structure "" in
-    let _ = Ctypes.field anon_structure "l" l in
+    let field_l = Ctypes.field anon_structure "l" l in
     let x = Ctypes.(typedef anon_structure "blst_fr") in
     Ctypes.seal x ;
+    (field_l, x)
+
+  let blst_fr_t : blst_fr_t Ctypes.typ =
+    let (_, x) = blst_fr_t_compo in
     x
 
   (* We must be on arch 64 *)
@@ -137,6 +143,15 @@ module Types : TYPES = struct
     let x = Ctypes.make blst_fr_t in
     let addr = Ctypes.addr x in
     addr
+
+  let copy_fr_inplace src dest =
+    let (field_l, _) = blst_fr_t_compo in
+    let l_src = Ctypes.(getf !@src field_l) in
+    let l_dest = Ctypes.(getf !@dest field_l) in
+    Ctypes.(CArray.(set l_dest 0 (get l_src 0))) ;
+    Ctypes.(CArray.(set l_dest 1 (get l_src 1))) ;
+    Ctypes.(CArray.(set l_dest 2 (get l_src 2))) ;
+    Ctypes.(CArray.(set l_dest 3 (get l_src 3)))
 
   (* Scalar *)
   type blst_scalar

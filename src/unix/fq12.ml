@@ -36,6 +36,8 @@ module Stubs = struct
 
   let empty () = Bytes.make size_in_bytes '\000'
 
+  let general_buffer = empty ()
+
   let check_bytes bs = Fq12_stubs.check_bytes (Ctypes.ocaml_bytes_start bs)
 
   let is_zero bs = Fq12_stubs.is_zero (Ctypes.ocaml_bytes_start bs)
@@ -56,6 +58,20 @@ module Stubs = struct
     let bs = empty () in
     Fq12_stubs.random (Ctypes.ocaml_bytes_start bs) ;
     bs
+
+  let add_inplace x y =
+    Fq12_stubs.add
+      (Ctypes.ocaml_bytes_start general_buffer)
+      (Ctypes.ocaml_bytes_start x)
+      (Ctypes.ocaml_bytes_start y) ;
+    Bytes.blit general_buffer 0 x 0 size_in_bytes
+
+  let mul_inplace x y =
+    Fq12_stubs.mul
+      (Ctypes.ocaml_bytes_start general_buffer)
+      (Ctypes.ocaml_bytes_start x)
+      (Ctypes.ocaml_bytes_start y) ;
+    Bytes.blit general_buffer 0 x 0 size_in_bytes
 
   let add x y =
     let buffer = empty () in

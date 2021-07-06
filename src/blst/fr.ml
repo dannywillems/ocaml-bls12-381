@@ -27,6 +27,8 @@ module Stubs = Blst_bindings.StubsFr (Blst_stubs)
 module Fr = struct
   exception Not_in_field of Bytes.t
 
+  let general_buffer = Blst_bindings.Types.allocate_fr ()
+
   type t = Blst_bindings.Types.blst_fr_t Ctypes.ptr
 
   let size_in_bytes = 32
@@ -108,6 +110,14 @@ module Fr = struct
   let rec non_null_random ?state () =
     let r = random ?state () in
     if is_zero r then non_null_random ?state () else r
+
+  let add_inplace x y =
+    Stubs.add general_buffer x y ;
+    Blst_bindings.Types.copy_fr_inplace general_buffer x
+
+  let mul_inplace x y =
+    Stubs.mul general_buffer x y ;
+    Blst_bindings.Types.copy_fr_inplace general_buffer x
 
   let add x y =
     let buffer = Blst_bindings.Types.allocate_fr () in
