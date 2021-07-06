@@ -65,6 +65,8 @@ module Make (Stubs : sig
 end) : sig
   include Ff_sig.BASE
 
+  val copy : t -> t
+
   val add_inplace : t -> t -> unit
 
   val mul_inplace : t -> t -> unit
@@ -76,6 +78,8 @@ end = struct
   let order = Stubs.order
 
   let size_in_bytes = Stubs.size_in_bytes
+
+  let copy x = Bytes.copy x
 
   let pad_if_require bs =
     (* Pad to 32 bytes. In anycase, copy the bytes to a new buffer *)

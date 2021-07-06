@@ -25,6 +25,8 @@
 module type T = sig
   include Ff_sig.PRIME
 
+  val copy : t -> t
+
   val add_inplace : t -> t -> unit
 
   val mul_inplace : t -> t -> unit

@@ -45,6 +45,11 @@ module Fr = struct
       padded_bytes )
     else Bytes.copy bs
 
+  let copy x =
+    let buffer = Blst_bindings.Types.allocate_fr () in
+    Blst_bindings.Types.copy_fr_inplace x buffer ;
+    buffer
+
   let of_bytes_opt bs =
     if Bytes.length bs > size_in_bytes then None
     else
