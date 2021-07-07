@@ -93,9 +93,9 @@ module Fr = struct
 
   let ( = ) = eq
 
-  let is_zero s = s = zero
+  let is_zero s = eq s zero
 
-  let is_one s = s = one
+  let is_one s = eq s one
 
   let rec random ?state () =
     ignore state ;
