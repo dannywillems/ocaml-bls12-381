@@ -157,7 +157,10 @@ module G2 = struct
 
   let order_minus_one = Scalar.(negate one)
 
-  let negate g = mul g order_minus_one
+  let negate g =
+    let buffer = Blst_bindings.Types.g2_copy g in
+    Stubs.cneg buffer true ;
+    buffer
 
   let of_z_opt ~x ~y =
     let (x1, x2) = x in
