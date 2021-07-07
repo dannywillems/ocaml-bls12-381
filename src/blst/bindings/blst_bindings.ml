@@ -195,9 +195,6 @@ module Types : TYPES = struct
     Ctypes.seal x ;
     x
 
-  (* We must be on arch 64 *)
-  (* let () = assert (Ctypes.sizeof blst_fq_t = 48) *)
-
   let allocate_fq () =
     let x = Ctypes.make blst_fq_t in
     let addr = Ctypes.addr x in
