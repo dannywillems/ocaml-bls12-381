@@ -505,6 +505,11 @@ module StubsFq (S : Cstubs.FOREIGN) = struct
 
   let sqrt =
     foreign "blst_fp_sqrt" (ptr blst_fq_t @-> ptr blst_fq_t @-> returning bool)
+
+  let cneg =
+    foreign
+      "blst_fp_cneg"
+      (ptr blst_fq_t @-> ptr blst_fq_t @-> bool @-> returning void)
 end
 
 module StubsFq2 (S : Cstubs.FOREIGN) = struct
@@ -526,6 +531,11 @@ module StubsFq2 (S : Cstubs.FOREIGN) = struct
     foreign
       "blst_fp2_sqrt"
       (ptr blst_fq2_t @-> ptr blst_fq2_t @-> returning bool)
+
+  let cneg =
+    foreign
+      "blst_fp2_cneg"
+      (ptr blst_fq2_t @-> ptr blst_fq2_t @-> bool @-> returning void)
 end
 
 module StubsG1 (S : Cstubs.FOREIGN) = struct
