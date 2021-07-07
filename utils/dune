@@ -15,3 +15,9 @@
  (modules generate_final_exponentiation_vectors)
  (libraries hex bls12-381-unix)
 )
+
+(executable
+ (name generate_g1_test_vectors)
+ (modules generate_g1_test_vectors)
+ (libraries hex bls12-381-unix)
+)
