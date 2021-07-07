@@ -115,12 +115,16 @@ module type TYPES = sig
   val g1_affine_set_y :
     blst_g1_affine_t Ctypes.ptr -> blst_fq_t Ctypes.ptr -> unit
 
+  val g1_copy : blst_g1_t Ctypes.ptr -> blst_g1_t Ctypes.ptr
+
   (* G2 *)
   type blst_g2_t
 
   val blst_g2_t : blst_g2_t Ctypes.typ
 
   val allocate_g2 : unit -> blst_g2_t Ctypes.ptr
+
+  val g2_copy : blst_g2_t Ctypes.ptr -> blst_g2_t Ctypes.ptr
 
   type blst_g2_affine_t
 
@@ -323,13 +327,17 @@ module Types : TYPES = struct
 
   type blst_g1_t = blst_g1 Ctypes.structure
 
-  let blst_g1_t : blst_g1_t Ctypes.typ =
+  let blst_g1_t_compo =
     let anon_structure = Ctypes.structure "" in
-    let _ = Ctypes.field anon_structure "x" blst_fq_t in
-    let _ = Ctypes.field anon_structure "y" blst_fq_t in
-    let _ = Ctypes.field anon_structure "z" blst_fq_t in
+    let x_coord = Ctypes.field anon_structure "x" blst_fq_t in
+    let y_coord = Ctypes.field anon_structure "y" blst_fq_t in
+    let z_coord = Ctypes.field anon_structure "z" blst_fq_t in
     let x = Ctypes.(typedef anon_structure "blst_p1") in
     Ctypes.seal x ;
+    ((x_coord, y_coord, z_coord), x)
+
+  let blst_g1_t : blst_g1_t Ctypes.typ =
+    let (_, x) = blst_g1_t_compo in
     x
 
   let allocate_g1 () =
@@ -366,24 +374,68 @@ module Types : TYPES = struct
     let (_, _, field_y, _) = blst_g1_affine_t_compo in
     Ctypes.(setf !@p field_y !@y)
 
+  let g1_set_x p v_x =
+    let ((x_coord, _, _), _) = blst_g1_t_compo in
+    Ctypes.(setf !@p x_coord !@v_x)
+
+  let g1_set_y p v_y =
+    let ((_, y_coord, _), _) = blst_g1_t_compo in
+    Ctypes.(setf !@p y_coord !@v_y)
+
+  let g1_set_z p v_z =
+    let ((_, _, z_coord), _) = blst_g1_t_compo in
+    Ctypes.(setf !@p z_coord !@v_z)
+
+  let g1_copy p =
+    let buffer = allocate_g1 () in
+    let ((x_coord, y_coord, z_coord), _) = blst_g1_t_compo in
+    g1_set_x buffer Ctypes.(addr (getf !@p x_coord)) ;
+    g1_set_y buffer Ctypes.(addr (getf !@p y_coord)) ;
+    g1_set_z buffer Ctypes.(addr (getf !@p z_coord)) ;
+    buffer
+
   (* G2 *)
   type blst_g2
 
   type blst_g2_t = blst_g2 Ctypes.structure
 
-  let blst_g2_t : blst_g2_t Ctypes.typ =
+  let blst_g2_t_compo =
     let anon_structure = Ctypes.structure "" in
-    let _ = Ctypes.field anon_structure "x" blst_fq2_t in
-    let _ = Ctypes.field anon_structure "y" blst_fq2_t in
-    let _ = Ctypes.field anon_structure "z" blst_fq2_t in
+    let x_coord = Ctypes.field anon_structure "x" blst_fq2_t in
+    let y_coord = Ctypes.field anon_structure "y" blst_fq2_t in
+    let z_coord = Ctypes.field anon_structure "z" blst_fq2_t in
     let x = Ctypes.(typedef anon_structure "blst_p2") in
     Ctypes.seal x ;
+    ((x_coord, y_coord, z_coord), x)
+
+  let blst_g2_t : blst_g2_t Ctypes.typ =
+    let (_, x) = blst_g2_t_compo in
     x
+
+  let g2_set_x p v_x =
+    let ((x_coord, _, _), _) = blst_g2_t_compo in
+    Ctypes.(setf !@p x_coord !@v_x)
+
+  let g2_set_y p v_y =
+    let ((_, y_coord, _), _) = blst_g2_t_compo in
+    Ctypes.(setf !@p y_coord !@v_y)
+
+  let g2_set_z p v_z =
+    let ((_, _, z_coord), _) = blst_g2_t_compo in
+    Ctypes.(setf !@p z_coord !@v_z)
 
   let allocate_g2 () =
     let x = Ctypes.make blst_g2_t in
     let addr = Ctypes.addr x in
     addr
+
+  let g2_copy p =
+    let buffer = allocate_g2 () in
+    let ((x_coord, y_coord, z_coord), _) = blst_g2_t_compo in
+    g2_set_x buffer Ctypes.(addr (getf !@p x_coord)) ;
+    g2_set_y buffer Ctypes.(addr (getf !@p y_coord)) ;
+    g2_set_z buffer Ctypes.(addr (getf !@p z_coord)) ;
+    buffer
 
   type blst_g2_affine
 
@@ -573,6 +625,8 @@ module StubsG1 (S : Cstubs.FOREIGN) = struct
       "blst_p1_is_equal"
       (ptr blst_g1_t @-> ptr blst_g1_t @-> returning bool)
 
+  let cneg = foreign "blst_p1_cneg" (ptr blst_g1_t @-> bool @-> returning void)
+
   let is_on_curve = foreign "blst_p1_on_curve" (ptr blst_g1_t @-> returning bool)
 
   let in_g1 = foreign "blst_p1_in_g1" (ptr blst_g1_t @-> returning bool)
@@ -631,6 +685,8 @@ module StubsG2 (S : Cstubs.FOREIGN) = struct
     foreign
       "blst_p2_is_equal"
       (ptr blst_g2_t @-> ptr blst_g2_t @-> returning bool)
+
+  let cneg = foreign "blst_p2_cneg" (ptr blst_g2_t @-> bool @-> returning void)
 
   let is_on_curve = foreign "blst_p2_on_curve" (ptr blst_g2_t @-> returning bool)
 
