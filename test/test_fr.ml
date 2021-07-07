@@ -22,6 +22,8 @@
 (*                                                                           *)
 (*****************************************************************************)
 
+let () = Random.self_init ()
+
 (** The test vectors are generated using https://github.com/dannywillems/ocaml-ff *)
 let test_vectors =
   [ "5241434266765085153989819426158356963249585137477420674959011812945457865191";
