@@ -24,6 +24,8 @@
 
 (** Check the routine generators do not raise any exception *)
 
+let () = Random.self_init ()
+
 module G1 = Bls12_381.G1
 module ValueGeneration = Test_ec_make.MakeValueGeneration (G1)
 module IsZero = Test_ec_make.MakeIsZero (G1)

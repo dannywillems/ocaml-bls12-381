@@ -22,6 +22,8 @@
 (*                                                                           *)
 (*****************************************************************************)
 
+let () = Random.self_init ()
+
 module G2 = Bls12_381.G2
 module ValueGeneration = Test_ec_make.MakeValueGeneration (G2)
 module IsZero = Test_ec_make.MakeIsZero (G2)
