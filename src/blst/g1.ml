@@ -128,6 +128,7 @@ module G1 = struct
     match y_opt with
     | None -> random ?state ()
     | Some y ->
+        let y = if Random.bool () then y else Fq.negate y in
         let p_affine = Blst_bindings.Types.allocate_g1_affine () in
         Blst_bindings.Types.g1_affine_set_x p_affine x ;
         Blst_bindings.Types.g1_affine_set_y p_affine y ;

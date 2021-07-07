@@ -94,6 +94,11 @@ module Fq2 = struct
     let buffer = Blst_bindings.Types.allocate_fq2 () in
     let res = Stubs.sqrt buffer x in
     if res then Some buffer else None
+
+  let negate x =
+    let buffer = Blst_bindings.Types.allocate_fq2 () in
+    Stubs.cneg buffer x true ;
+    buffer
 end
 
 include Fq2

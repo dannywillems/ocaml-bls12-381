@@ -93,6 +93,11 @@ module Fq = struct
 
   let ( * ) = mul
 
+  let negate x =
+    let buffer = Blst_bindings.Types.allocate_fq () in
+    Stubs.cneg buffer x true ;
+    buffer
+
   let sqrt_opt x =
     let buffer = Blst_bindings.Types.allocate_fq () in
     let res = Stubs.sqrt buffer x in
