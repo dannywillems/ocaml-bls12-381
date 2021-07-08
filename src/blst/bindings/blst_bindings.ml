@@ -623,10 +623,6 @@ module StubsG1 (S : Cstubs.FOREIGN) = struct
 
   let cneg = foreign "blst_p1_cneg" (ptr blst_g1_t @-> bool @-> returning void)
 
-  let is_on_curve = foreign "blst_p1_on_curve" (ptr blst_g1_t @-> returning bool)
-
-  let in_g1 = foreign "blst_p1_in_g1" (ptr blst_g1_t @-> returning bool)
-
   let mult =
     foreign
       "blst_p1_mult"
@@ -684,8 +680,6 @@ module StubsG2 (S : Cstubs.FOREIGN) = struct
       (ptr blst_g2_t @-> ptr blst_g2_t @-> returning bool)
 
   let cneg = foreign "blst_p2_cneg" (ptr blst_g2_t @-> bool @-> returning void)
-
-  let is_on_curve = foreign "blst_p2_on_curve" (ptr blst_g2_t @-> returning bool)
 
   let in_g2 = foreign "blst_p2_in_g2" (ptr blst_g2_t @-> returning bool)
 
