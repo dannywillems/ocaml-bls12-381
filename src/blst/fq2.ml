@@ -69,7 +69,7 @@ module Fq2 = struct
     Bytes.concat Bytes.empty [x_bytes; y_bytes]
 
   let random ?state () =
-    ignore state ;
+    (match state with None -> () | Some state -> Random.set_state state) ;
     let x = Fq.random () in
     let y = Fq.random () in
     let buffer = Blst_bindings.Types.allocate_fq2 () in

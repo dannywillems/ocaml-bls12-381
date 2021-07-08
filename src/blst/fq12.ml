@@ -77,7 +77,7 @@ module Fq12 = struct
       Some buffer
 
   let random ?state () =
-    ignore state ;
+    (match state with None -> () | Some state -> Random.set_state state) ;
     let buffer = Blst_bindings.Types.allocate_fq12 () in
     for i = 0 to 11 do
       let x = Fq.random () in

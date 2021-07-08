@@ -120,13 +120,14 @@ module G1 = struct
   let b = Fq.(one + one + one + one)
 
   let rec random ?state () =
-    let x = Fq.random ?state () in
+    (match state with None -> () | Some state -> Random.set_state state) ;
+    let x = Fq.random () in
     let xx = Fq.(x * x) in
     let xxx = Fq.(x * xx) in
     let xxx_plus_b = Fq.(xxx + b) in
     let y_opt = Fq.sqrt_opt xxx_plus_b in
     match y_opt with
-    | None -> random ?state ()
+    | None -> random ()
     | Some y ->
         let y = if Random.bool () then y else Fq.negate y in
         let p_affine = Blst_bindings.Types.allocate_g1_affine () in
