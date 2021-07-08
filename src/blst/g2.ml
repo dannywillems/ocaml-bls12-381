@@ -135,13 +135,14 @@ module G2 = struct
     res
 
   let rec random ?state () =
-    let x = Fq2.random ?state () in
+    (match state with None -> () | Some state -> Random.set_state state) ;
+    let x = Fq2.random () in
     let xx = Fq2.(x * x) in
     let xxx = Fq2.(x * xx) in
     let xxx_plus_b = Fq2.(xxx + b) in
     let y_opt = Fq2.sqrt_opt xxx_plus_b in
     match y_opt with
-    | None -> random ?state ()
+    | None -> random ()
     | Some y ->
         let y = if Random.bool () then y else Fq2.negate y in
         let p_affine = Blst_bindings.Types.allocate_g2_affine () in
