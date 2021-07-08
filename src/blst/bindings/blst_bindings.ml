@@ -605,14 +605,10 @@ module StubsG1 (S : Cstubs.FOREIGN) = struct
       "blst_p1_from_affine"
       (ptr blst_g1_t @-> ptr blst_g1_affine_t @-> returning void)
 
-  let add =
-    foreign
-      "blst_p1_add"
-      (ptr blst_g1_t @-> ptr blst_g1_t @-> ptr blst_g1_t @-> returning void)
-
   let double =
     foreign "blst_p1_double" (ptr blst_g1_t @-> ptr blst_g1_t @-> returning void)
 
+  (* Must be used for the complete version *)
   let dadd =
     foreign
       "blst_p1_add_or_double"
@@ -671,9 +667,10 @@ module StubsG2 (S : Cstubs.FOREIGN) = struct
       "blst_p2_from_affine"
       (ptr blst_g2_t @-> ptr blst_g2_affine_t @-> returning void)
 
-  let add =
+  (* Must be used for the complete version *)
+  let dadd =
     foreign
-      "blst_p2_add"
+      "blst_p2_add_or_double"
       (ptr blst_g2_t @-> ptr blst_g2_t @-> ptr blst_g2_t @-> returning void)
 
   let double =
