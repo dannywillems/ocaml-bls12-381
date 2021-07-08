@@ -92,18 +92,17 @@ module G2 = struct
     buffer
 
   let add x y =
+    (* dadd must be used to be complete. add does not work when it is the same
+       point
+    *)
     let buffer = Blst_bindings.Types.allocate_g2 () in
-    Stubs.add buffer x y ;
+    Stubs.dadd buffer x y ;
     buffer
 
   let double x =
-    (* FIXME: I don't know why but double or dadd doesn't work. As it is just a
-       PoC, I leave it like this. Addition is complete
-    *)
-    (* let buffer = Blst_bindings.Types.allocate_g2 () in
-     * Stubs.dadd buffer x x ;
-     * buffer *)
-    add x x
+    let buffer = Blst_bindings.Types.allocate_g2 () in
+    Stubs.double buffer x ;
+    buffer
 
   let mul_bits g bytes =
     let buffer = Blst_bindings.Types.allocate_g2 () in
