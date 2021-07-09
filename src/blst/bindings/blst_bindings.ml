@@ -616,6 +616,8 @@ module StubsG1 (S : Cstubs.FOREIGN) = struct
 
   let is_zero = foreign "blst_p1_is_inf" (ptr blst_g1_t @-> returning bool)
 
+  let in_g1 = foreign "blst_p1_in_g1" (ptr blst_g1_t @-> returning bool)
+
   let equal =
     foreign
       "blst_p1_is_equal"
