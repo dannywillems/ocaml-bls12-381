@@ -84,6 +84,13 @@ module StringRepresentation = struct
           String.equal (Bls12_381.Fr.to_string (Bls12_381.Fr.of_string x)) x ))
       test_vectors
 
+  let test_of_string_higher_than_the_modulus () =
+    let x = random_z () in
+    let x_str = Z.to_string x in
+    let x_plus_order = Z.(add x Bls12_381.Fr.order) in
+    let x_plus_order_str = Z.to_string x_plus_order in
+    assert (Bls12_381.Fr.(eq (of_string x_str) (of_string x_plus_order_str)))
+
   let get_tests () =
     let open Alcotest in
     ( "String representation",
@@ -92,6 +99,10 @@ module StringRepresentation = struct
           "consistency of_string with of_z with test vectors"
           `Quick
           test_of_string_with_of_z;
+        test_case
+          "of_string accepts elements higher than the modulus"
+          `Quick
+          test_of_string_higher_than_the_modulus;
         test_case
           "consistency of_string to_string with test vectors"
           `Quick
