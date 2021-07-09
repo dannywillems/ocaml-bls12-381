@@ -45,7 +45,8 @@ module G2 = struct
     if res = 0 then (
       let buffer = Blst_bindings.Types.allocate_g2 () in
       Stubs.from_affine buffer buffer_affine ;
-      Some buffer )
+      let is_in_prime_subgroup = Stubs.in_g2 buffer in
+      if is_in_prime_subgroup then Some buffer else None )
     else None
 
   let of_bytes_exn bs =
@@ -149,7 +150,8 @@ module G2 = struct
         Blst_bindings.Types.g2_affine_set_y p_affine y ;
         let p = Blst_bindings.Types.allocate_g2 () in
         Stubs.from_affine p p_affine ;
-        clear_cofactor p
+        let p = clear_cofactor p in
+        p
 
   let eq g1 g2 = Stubs.equal g1 g2
 
