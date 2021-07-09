@@ -83,13 +83,13 @@ lint-js:
     - opam pin add bls12-381-unix-blst.dev . --no-action
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
-    # Install the packages
-    - opam install bls12-381-gen -y --with-test
-    - opam install bls12-381 -y --with-test
-    - opam install bls12-381-unix -y --with-test
-    - opam install bls12-381-unix-blst -y --with-test
-    - opam install bls12-381-js-gen -y --with-test
-    - opam install bls12-381-js -y --with-test
+    # Install the dependencies
+    - opam install bls12-381-gen -y --with-test --deps-only
+    - opam install bls12-381 -y --with-test --deps-only
+    - opam install bls12-381-unix -y --with-test --deps-only
+    - opam install bls12-381-unix-blst -y --with-test --deps-only
+    - opam install bls12-381-js-gen -y --with-test --deps-only
+    - opam install bls12-381-js -y --with-test --deps-only
     - dune build @install
     - dune runtest
     # Additional test for the browser case of `js`. Tests are not automatic.
@@ -315,7 +315,14 @@ doc:
     - cp libblst.a $OPAM_SWITCH_PREFIX/lib/blst
     - cp bindings/*.h $OPAM_SWITCH_PREFIX/lib/blst
     - cd ../
-    - opam install . -y --with-test
+    # Install packages after pin
+    - opam pin add bls12-381-gen.dev . --no-action
+    - opam pin add bls12-381.dev . --no-action
+    - opam pin add bls12-381-js-gen.dev . --no-action
+    - opam pin add bls12-381-js.dev . --no-action
+    - opam pin add bls12-381-unix.dev . --no-action
+    - opam pin add bls12-381-unix-blst.dev . --no-action
+    - opam install . -y --deps-only
   script:
     - dune build @doc
     - cp -r _build/default/_doc/_html _odoc/
