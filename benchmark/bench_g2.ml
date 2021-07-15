@@ -48,6 +48,17 @@ let t8 =
   Bench.Test.create ~name:"to_compressed_bytes on G2" (fun () ->
       ignore (G2.to_compressed_bytes p))
 
-let command = Bench.make_command [t1; t2; t3; t4; t5; t6; t7; t8]
+let t9 =
+  let open Bls12_381 in
+  let message_length = Random.int 512 in
+  let dst_length = Random.int 48 in
+  let message =
+    Bytes.init message_length ~f:(fun _i -> char_of_int (Random.int 256))
+  in
+  let dst = Bytes.init dst_length ~f:(fun _i -> char_of_int (Random.int 48)) in
+  Bench.Test.create ~name:"hash_to_curve on G2" (fun () ->
+      ignore (G2.hash_to_curve message dst))
+
+let command = Bench.make_command [t1; t2; t3; t4; t5; t6; t7; t8; t9]
 
 let () = Core.Command.run command
