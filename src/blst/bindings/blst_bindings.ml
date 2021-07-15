@@ -648,6 +648,12 @@ module StubsG1 (S : Cstubs.FOREIGN) = struct
     foreign
       "blst_p1_uncompress"
       (ptr blst_g1_affine_t @-> ocaml_bytes @-> returning int)
+
+  let hash_to_curve =
+    foreign
+      "blst_hash_to_g1"
+      ( ptr blst_g1_t @-> ocaml_bytes @-> size_t @-> ocaml_bytes @-> size_t
+      @-> ocaml_bytes @-> size_t @-> returning void )
 end
 
 module StubsG2 (S : Cstubs.FOREIGN) = struct
@@ -708,6 +714,12 @@ module StubsG2 (S : Cstubs.FOREIGN) = struct
     foreign
       "blst_p2_uncompress"
       (ptr blst_g2_affine_t @-> ocaml_bytes @-> returning int)
+
+  let hash_to_curve =
+    foreign
+      "blst_hash_to_g2"
+      ( ptr blst_g2_t @-> ocaml_bytes @-> size_t @-> ocaml_bytes @-> size_t
+      @-> ocaml_bytes @-> size_t @-> returning void )
 end
 
 module StubsFq12 (S : Cstubs.FOREIGN) = struct

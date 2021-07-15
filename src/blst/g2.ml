@@ -224,6 +224,22 @@ module G2 = struct
       let scalar_of_z = Scalar.of_z
     end in
     Bls12_381_gen.Fft.ifft (module M) ~domain ~points
+
+  let hash_to_curve message dst =
+    let message_length = Bytes.length message in
+    let dst_length = Bytes.length dst in
+    assert (message_length <= 512) ;
+    assert (dst_length <= 48) ;
+    let buffer = Blst_bindings.Types.allocate_g2 () in
+    Stubs.hash_to_curve
+      buffer
+      (Ctypes.ocaml_bytes_start message)
+      (Unsigned.Size_t.of_int message_length)
+      (Ctypes.ocaml_bytes_start dst)
+      (Unsigned.Size_t.of_int dst_length)
+      (Ctypes.ocaml_bytes_start Bytes.empty)
+      Unsigned.Size_t.zero ;
+    buffer
 end
 
 include G2
