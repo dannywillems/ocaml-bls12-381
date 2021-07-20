@@ -1,6 +1,20 @@
 (copy_files bindings/{blst_bindings.ml})
 (copy_files bindings/{blst_stubs.ml})
 (copy_files bindings/blst_ctypes_c_stubs.c)
+(copy_files libblst/bindings/blst.h)
+(copy_files libblst/bindings/blst_aux.h)
+(data_only_dirs libblst)
+
+(rule
+ (deps (source_tree libblst))
+ (targets libblst.a dllblst.so)
+ (action
+ (no-infer
+  (progn
+   (chdir libblst (run ./build.sh -shared))
+   (copy libblst/libblst.a libblst.a)
+   (copy libblst/libblst.so dllblst.so)
+   ))))
 
 (library
  (public_name bls12-381-unix-blst)
@@ -34,16 +48,9 @@
    bls12-381-gen
  )
  (library_flags :standard -linkall -ccopt -lpthread)
+ (foreign_archives blst)
  (foreign_stubs
   (language c)
   (names blst_ctypes_c_stubs)
-  (flags (
-    -I%{env:OPAM_SWITCH_PREFIX=}/lib/blst)
-  )
- )
- (c_library_flags (
-   -L%{env:OPAM_SWITCH_PREFIX=}/lib/blst
-      -lblst
-      -lpthread)
  )
 )
