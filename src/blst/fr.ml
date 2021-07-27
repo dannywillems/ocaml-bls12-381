@@ -103,7 +103,7 @@ module Fr = struct
       Bytes.init size_in_bytes (fun _ -> char_of_int @@ Random.int 256)
     in
     let res = of_bytes_opt random_bytes in
-    match res with None -> random ?state () | Some res -> res
+    match res with None -> random ?state:None () | Some res -> res
 
   let rec non_null_random ?state () =
     let r = random ?state () in
