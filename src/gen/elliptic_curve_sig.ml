@@ -114,6 +114,8 @@ module type T = sig
       complexity is O(n log(n)) where [n] is the domain size.
   *)
   val ifft : domain:Scalar.t array -> points:t array -> t array
+
+  val hash_to_curve : Bytes.t -> Bytes.t -> t
 end
 
 module type RAW_BASE = sig
