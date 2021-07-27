@@ -325,6 +325,13 @@ doc:
     - opam update
     - opam depext -i -y zarith conf-libffi conf-rust conf-perl conf-pkg-config
     - sudo apt-get install m4 -y
+    # Pin dev versions. Avoid clash with public opam-repository
+    - opam pin add bls12-381-gen.dev . --no-action
+    - opam pin add bls12-381.dev . --no-action
+    - opam pin add bls12-381-js-gen.dev . --no-action
+    - opam pin add bls12-381-js.dev . --no-action
+    - opam pin add bls12-381-unix.dev . --no-action
+    - opam pin add bls12-381-unix-blst.dev . --no-action
     - opam install odoc -y
     - opam install . -y --deps-only
   script:
