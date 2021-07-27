@@ -287,4 +287,9 @@ struct
       let scalar_of_z = Scalar.of_z
     end in
     Fft.ifft (module M) ~domain ~points
+
+  let hash_to_curve message dst =
+    ignore message ;
+    ignore dst ;
+    failwith "Not implemented"
 end
