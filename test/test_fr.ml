@@ -43,12 +43,10 @@ let test_vectors =
     "65363576374567456780984059630856836098740965874094860978";
     "546574608450909809809809824360345639808560937" ]
 
-let rec random_z () =
-  let size = Random.int Bls12_381.Fr.size_in_bytes in
-  if size = 0 then random_z ()
-  else
-    let r = Bytes.init size (fun _ -> char_of_int (Random.int 256)) in
-    Z.erem (Z.of_bits (Bytes.to_string r)) Bls12_381.Fr.order
+let random_z () =
+  let size = 1 + Random.int Bls12_381.Fr.size_in_bytes in
+  let r = Bytes.init size (fun _ -> char_of_int (Random.int 256)) in
+  Z.erem (Z.of_bits (Bytes.to_string r)) Bls12_381.Fr.order
 
 let rec repeat n f =
   if n <= 0 then
