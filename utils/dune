@@ -27,3 +27,9 @@
  (modules generate_g2_test_vectors)
  (libraries hex bls12-381-unix)
 )
+
+(executable
+ (name generate_hash_to_curve_vectors)
+ (modules generate_hash_to_curve_vectors)
+ (libraries hex bls12-381-unix-blst)
+)
