@@ -59,12 +59,10 @@ let test_vectors_g2_from_bls_sigs_ref_files () =
         in
         let msg = Hex.(to_bytes (`Hex msg_str)) in
         let res = Bls12_381.G2.hash_to_curve msg ciphersuite in
-        print_endline "hello" ;
         let expected_result =
           Bls12_381.G2.of_compressed_bytes_exn
             Hex.(to_bytes (`Hex expected_result_str))
         in
-        print_endline "hello" ;
         if not @@ Bls12_381.G2.eq res expected_result then
           Alcotest.failf
             "Expected result is %s on input %s, but computed %s"
