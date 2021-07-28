@@ -4,6 +4,10 @@
 
 (copy_files ../test_vectors/{*})
 
+(copy_files ../test_vectors/hash_to_curve_g1/{*})
+
+(copy_files ../test_vectors/hash_to_curve_g2/{*})
+
 (tests
  (names
    test_fr
@@ -14,6 +18,7 @@
    test_g2_fft
    test_pairing
    test_random_state
+   test_hash_to_curve
  )
  (modules
    test_fr
@@ -25,6 +30,7 @@
    test_pairing
    test_ec_make
    test_random_state
+   test_hash_to_curve
  )
  (package bls12-381-unix-blst)
  (deps
@@ -34,5 +40,30 @@
    ifft_test_vector_g2_2
    test_vector_g1_2
    test_vector_g2_2
+   ;; These files come from https://github.com/algorand/bls_sigs_ref/pull/7.
+   g1_fips_186_3_B233
+   g1_fips_186_3_B283
+   g1_fips_186_3_B409
+   g1_fips_186_3_B571
+   g1_fips_186_3_K233
+   g1_fips_186_3_K409
+   g1_fips_186_3_K571
+   g1_fips_186_3_P224
+   g1_fips_186_3_P256
+   g1_fips_186_3_P384
+   g1_fips_186_3_P521
+   g1_rfc6979
+   g2_fips_186_3_B233
+   g2_fips_186_3_B283
+   g2_fips_186_3_B409
+   g2_fips_186_3_B571
+   g2_fips_186_3_K233
+   g2_fips_186_3_K409
+   g2_fips_186_3_K571
+   g2_fips_186_3_P224
+   g2_fips_186_3_P256
+   g2_fips_186_3_P384
+   g2_fips_186_3_P521
+   g2_rfc6979
  )
  (libraries bls12-381-unix-blst alcotest ff-pbt hex))
