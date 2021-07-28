@@ -204,11 +204,30 @@ module CompressedRepresentation = struct
         assert (Bytes.equal expected_bytes computed_bytes))
       vectors
 
+  let test_of_compressed_bytes_exn_and_opt_do_not_accept_uncompressed_bytes_representation
+      () =
+    let x = Bls12_381.G2.random () in
+    let x_uncompressed_bytes = Bls12_381.G2.to_bytes x in
+    assert (
+      Option.is_none (Bls12_381.G2.of_compressed_bytes_opt x_uncompressed_bytes)
+    ) ;
+    try
+      ignore @@ Bls12_381.G2.of_compressed_bytes_exn x_uncompressed_bytes ;
+      assert false
+    with Bls12_381.G2.Not_on_curve _b -> ()
+
   let get_tests () =
     let open Alcotest in
     let (name, common_tests) = get_tests () in
     ( name,
       test_case "vectors" `Quick test_vectors
+      :: test_case
+           "of_compressed_bytes_opt/exn do not accept uncompressed bytes \
+            representation"
+           `Quick
+           (Test_ec_make.repeat
+              1000
+              test_of_compressed_bytes_exn_and_opt_do_not_accept_uncompressed_bytes_representation)
       :: test_case "Regression tests" `Quick regression_tests
       :: common_tests )
 end
