@@ -43,13 +43,15 @@ module G1 = struct
 
   let of_bytes_opt bs =
     let buffer_affine = Blst_bindings.Types.allocate_g1_affine () in
-    let res = Stubs.deserialize buffer_affine (Ctypes.ocaml_bytes_start bs) in
-    if res = 0 then (
-      let buffer = Blst_bindings.Types.allocate_g1 () in
-      Stubs.from_affine buffer buffer_affine ;
-      let is_in_prime_subgroup = Stubs.in_g1 buffer in
-      if is_in_prime_subgroup then Some buffer else None )
-    else None
+    if Bytes.length bs <> size_in_bytes then None
+    else
+      let res = Stubs.deserialize buffer_affine (Ctypes.ocaml_bytes_start bs) in
+      if res = 0 then (
+        let buffer = Blst_bindings.Types.allocate_g1 () in
+        Stubs.from_affine buffer buffer_affine ;
+        let is_in_prime_subgroup = Stubs.in_g1 buffer in
+        if is_in_prime_subgroup then Some buffer else None )
+      else None
 
   let of_bytes_exn bs =
     match of_bytes_opt bs with None -> raise (Not_on_curve bs) | Some p -> p

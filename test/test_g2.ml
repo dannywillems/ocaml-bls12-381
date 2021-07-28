@@ -106,6 +106,16 @@ module UncompressedRepresentation = struct
         assert (Option.is_none (Bls12_381.G2.of_bytes_opt p_bytes)))
       test_vectors
 
+  let test_of_bytes_exn_and_opt_do_not_accept_compressed_bytes_representation ()
+      =
+    let x = Bls12_381.G2.random () in
+    let x_compressed_bytes = Bls12_381.G2.to_compressed_bytes x in
+    assert (Option.is_none (Bls12_381.G2.of_bytes_opt x_compressed_bytes)) ;
+    try
+      ignore @@ Bls12_381.G2.of_bytes_exn x_compressed_bytes ;
+      assert false
+    with Bls12_381.G2.Not_on_curve _b -> ()
+
   let get_tests () =
     let open Alcotest in
     ( "Representation of G2 Uncompressed",
@@ -117,6 +127,12 @@ module UncompressedRepresentation = struct
           "of_bytes_[opt/exn] verifies the point is in the prime subgroup"
           `Quick
           test_of_bytes_checks_the_point_is_in_the_prime_subgroup;
+        test_case
+          "of_bytes_opt/exn do not accept compressed bytes representation"
+          `Quick
+          (Test_ec_make.repeat
+             1000
+             test_of_bytes_exn_and_opt_do_not_accept_compressed_bytes_representation);
         test_case
           "random has first byte strictly lower than 64"
           `Quick

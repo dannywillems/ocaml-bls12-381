@@ -41,32 +41,18 @@ module G2 = struct
 
   let of_bytes_opt bs =
     let buffer_affine = Blst_bindings.Types.allocate_g2_affine () in
-    let res = Stubs.deserialize buffer_affine (Ctypes.ocaml_bytes_start bs) in
-    if res = 0 then (
-      let buffer = Blst_bindings.Types.allocate_g2 () in
-      Stubs.from_affine buffer buffer_affine ;
-      let is_in_prime_subgroup = Stubs.in_g2 buffer in
-      if is_in_prime_subgroup then Some buffer else None )
-    else None
+    if Bytes.length bs <> size_in_bytes then None
+    else
+      let res = Stubs.deserialize buffer_affine (Ctypes.ocaml_bytes_start bs) in
+      if res = 0 then (
+        let buffer = Blst_bindings.Types.allocate_g2 () in
+        Stubs.from_affine buffer buffer_affine ;
+        let is_in_prime_subgroup = Stubs.in_g2 buffer in
+        if is_in_prime_subgroup then Some buffer else None )
+      else None
 
   let of_bytes_exn bs =
     match of_bytes_opt bs with None -> raise (Not_on_curve bs) | Some p -> p
-
-  let zero =
-    let bytes =
-      Hex.to_bytes
-        (`Hex
-          "c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
-    in
-    of_bytes_exn bytes
-
-  let one =
-    let bytes =
-      Hex.to_bytes
-        (`Hex
-          "93e02b6052719f607dacd3a088274f65596bd0d09920b61ab5da61bbdc7f5049334cf11213945d57e5ac7d055d042b7e024aa2b2f08f0a91260805272dc51051c6e47ad4fa403b02b4510b647ae3d1770bac0326a805bbefd48056c8c121bdb8")
-    in
-    of_bytes_exn bytes
 
   let of_compressed_bytes_opt bs =
     let buffer_affine = Blst_bindings.Types.allocate_g2_affine () in
@@ -81,6 +67,22 @@ module G2 = struct
     match of_compressed_bytes_opt bs with
     | None -> raise (Not_on_curve bs)
     | Some p -> p
+
+  let zero =
+    let bytes =
+      Hex.to_bytes
+        (`Hex
+          "c00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+    in
+    of_compressed_bytes_exn bytes
+
+  let one =
+    let bytes =
+      Hex.to_bytes
+        (`Hex
+          "93e02b6052719f607dacd3a088274f65596bd0d09920b61ab5da61bbdc7f5049334cf11213945d57e5ac7d055d042b7e024aa2b2f08f0a91260805272dc51051c6e47ad4fa403b02b4510b647ae3d1770bac0326a805bbefd48056c8c121bdb8")
+    in
+    of_compressed_bytes_exn bytes
 
   let to_bytes p =
     let buffer = Bytes.make size_in_bytes '\000' in
