@@ -32,6 +32,7 @@ module AllBindings (F : Cstubs.FOREIGN) = struct
   include Blst_bindings.StubsG1 (F)
   include Blst_bindings.StubsG2 (F)
   include Blst_bindings.StubsPairing (F)
+  include Blst_bindings.StubsSignature (F)
 end
 
 let () =

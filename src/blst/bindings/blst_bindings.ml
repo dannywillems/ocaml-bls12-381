@@ -137,6 +137,10 @@ module type TYPES = sig
 
   val g2_affine_set_y :
     blst_g2_affine_t Ctypes.ptr -> blst_fq2_t Ctypes.ptr -> unit
+
+  type blst_pairing_t
+
+  val blst_pairing_t : blst_pairing_t Ctypes.typ
 end
 
 module Types : TYPES = struct
@@ -465,6 +469,18 @@ module Types : TYPES = struct
   let g2_affine_set_y p y =
     let (_, _, field_y, _) = blst_g2_affine_t_compo in
     Ctypes.(setf !@p field_y !@y)
+
+  type blst_pairing
+
+  type blst_pairing_t = blst_pairing Ctypes.structure
+
+  let blst_pairing_t : blst_pairing_t Ctypes.typ =
+    let anon_structure = Ctypes.structure "" in
+    (* only adding one field to avoid having "struct with no fields" *)
+    let _field_ctrl = Ctypes.field anon_structure "ctrl" Ctypes.uint in
+    let blst_pairing_t = Ctypes.(typedef anon_structure "blst_pairing") in
+    Ctypes.seal blst_pairing_t ;
+    blst_pairing_t
 end
 
 module StubsFr (S : Cstubs.FOREIGN) = struct
@@ -766,4 +782,65 @@ module StubsPairing (S : Cstubs.FOREIGN) = struct
     foreign
       "blst_final_exp"
       (ptr blst_fq12_t @-> ptr blst_fq12_t @-> returning void)
+end
+
+module StubsSignature (S : Cstubs.FOREIGN) = struct
+  open Ctypes
+  open Types
+  open S
+
+  let keygen =
+    foreign
+      "blst_keygen"
+      ( ptr blst_scalar_t @-> ocaml_bytes @-> size_t @-> ocaml_bytes @-> size_t
+      @-> returning void )
+
+  let sk_to_pk =
+    foreign
+      "blst_sk_to_pk_in_g1"
+      (ptr blst_g1_t @-> ptr blst_scalar_t @-> returning void)
+
+  let sign =
+    foreign
+      "blst_sign_pk_in_g1"
+      (ptr blst_g2_t @-> ptr blst_g2_t @-> ptr blst_scalar_t @-> returning void)
+
+  let pairing_init =
+    foreign
+      "blst_pairing_init"
+      (ptr blst_pairing_t @-> bool @-> ocaml_bytes @-> size_t @-> returning void)
+
+  let core_verify =
+    foreign
+      "blst_core_verify_pk_in_g1"
+      ( ptr blst_g1_affine_t @-> ptr blst_g2_affine_t @-> bool @-> ocaml_bytes
+      @-> size_t @-> ocaml_bytes @-> size_t @-> ocaml_bytes @-> size_t
+      @-> returning int )
+
+  let aggregate_signature =
+    foreign
+      "blst_pairing_aggregate_pk_in_g1"
+      ( ptr blst_pairing_t @-> ptr blst_g1_affine_t @-> ptr blst_g2_affine_t
+      @-> ocaml_bytes @-> size_t @-> ocaml_bytes @-> size_t @-> returning int )
+
+  let sizeof_pairing = foreign "blst_pairing_sizeof" (void @-> returning size_t)
+
+  let malloc = foreign "malloc" (size_t @-> returning (ptr void))
+
+  let free = foreign "free" (ptr void @-> returning void)
+
+  let pairing_commit =
+    foreign "blst_pairing_commit" (ptr blst_pairing_t @-> returning void)
+
+  let pairing_finalverify =
+    foreign
+      "blst_pairing_finalverify"
+      (ptr blst_pairing_t @-> ptr blst_fq12_t @-> returning bool)
+
+  let pairing_chk_n_mul_n_aggr_pk_in_g1 =
+    foreign
+      "blst_pairing_chk_n_mul_n_aggr_pk_in_g1"
+      ( ptr blst_pairing_t @-> ptr blst_g1_affine_t @-> bool
+      @-> ptr blst_g2_affine_t @-> bool @-> ocaml_bytes @-> size_t
+      @-> ocaml_bytes @-> size_t @-> ocaml_bytes @-> size_t @-> returning int )
 end

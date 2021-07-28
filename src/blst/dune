@@ -27,6 +27,7 @@
    g1
    g2
    pairing
+   signature
    ;; private
    fq
    fq2
