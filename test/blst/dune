@@ -8,6 +8,14 @@
 
 (copy_files ../test_vectors/hash_to_curve_g2/{*})
 
+(copy_files ../test_vectors/sig_g2_basic/{*})
+
+(copy_files ../test_vectors/sig_g2_aug/{*})
+
+(copy_files ../test_vectors/sig_g2_pop/{*})
+
+(copy_files ../test_vectors/pop_g2/{*})
+
 (tests
  (names
    test_fr
@@ -19,6 +27,8 @@
    test_pairing
    test_random_state
    test_hash_to_curve
+   test_signature
+   test_aggregated_signature
  )
  (modules
    test_fr
@@ -31,6 +41,8 @@
    test_ec_make
    test_random_state
    test_hash_to_curve
+   test_signature
+   test_aggregated_signature
  )
  (package bls12-381-unix-blst)
  (deps
@@ -41,6 +53,7 @@
    test_vector_g1_2
    test_vector_g2_2
    ;; These files come from https://github.com/algorand/bls_sigs_ref/pull/7.
+   ;; ;; hash_to_curve
    g1_fips_186_3_B233
    g1_fips_186_3_B283
    g1_fips_186_3_B409
@@ -65,5 +78,55 @@
    g2_fips_186_3_P384
    g2_fips_186_3_P521
    g2_rfc6979
+   ;; ;; signature
+   sig_g2_basic_fips_186_3_B233_blst
+   sig_g2_basic_fips_186_3_B283_blst
+   sig_g2_basic_fips_186_3_B409_blst
+   sig_g2_basic_fips_186_3_B571_blst
+   sig_g2_basic_fips_186_3_K233_blst
+   sig_g2_basic_fips_186_3_K409_blst
+   sig_g2_basic_fips_186_3_K571_blst
+   sig_g2_basic_fips_186_3_P224_blst
+   sig_g2_basic_fips_186_3_P256_blst
+   sig_g2_basic_fips_186_3_P384_blst
+   sig_g2_basic_fips_186_3_P521_blst
+   sig_g2_basic_rfc6979_blst
+   sig_g2_aug_fips_186_3_B233_blst
+   sig_g2_aug_fips_186_3_B283_blst
+   sig_g2_aug_fips_186_3_B409_blst
+   sig_g2_aug_fips_186_3_B571_blst
+   sig_g2_aug_fips_186_3_K233_blst
+   sig_g2_aug_fips_186_3_K409_blst
+   sig_g2_aug_fips_186_3_K571_blst
+   sig_g2_aug_fips_186_3_P224_blst
+   sig_g2_aug_fips_186_3_P256_blst
+   sig_g2_aug_fips_186_3_P384_blst
+   sig_g2_aug_fips_186_3_P521_blst
+   sig_g2_aug_rfc6979_blst
+   sig_g2_pop_fips_186_3_B233_blst
+   sig_g2_pop_fips_186_3_B283_blst
+   sig_g2_pop_fips_186_3_B409_blst
+   sig_g2_pop_fips_186_3_B571_blst
+   sig_g2_pop_fips_186_3_K233_blst
+   sig_g2_pop_fips_186_3_K409_blst
+   sig_g2_pop_fips_186_3_K571_blst
+   sig_g2_pop_fips_186_3_P224_blst
+   sig_g2_pop_fips_186_3_P256_blst
+   sig_g2_pop_fips_186_3_P384_blst
+   sig_g2_pop_fips_186_3_P521_blst
+   sig_g2_pop_rfc6979_blst
+   ;; ;; pop
+   pop_g2_fips_186_3_B233_blst
+   pop_g2_fips_186_3_B283_blst
+   pop_g2_fips_186_3_B409_blst
+   pop_g2_fips_186_3_B571_blst
+   pop_g2_fips_186_3_K233_blst
+   pop_g2_fips_186_3_K409_blst
+   pop_g2_fips_186_3_K571_blst
+   pop_g2_fips_186_3_P224_blst
+   pop_g2_fips_186_3_P256_blst
+   pop_g2_fips_186_3_P384_blst
+   pop_g2_fips_186_3_P521_blst
+   pop_g2_rfc6979_blst
  )
  (libraries bls12-381-unix-blst alcotest ff-pbt hex))
