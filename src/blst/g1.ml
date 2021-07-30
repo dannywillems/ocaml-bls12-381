@@ -222,8 +222,6 @@ module G1 = struct
   let hash_to_curve message dst =
     let message_length = Bytes.length message in
     let dst_length = Bytes.length dst in
-    assert (message_length <= 512) ;
-    assert (dst_length <= 48) ;
     let buffer = Blst_bindings.Types.allocate_g1 () in
     Stubs.hash_to_curve
       buffer
