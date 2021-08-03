@@ -87,9 +87,11 @@ For more examples, see the test directories.
 
 ```
 opam install core_bench
-dune exec benchmark/bench_ec.exe
-dune exec benchmark/bench_ff.exe
+dune exec benchmark/bench_fr.exe
+dune exec benchmark/bench_g1.exe
+dune exec benchmark/bench_g2.exe
 dune exec benchmark/bench_pairing.exe
+dune exec benchmark/bench_signature.exe
 ```
 
 ## Documentation

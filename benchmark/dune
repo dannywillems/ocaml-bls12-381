@@ -5,3 +5,5 @@
 (executable (name bench_fr) (modules bench_fr) (libraries bls12-381-unix core core_bench))
 
 (executable (name bench_pairing) (modules bench_pairing) (libraries bls12-381-unix core core_bench))
+
+(executable (name bench_signature) (modules bench_signature) (libraries bls12-381-unix-blst core core_bench))
