@@ -12,8 +12,9 @@
  (no-infer
   (progn
    (chdir libblst (run ./build.sh -shared))
-   (copy libblst/libblst.a libblst.a)
-   (copy libblst/libblst.so dllblst.so)
+   (run cp libblst/libblst.a libblst.a)
+   (with-accepted-exit-codes (or 0 1) (run cp libblst/libblst.so dllblst.so))
+   (with-accepted-exit-codes (or 0 1) (run cp libblst/libblst.dylib dllblst.so))
    ))))
 
 (library
