@@ -60,7 +60,8 @@ module G2 = struct
     if res = 0 then (
       let buffer = Blst_bindings.Types.allocate_g2 () in
       Stubs.from_affine buffer buffer_affine ;
-      Some buffer )
+      let is_in_prime_subgroup = Stubs.in_g2 buffer in
+      if is_in_prime_subgroup then Some buffer else None )
     else None
 
   let of_compressed_bytes_exn bs =
