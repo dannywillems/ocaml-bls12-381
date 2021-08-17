@@ -2,7 +2,7 @@ opam-version: "2.0"
 authors: [ "Danny Willems <be.danny.willems@gmail.com>" ]
 maintainer: [ "Danny Willems <be.danny.willems@gmail.com>" ]
 synopsis: "UNIX version of BLS12-381 primitives implementing the virtual package
-bls12-381"
+bls12-381 using Rust backend"
 homepage: "https://gitlab.com/dannywillems/ocaml-bls12-381"
 dev-repo: "git+https://gitlab.com/dannywillems/ocaml-bls12-381.git"
 bug-reports: "https://gitlab.com/dannywillems/ocaml-bls12-381/issues"
@@ -18,10 +18,10 @@ depends: [
   "ctypes-foreign"
   "bls12-381-gen" {= version}
   "bls12-381" {= version}
-  "tezos-rust-libs" {= "1.1"}
+  "tezos-rust-libs" { = "1.1" }
   "alcotest" {with-test}
-  "bisect_ppx" {with-test & >= "2.5"}
   "ff-pbt" {>= "0.6.0" & < "0.7.0" & with-test}
+  "bisect_ppx" {with-test & >= "2.5"}
   "hex" {with-test}
 ]
 build: [[ "dune" "build" "-j" jobs "-p" name "@install" ]]

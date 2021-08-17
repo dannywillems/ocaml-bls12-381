@@ -1,8 +1,8 @@
 (copy_files bindings/{rustc_bls12_381_ctypes_c_stubs.c,rustc_bls12_381_stubs.ml,rustc_bls12_381_bindings.ml})
 
 (library
- (public_name bls12-381-unix)
- (name bls12_381_unix)
+ (public_name bls12-381-unix-rust)
+ (name bls12_381_unix_rust)
  (implements bls12-381)
  (modules bls12_381 fr g1 g2 pairing fq12 rustc_bls12_381_stubs rustc_bls12_381_bindings)
  (instrumentation (backend bisect_ppx))

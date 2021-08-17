@@ -1,6 +1,6 @@
 (copy_files ../{*.ml})
 
-(copy_files ../unix/{test_g1_fft.ml,test_g2_fft.ml})
+(copy_files ../rust/{test_g1_fft.ml,test_g2_fft.ml})
 
 (copy_files ../test_vectors/{*})
 
@@ -44,7 +44,7 @@
    test_signature
    test_aggregated_signature
  )
- (package bls12-381-unix-blst)
+ (package bls12-381-unix)
  (deps
    fft_test_vector_g1_2
    fft_test_vector_g2_2
@@ -129,4 +129,4 @@
    pop_g2_fips_186_3_P521_blst
    pop_g2_rfc6979_blst
  )
- (libraries bls12-381-unix-blst alcotest ff-pbt hex))
+ (libraries bls12-381-unix alcotest ff-pbt hex))

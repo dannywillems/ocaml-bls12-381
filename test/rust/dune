@@ -20,7 +20,7 @@
    test_pairing
    test_ec_make
  )
- (package bls12-381-unix)
+ (package bls12-381-unix-rust)
  (deps
    fft_test_vector_g1_2
    fft_test_vector_g2_2
@@ -29,4 +29,4 @@
    test_vector_g1_2
    test_vector_g2_2
  )
- (libraries bls12-381-unix alcotest ff-pbt hex))
+ (libraries bls12-381-unix-rust alcotest ff-pbt hex))
