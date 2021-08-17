@@ -5,5 +5,7 @@
 
 (rule
  (targets rustc_bls12_381_stubs.ml rustc_bls12_381_ctypes_c_stubs.c)
- (deps    (:gen ./rustc_bls12_381_gen.exe))
- (action  (run %{gen} %{targets})))
+ (deps
+  (:gen ./rustc_bls12_381_gen.exe))
+ (action
+  (run %{gen} %{targets})))
