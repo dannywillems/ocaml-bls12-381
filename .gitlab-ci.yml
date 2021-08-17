@@ -82,14 +82,14 @@ lint-js:
     - opam pin add bls12-381-gen.dev . --no-action
     - opam pin add bls12-381.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
-    - opam pin add bls12-381-unix-blst.dev . --no-action
+    - opam pin add bls12-381-unix-rust.dev . --no-action
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     # Install the dependencies
     - opam install bls12-381-gen -y --with-test --deps-only
     - opam install bls12-381 -y --with-test --deps-only
     - opam install bls12-381-unix -y --with-test --deps-only
-    - opam install bls12-381-unix-blst -y --with-test --deps-only
+    - opam install bls12-381-unix-rust -y --with-test --deps-only
     - opam install bls12-381-js-gen -y --with-test --deps-only
     - opam install bls12-381-js -y --with-test --deps-only
     - dune build @install
@@ -186,7 +186,7 @@ opam-install-and-remove:
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
-    - opam pin add bls12-381-unix-blst.dev . --no-action
+    - opam pin add bls12-381-unix-rust.dev . --no-action
 
     - opam depext bls12-381-gen -y -v
     - opam install bls12-381-gen -y -v --deps-only
@@ -208,14 +208,14 @@ opam-install-and-remove:
     - opam install bls12-381-unix -y -v --deps-only
     - opam install bls12-381-unix -y -v
 
-    - opam depext bls12-381-unix-blst -y -v
-    - opam install bls12-381-unix-blst -y -v --deps-only
-    - opam install bls12-381-unix-blst -y -v
+    - opam depext bls12-381-unix-rust -y -v
+    - opam install bls12-381-unix-rust -y -v --deps-only
+    - opam install bls12-381-unix-rust -y -v
 
     - opam remove -a -y bls12-381-js
     - opam remove -a -y bls12-381-js-gen
     - opam remove -a -y bls12-381-unix
-    - opam remove -a -y bls12-381-unix-blst
+    - opam remove -a -y bls12-381-unix-rust
     - opam remove -a -y bls12-381
     - opam remove -a -y bls12-381-gen
   rules:
@@ -243,7 +243,7 @@ opam-install-and-remove-local-switch:
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
-    - opam pin add bls12-381-unix-blst.dev . --no-action
+    - opam pin add bls12-381-unix-rust.dev . --no-action
 
     - opam depext bls12-381-gen -y -v
     - opam install bls12-381-gen -y -v --deps-only
@@ -265,14 +265,14 @@ opam-install-and-remove-local-switch:
     - opam install bls12-381-unix -y -v --deps-only
     - opam install bls12-381-unix -y -v
 
-    - opam depext bls12-381-unix-blst -y -v
-    - opam install bls12-381-unix-blst -y -v --deps-only
-    - opam install bls12-381-unix-blst -y -v
+    - opam depext bls12-381-unix-rust -y -v
+    - opam install bls12-381-unix-rust -y -v --deps-only
+    - opam install bls12-381-unix-rust -y -v
 
     - opam remove -a -y bls12-381-js
     - opam remove -a -y bls12-381-js-gen
     - opam remove -a -y bls12-381-unix
-    - opam remove -a -y bls12-381-unix-blst
+    - opam remove -a -y bls12-381-unix-rust
     - opam remove -a -y bls12-381
     - opam remove -a -y bls12-381-gen
   rules:
@@ -294,7 +294,7 @@ doc:
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
-    - opam pin add bls12-381-unix-blst.dev . --no-action
+    - opam pin add bls12-381-unix-rust.dev . --no-action
     - opam install odoc -y
     - opam install . -y --deps-only
   script:
