@@ -30,7 +30,106 @@ let rec repeat n f =
     f () ;
     repeat (n - 1) f )
 
-module MakeEquality (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
+(* copied from G_SIG to remove the dependency on
+   bls12-381-gen
+*)
+module type G_SIG = sig
+  exception Not_on_curve of Bytes.t
+
+  (** The type of the element in the elliptic curve *)
+  type t
+
+  (** The size of a point representation, in bytes *)
+  val size_in_bytes : int
+
+  module Scalar : Ff_sig.PRIME
+
+  (** Create an empty value to store an element of the curve. DO NOT USE THIS TO
+      DO COMPUTATIONS WITH, UNDEFINED BEHAVIORS MAY HAPPEN *)
+  val empty : unit -> t
+
+  (** Check if a point, represented as a byte array, is on the curve **)
+  val check_bytes : Bytes.t -> bool
+
+  (** Attempt to construct a point from a byte array of length [size_in_bytes]. *)
+  val of_bytes_opt : Bytes.t -> t option
+
+  (** Attempt to construct a point from a byte array of length [size_in_bytes].
+      Raise [Not_on_curve] if the point is not on the curve
+  *)
+  val of_bytes_exn : Bytes.t -> t
+
+  (** Allocates a new point from a byte of length [size_in_bytes / 2] array
+      representing a point in compressed form.
+  *)
+  val of_compressed_bytes_opt : Bytes.t -> t option
+
+  (** Allocates a new point from a byte array of length [size_in_bytes / 2]
+      representing a point in compressed form.
+      Raise [Not_on_curve] if the point is not on the curve.
+  *)
+  val of_compressed_bytes_exn : Bytes.t -> t
+
+  (** Return a representation in bytes *)
+  val to_bytes : t -> Bytes.t
+
+  (** Return a compressed bytes representation *)
+  val to_compressed_bytes : t -> Bytes.t
+
+  (** Zero of the elliptic curve *)
+  val zero : t
+
+  (** A fixed generator of the elliptic curve *)
+  val one : t
+
+  (** Return [true] if the given element is zero *)
+  val is_zero : t -> bool
+
+  (** Generate a random element. The element is on the curve and in the prime
+      subgroup.
+  *)
+  val random : ?state:Random.State.t -> unit -> t
+
+  (** Return the addition of two element *)
+  val add : t -> t -> t
+
+  (** [double g] returns [2g] *)
+  val double : t -> t
+
+  (** Return the opposite of the element *)
+  val negate : t -> t
+
+  (** Return [true] if the two elements are algebraically the same *)
+  val eq : t -> t -> bool
+
+  (** Multiply an element by a scalar *)
+  val mul : t -> Scalar.t -> t
+
+  (** [fft ~domain ~points] performs a Fourier transform on [points] using [domain]
+      The domain should be of the form [w^{i}] where [w] is a principal root of
+      unity. If the domain is of size [n], [w] must be a [n]-th principal root
+      of unity.
+      The number of points can be smaller than the domain size, but not larger. The
+      complexity is in [O(n log(m))] where [n] is the domain size and [m] the
+      number of points.
+   *)
+  val fft : domain:Scalar.t array -> points:t array -> t array
+
+  (** [ifft ~domain ~points] performs an inverse Fourier transform on [points]
+      using [domain].
+      The domain should be of the form [w^{-i}] (i.e the "inverse domain") where
+      [w] is a principal root of
+      unity. If the domain is of size [n], [w] must be a [n]-th principal root
+      of unity.
+      The domain size must be exactly the same than the number of points. The
+      complexity is O(n log(n)) where [n] is the domain size.
+  *)
+  val ifft : domain:Scalar.t array -> points:t array -> t array
+
+  val hash_to_curve : Bytes.t -> Bytes.t -> t
+end
+
+module MakeEquality (G : G_SIG) = struct
   (** Verify the equality is correct with the value zero *)
   let zero () = assert (G.eq G.zero G.zero)
 
@@ -52,7 +151,7 @@ module MakeEquality (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
       ] )
 end
 
-module MakeValueGeneration (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
+module MakeValueGeneration (G : G_SIG) = struct
   let random () = ignore @@ G.random ()
 
   let negation_with_random () =
@@ -84,7 +183,7 @@ module MakeValueGeneration (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
         test_case "double_with_zero" `Quick (repeat 100 double_with_zero) ] )
 end
 
-module MakeIsZero (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
+module MakeIsZero (G : G_SIG) = struct
   let with_zero_value () = assert (G.is_zero G.zero = true)
 
   let with_one_value () = assert (G.is_zero G.one = false)
@@ -100,7 +199,7 @@ module MakeIsZero (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
         test_case "with random value" `Quick (repeat 100 with_random_value) ] )
 end
 
-module MakeECProperties (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
+module MakeECProperties (G : G_SIG) = struct
   (** Verify that a random point is valid *)
   let check_bytes_random () = assert (G.(check_bytes @@ to_bytes @@ random ()))
 
@@ -315,8 +414,7 @@ module MakeECProperties (G : Bls12_381_gen.Elliptic_curve_sig.T) = struct
           (repeat 100 additive_associativity) ] )
 end
 
-module MakeCompressedRepresentation (G : Bls12_381_gen.Elliptic_curve_sig.T) =
-struct
+module MakeCompressedRepresentation (G : G_SIG) = struct
   let test_recover_correct_point_uncompressed () =
     let g = G.random () in
     let compressed_bytes = G.to_compressed_bytes g in

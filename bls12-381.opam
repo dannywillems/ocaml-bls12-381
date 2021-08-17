@@ -11,6 +11,5 @@ depends: [
   "dune" {>= "2.8.4"}
   "ff-sig" {>= "0.6.1" & < "0.7.0"}
   "zarith" {>= "1.10" & < "2.0"}
-  "bls12-381-gen" {= version}
 ]
 build: [[ "dune" "build" "-j" jobs "-p" name "@install" ]]
