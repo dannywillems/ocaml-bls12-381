@@ -25,14 +25,18 @@
 module Fq12 : sig
   type t
 
+  (** Minimal number of bytes required to encode a value of the group *)
   val size_in_bytes : int
 
   exception Not_in_field of Bytes.t
 
+  (** The neutral element of the multiplicative subgroup *)
   val one : t
 
+  (** [is_zero x] returns [true] if [x] is the neutral element of the additive subgroup *)
   val is_zero : t -> bool
 
+  (** [is_one x] returns [true] if [x] is the neutral element for the multiplication *)
   val is_one : t -> bool
 
   val mul : t -> t -> t
@@ -384,12 +388,37 @@ module Signature : sig
   *)
   val sk_to_bytes : sk -> Bytes.t
 
+  (** Build a value of type [pk] without performing any check on the input.
+      It is safe to use this function when verifying a signature as the
+      signature function verifies if the point is in the prime subgroup. Using
+      [unsafe_pk_of_bytes] removes a verification performed twice when used
+      [pk_of_bytes_exn] or [pk_of_bytes_opt].
+
+      The expected bytes format are the compressed form of a point on G1.
+   *)
   val unsafe_pk_of_bytes : Bytes.t -> pk
 
+  (** Build a value of type [pk] safely, i.e. the function checks the bytes
+      given in parameters represents a point on the curve and in the prime subgroup.
+      Raise [Invalid_argument] if the bytes are not in the correct format or does
+      not represent a point in the prime subgroup.
+
+      The expected bytes format are the compressed form of a point on G1.
+  *)
   val pk_of_bytes_exn : Bytes.t -> pk
 
+  (** Build a value of type [pk] safely, i.e. the function checks the bytes
+      given in parameters represents a point on the curve and in the prime subgroup.
+      Return [None] if the bytes are not in the correct format or does
+      not represent a point in the prime subgroup.
+
+      The expected bytes format are the compressed form of a point on G1.
+  *)
   val pk_of_bytes_opt : Bytes.t -> pk option
 
+  (** Returns a bytes representation of a value of type [pk]. The output is the
+      compressed form a the point G1.t the [pk] represents.
+  *)
   val pk_to_bytes : pk -> Bytes.t
 
   (** [generate_sk ?key_info ikm] generates a new (random) secret key. [ikm]
@@ -477,7 +506,8 @@ module Signature : sig
     (**
       [aggregate_verify pks msg aggregated_signature] performs a aggregate
       signature verification. It supposes the same message [msg] has been
-      signed.
+      signed. It implements the FastAggregateVerify algorithm specified in
+      https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.4
     *)
     val aggregate_verify : (pk * proof) list -> Bytes.t -> signature -> bool
   end
