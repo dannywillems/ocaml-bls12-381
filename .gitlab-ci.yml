@@ -163,7 +163,6 @@ build-ocaml-4.12-rust-1.44.0:
   rules:
     - when: always
 
-# Core bench 0.12.0 only available for 4.09. FIXME: update to other versions
 benchmark-ocaml-4.09-rust-1.44.0:
   <<: *benchmark_definition
   image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.44.0
