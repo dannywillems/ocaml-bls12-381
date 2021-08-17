@@ -258,7 +258,7 @@ module Fr = struct
 
       let scalar_of_z = of_z
     end in
-    Bls12_381_gen.Fft.fft (module M) ~domain ~points
+    Fft.fft (module M) ~domain ~points
 
   let ifft ~domain ~points =
     let module M = struct
@@ -278,7 +278,7 @@ module Fr = struct
 
       let scalar_of_z = of_z
     end in
-    Bls12_381_gen.Fft.ifft (module M) ~domain ~points
+    Fft.ifft (module M) ~domain ~points
 end
 
 include Fr

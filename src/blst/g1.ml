@@ -197,7 +197,7 @@ module G1 = struct
 
       let scalar_of_z = Scalar.of_z
     end in
-    Bls12_381_gen.Fft.fft (module M) ~domain ~points
+    Fft.fft (module M) ~domain ~points
 
   let ifft ~domain ~points =
     let module M = struct
@@ -217,7 +217,7 @@ module G1 = struct
 
       let scalar_of_z = Scalar.of_z
     end in
-    Bls12_381_gen.Fft.ifft (module M) ~domain ~points
+    Fft.ifft (module M) ~domain ~points
 
   let hash_to_curve message dst =
     let message_length = Bytes.length message in
