@@ -280,7 +280,7 @@ opam-install-and-remove-local-switch:
 
 doc:
   stage: doc
-  image: ocaml/opam2:4.09
+  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.12-1.44.0
   before_script:
     - sudo apt-get update && sudo apt-get upgrade -y
     - eval $(opam env)
@@ -308,7 +308,7 @@ doc:
 
 pages:
   stage: deploy
-  image: ocaml/opam2:4.09
+  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.12-1.44.0
   script:
     - cp -r _odoc public/
   artifacts:
