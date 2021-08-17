@@ -20,24 +20,11 @@ check-blst-version:
 
 lint-ocaml:
   stage: lint
-  image: registry.gitlab.com/dannywillems/docker-ocamlformat:0.15.0
+  image: ocaml/opam:debian-ocaml-4.11
   before_script:
-    - eval $(opam env)
+    - opam install ocamlformat.0.15.0
   script:
-    - ocamlformat --check benchmark/*.ml*
-    - ocamlformat --check common/*.ml*
-    - ocamlformat --check src/gen/*.ml*
-    - ocamlformat --check src/js/*.ml*
-    - ocamlformat --check src/js-gen/*.ml*
-    - ocamlformat --check src/unix/*.ml*
-    - ocamlformat --check src/unix/bindings/*.ml*
-    - ocamlformat --check src/blst/bindings/*.ml*
-    - ocamlformat --check src/blst/*.ml*
-    - ocamlformat --check src/virtual/*.ml*
-    - ocamlformat --check test/*.ml*
-    - ocamlformat --check test/js/*.ml*
-    - ocamlformat --check test/js-gen/*.ml*
-    - ocamlformat --check test/unix/*.ml*
+    - dune build @fmt
   rules:
     - when: always
 
