@@ -136,6 +136,16 @@ let regression_test () =
           Hex.(show (of_bytes (Bls12_381.G2.to_bytes res_g2))))
     v
 
+let test_hash_to_curve_accepts_dst_longer_than_255_characters () =
+  let dst =
+    Bytes.init (256 + Random.int 1000) (fun _ -> char_of_int (Random.int 256))
+  in
+  let msg =
+    Bytes.init (Random.int 10000) (fun _ -> char_of_int (Random.int 256))
+  in
+  ignore @@ Bls12_381.G1.hash_to_curve msg dst ;
+  ignore @@ Bls12_381.G2.hash_to_curve msg dst
+
 let () =
   let open Alcotest in
   run
@@ -143,5 +153,11 @@ let () =
     [ ( "From bls_sigs_ref",
         [ test_case "G1" `Quick test_vectors_g1_from_bls_sigs_ref_files;
           test_case "G2" `Quick test_vectors_g2_from_bls_sigs_ref_files ] );
-      ("Regression tests", [test_case "Using this repo" `Quick regression_test])
-    ]
+      ("Regression tests", [test_case "Using this repo" `Quick regression_test]);
+      ( "Special cases",
+        [ test_case
+            "DST can be longer than 255 characters"
+            `Quick
+            (Test_ec_make.repeat
+               1000
+               test_hash_to_curve_accepts_dst_longer_than_255_characters) ] ) ]
