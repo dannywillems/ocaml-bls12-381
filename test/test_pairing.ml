@@ -164,6 +164,9 @@ module Properties = struct
         (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)])) )
+
+  let test_miller_loop_empty_list_returns_one () =
+    assert (Fq12.is_one (Pairing.miller_loop []))
 end
 
 let result_pairing_one_one =
@@ -492,6 +495,10 @@ let () =
             "test result pairing with miller loop nb random points"
             `Quick
             (repeat 10 test_miller_loop_pairing_random_number_of_points);
+          test_case
+            "test miller loop on empty list returns one"
+            `Quick
+            Properties.test_miller_loop_empty_list_returns_one;
           test_case
             "linearity commutativity scalar"
             `Quick
