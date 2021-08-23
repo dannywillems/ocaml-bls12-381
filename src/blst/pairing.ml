@@ -65,3 +65,7 @@ let final_exponentiation_exn x =
 let pairing g1 g2 =
   let ml = miller_loop_simple g1 g2 in
   final_exponentiation_exn ml
+
+let pairing_check points =
+  let res_opt = miller_loop points |> final_exponentiation_opt in
+  match res_opt with None -> false | Some res -> Fq12.is_one res

@@ -92,6 +92,11 @@ module Make (G1 : G1.T) (G2 : G2.T) (GT : Fq12.T) (Stubs : RAW_STUBS) : sig
   (** Compute the final exponentiation of the given point. Raise
       [FailToComputeFinalExponentiation] if the point is null *)
   val final_exponentiation_exn : GT.t -> GT.t
+
+  (** [pairing_check points] returns [true] if [pairing points = GT.one]. Return
+      [true] if the empty list is given
+  *)
+  val pairing_check : (G1.t * G2.t) list -> bool
 end = struct
   module G1 = G1
   module G2 = G2
@@ -197,4 +202,8 @@ end = struct
     in
     if List.length xs = 0 then failwith "Empty list of points given"
     else f GT.one xs
+
+  let pairing_check points =
+    let res_opt = miller_loop points |> final_exponentiation_opt in
+    match res_opt with None -> false | Some res -> GT.is_one res
 end

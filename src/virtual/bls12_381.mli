@@ -354,6 +354,11 @@ module Pairing : sig
   (** Compute a pairing result of a list of points *)
   val pairing : G1.t -> G2.t -> Fq12.t
 
+  (** [pairing_check points] returns [true] if [pairing points = GT.one]. Return
+      [true] if the empty list is given
+  *)
+  val pairing_check : (G1.t * G2.t) list -> bool
+
   (** Compute the final exponentiation of the given point. Returns a [None] if
         the point is null *)
   val final_exponentiation_opt : Fq12.t -> Fq12.t option
