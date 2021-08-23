@@ -200,8 +200,7 @@ end = struct
           let acc = GT.mul (GT.of_bytes_exn res) acc in
           f acc xs
     in
-    if List.length xs = 0 then failwith "Empty list of points given"
-    else f GT.one xs
+    f GT.one xs
 
   let pairing_check points =
     let res_opt = miller_loop points |> final_exponentiation_opt in
