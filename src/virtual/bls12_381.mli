@@ -346,6 +346,9 @@ end
 module Pairing : sig
   exception FailToComputeFinalExponentiation of Fq12.t
 
+  (** Compute the miller loop on a list of points. Return [Fq12.one] if the
+      list is empty
+  *)
   val miller_loop : (G1.t * G2.t) list -> Fq12.t
 
   (** Compute the miller loop on a single tuple of point *)
