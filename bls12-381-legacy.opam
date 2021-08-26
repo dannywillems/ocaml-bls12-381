@@ -1,7 +1,7 @@
 opam-version: "2.0"
 authors: [ "Danny Willems <be.danny.willems@gmail.com>" ]
 maintainer: [ "Danny Willems <be.danny.willems@gmail.com>" ]
-synopsis: "UNIX version of BLS12-381 primitives. Not implementating the virtual package bls12-381."
+synopsis: "UNIX version of BLS12-381 primitives. Not implementating the virtual package bls12-381"
 description: "This package should only be used if newer versions of bls12-381 conflict with this version. This package should be considered as legacy and should never be used."
 homepage: "https://gitlab.com/dannywillems/ocaml-bls12-381"
 dev-repo: "git+https://gitlab.com/dannywillems/ocaml-bls12-381.git"
