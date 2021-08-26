@@ -16,10 +16,12 @@ lint-ocaml:
     - ocamlformat --check src/js/*.ml*
     - ocamlformat --check src/js-gen/*.ml*
     - ocamlformat --check src/unix/*.ml*
+    - ocamlformat --check src/legacy/*.ml*
     - ocamlformat --check src/unix/bindings/*.ml*
     - ocamlformat --check src/virtual/*.ml*
     - ocamlformat --check test/*.ml*
     - ocamlformat --check test/js/*.ml*
+    - ocamlformat --check test/legacy/*.ml*
     - ocamlformat --check test/js-gen/*.ml*
 
 lint-js:
@@ -63,12 +65,14 @@ lint-js:
     - opam pin add bls12-381-unix.dev . --no-action
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
+    - opam pin add bls12-381-legacy.dev . --no-action
     # Install the packages
     - opam install bls12-381-gen -y --with-test
     - opam install bls12-381 -y --with-test
     - opam install bls12-381-unix -y --with-test
     - opam install bls12-381-js-gen -y --with-test
     - opam install bls12-381-js -y --with-test
+    - opam install bls12-381-legacy -y --with-test
     - dune build @install
     - dune runtest
     # Additional test for the browser case of `js`. Tests are not automatic.
@@ -115,12 +119,14 @@ build-ocaml-4.11-rust-1.44.0:
     - opam pin add bls12-381-unix.dev . --no-action
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
+    - opam pin add bls12-381-legacy.dev . --no-action
     # Install the packages
     - opam install bls12-381-gen -y
     - opam install bls12-381 -y
     - opam install bls12-381-unix -y
     - opam install bls12-381-js-gen -y
     - opam install bls12-381-js -y
+    - opam install bls12-381-legacy -y
   script:
     # Benchmark
     - opam install core_bench.v0.12.0
@@ -151,6 +157,7 @@ opam-install-and-remove:
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
+    - opam pin add bls12-381-legacy.dev . --no-action
 
     - opam depext bls12-381-gen -y -v
     - opam install bls12-381-gen -y -v --deps-only
@@ -172,11 +179,16 @@ opam-install-and-remove:
     - opam install bls12-381-unix -y -v --deps-only
     - opam install bls12-381-unix -y -v
 
+    - opam depext bls12-381-legacy -y -v
+    - opam install bls12-381-legacy -y -v --deps-only
+    - opam install bls12-381-legacy -y -v
+
     - opam remove -a -y bls12-381-js
     - opam remove -a -y bls12-381-js-gen
     - opam remove -a -y bls12-381-unix
     - opam remove -a -y bls12-381
     - opam remove -a -y bls12-381-gen
+    - opam remove -a -y bls12-381-legacy
 
 opam-install-and-remove-local-switch:
   stage: install
@@ -200,6 +212,7 @@ opam-install-and-remove-local-switch:
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
+    - opam pin add bls12-381-legacy.dev . --no-action
 
     - opam depext bls12-381-gen -y -v
     - opam install bls12-381-gen -y -v --deps-only
@@ -221,6 +234,11 @@ opam-install-and-remove-local-switch:
     - opam install bls12-381-unix -y -v --deps-only
     - opam install bls12-381-unix -y -v
 
+    - opam depext bls12-381-legacy -y -v
+    - opam install bls12-381-legacy -y -v --deps-only
+    - opam install bls12-381-legacy -y -v
+
+    - opam remove -a -y bls12-381-legacy
     - opam remove -a -y bls12-381-js
     - opam remove -a -y bls12-381-js-gen
     - opam remove -a -y bls12-381-unix
