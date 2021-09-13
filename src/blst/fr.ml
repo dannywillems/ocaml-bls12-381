@@ -114,12 +114,18 @@ module Fr = struct
     Stubs.add buffer x y ;
     buffer
 
+  let add_noalloc dst x y =
+    Stubs.add dst x y
+
   let ( + ) = add
 
   let mul x y =
     let buffer = Blst_bindings.Types.allocate_fr () in
     Stubs.mul buffer x y ;
     buffer
+
+  let mul_noalloc dst x y =
+    Stubs.mul dst x y
 
   let ( * ) = mul
 
@@ -137,6 +143,9 @@ module Fr = struct
     let buffer = Blst_bindings.Types.allocate_fr () in
     Stubs.sub buffer a b ;
     buffer
+
+  let sub_noalloc dst x y =
+    Stubs.sub dst x y
 
   let square x = x * x
 
