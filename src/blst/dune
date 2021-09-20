@@ -21,7 +21,11 @@
    (progn
     (chdir
      libblst
-     (run ./build.sh -shared))
+     ;; If you update the build.sh flags, you must also update
+     ;; .github/workflows/build-blst-on-macos accordingly
+     ;; Adding -Wno-missing-braces for clang-11 (and also should be for clang-10, but clang 10
+     ;; is not officially supported).
+     (run ./build.sh -shared -Wno-missing-braces))
     (run cp libblst/libblst.a libblst.a)
     (with-accepted-exit-codes
      (or 0 1)
