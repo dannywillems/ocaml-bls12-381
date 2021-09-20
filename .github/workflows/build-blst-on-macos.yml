@@ -1,0 +1,37 @@
+# If you update the build.sh flags, you must also update src/blst/dune accordingly
+name: Build blst on MacOS
+on: [push]
+jobs:
+  # Not supporting clang 10
+  # Getting error:
+  # > ld: unsupported tapi file type '!tapi-tbd' in YAML file
+  # > '/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/lib/libSystem.tbd'
+  # > for architecture x86_64
+  # > clang: error: linker command failed with exit code 1 (use -v to see invocation)
+
+  # blst-build-clang-10:
+  #   runs-on: [macos-10.15]
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - run: |
+  #         sudo xcode-select -s /Applications/Xcode_10.3.app/Contents/Developer
+  #         cc --version
+  #         cd src/blst/libblst && ./build.sh -shared -Wno-missing-braces
+
+  blst-build-clang-11:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          sudo xcode-select -s /Applications/Xcode_11.3.app/Contents/Developer
+          cc --version
+          cd src/blst/libblst && ./build.sh -shared -Wno-missing-braces
+
+  blst-build-clang-12:
+    runs-on: macos-10.15
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          sudo xcode-select -s /Applications/Xcode_12.app/Contents/Developer
+          cc --version
+          cd src/blst/libblst && ./build.sh -shared -Wno-missing-braces
