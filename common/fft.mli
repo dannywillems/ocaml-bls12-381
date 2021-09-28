@@ -16,9 +16,15 @@ module type C = sig
 
   val mul : group -> scalar -> group
 
+  val mul_noalloc : group -> group -> scalar -> unit
+
   val add : group -> group -> group
 
+  val add_noalloc : group -> group -> group -> unit
+
   val sub : group -> group -> group
+
+  val sub_noalloc : group -> group -> group -> unit
 
   val inverse_exn_scalar : scalar -> scalar
 

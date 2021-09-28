@@ -7,9 +7,15 @@ module type C = sig
 
   val mul : group -> scalar -> group
 
+  val mul_noalloc : group -> group -> scalar -> unit
+
   val add : group -> group -> group
 
+  val add_noalloc : group -> group -> group -> unit
+
   val sub : group -> group -> group
+
+  val sub_noalloc : group -> group -> group -> unit
 
   val inverse_exn_scalar : scalar -> scalar
 
@@ -57,22 +63,104 @@ let fft (type a b) (module G : C with type group = a and type scalar = b)
       Array.copy points )
   in
   reorg_coefficients n logn output ;
-  let m = ref 1 in
-  for _i = 0 to logn - 1 do
-    let exponent = n / (2 * !m) in
-    let k = ref 0 in
-    while !k < n do
-      for j = 0 to !m - 1 do
-        let w = domain.(exponent * j) in
-        (* odd *)
-        let right = G.mul output.(!k + j + !m) w in
-        output.(!k + j + !m) <- G.sub output.(!k + j) right ;
-        output.(!k + j) <- G.add output.(!k + j) right
+
+  (* noalloc + copy *)
+  let _fft_inplace ~domain output =
+    let copy_val = G.add G.zero in
+    let dst1 = copy_val G.zero in
+    let dst2 = copy_val G.zero in
+    let m = ref 1 in
+    for _i = 0 to logn - 1 do
+      let exponent = n / (2 * !m) in
+      let k = ref 0 in
+      while !k < n do
+        for j = 0 to !m - 1 do
+          let w = domain.(exponent * j) in
+          (* odd *)
+          G.mul_noalloc dst1 output.(!k + j + !m) w ;
+          G.sub_noalloc dst2 output.(!k + j) dst1;
+          output.(!k + j + !m) <- copy_val dst2 ;
+          G.add_noalloc dst2 output.(!k + j) dst1 ;
+          output.(!k + j) <- copy_val dst2
+          (* output.(!k + j + !m) <- G.sub output.(!k + j) dst1 ;
+           * output.(!k + j) <- G.add output.(!k + j) dst1 *)
+        done ;
+        k := !k + (!m * 2)
       done ;
-      k := !k + (!m * 2)
+      m := !m * 2
     done ;
-    m := !m * 2
-  done ;
+    ()
+  in
+
+  (* noalloc *)
+  let _fft_inplace ~domain output =
+    let copy_val = G.add G.zero in
+    let dst1 = copy_val G.zero in
+    let m = ref 1 in
+    for _i = 0 to logn - 1 do
+      let exponent = n / (2 * !m) in
+      let k = ref 0 in
+      while !k < n do
+        for j = 0 to !m - 1 do
+          let w = domain.(exponent * j) in
+          (* odd *)
+          G.mul_noalloc dst1 output.(!k + j + !m) w ;
+          output.(!k + j + !m) <- G.sub output.(!k + j) dst1 ;
+          output.(!k + j) <- G.add output.(!k + j) dst1
+        done ;
+        k := !k + (!m * 2)
+      done ;
+      m := !m * 2
+    done ;
+    ()
+  in
+
+  (* noalloc in array *)
+  let _fft_inplace ~domain output =
+    let copy_val = G.add G.zero in
+    let dst1 = copy_val G.zero in
+    let m = ref 1 in
+    for _i = 0 to logn - 1 do
+      let exponent = n / (2 * !m) in
+      let k = ref 0 in
+      while !k < n do
+        for j = 0 to !m - 1 do
+          let w = domain.(exponent * j) in
+          (* odd *)
+          G.mul_noalloc dst1 output.(!k + j + !m) w ;
+          G.sub_noalloc output.(!k + j + !m) output.(!k + j) dst1 ;
+          G.add_noalloc output.(!k + j) output.(!k + j) dst1
+        done ;
+        k := !k + (!m * 2)
+      done ;
+      m := !m * 2
+    done ;
+    ()
+  in
+
+  (* original *)
+  let fft_inplace ~domain output =
+    let m = ref 1 in
+    for _i = 0 to logn - 1 do
+      let exponent = n / (2 * !m) in
+      let k = ref 0 in
+      while !k < n do
+        for j = 0 to !m - 1 do
+          let w = domain.(exponent * j) in
+          (* odd *)
+          let right = G.mul output.(!k + j + !m) w in (* Printf.printf "mul: %s\n" (Hex.show (Hex.of_bytes (Obj.magic right))); *)
+          output.(!k + j + !m) <- G.sub output.(!k + j) right ; (* Printf.printf "sub: %s\n" (Hex.show (Hex.of_bytes (Obj.magic output.(!k + j + !m)))); *)
+          output.(!k + j) <- G.add output.(!k + j) right; (* Printf.printf "add: %s\n" (Hex.show (Hex.of_bytes (Obj.magic output.(!k + j)))); *)
+        done ;
+        k := !k + (!m * 2)
+      done ;
+      m := !m * 2
+    done ;
+    ()
+  in
+
+  (* fft_inplace_noalloc ~domain output ; *)
+  fft_inplace ~domain output ;
   output
 
 let ifft (type a b) (module G : C with type group = a and type scalar = b)

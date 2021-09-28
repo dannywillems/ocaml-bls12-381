@@ -57,20 +57,26 @@ module Stubs = struct
     Fq12_stubs.random (Ctypes.ocaml_bytes_start bs) ;
     bs
 
+  let add_noalloc dst x y =
+    Fq12_stubs.add
+      (Ctypes.ocaml_bytes_start dst)
+      (Ctypes.ocaml_bytes_start x)
+      (Ctypes.ocaml_bytes_start y)
+
   let add x y =
     let buffer = empty () in
-    Fq12_stubs.add
-      (Ctypes.ocaml_bytes_start buffer)
-      (Ctypes.ocaml_bytes_start x)
-      (Ctypes.ocaml_bytes_start y) ;
+    add_noalloc buffer x y;
     buffer
+
+  let mul_noalloc dst x y =
+    Fq12_stubs.mul
+      (Ctypes.ocaml_bytes_start dst)
+      (Ctypes.ocaml_bytes_start x)
+      (Ctypes.ocaml_bytes_start y)
 
   let mul x y =
     let buffer = empty () in
-    Fq12_stubs.mul
-      (Ctypes.ocaml_bytes_start buffer)
-      (Ctypes.ocaml_bytes_start x)
-      (Ctypes.ocaml_bytes_start y) ;
+    mul_noalloc buffer x y;
     buffer
 
   let unsafe_inverse x =

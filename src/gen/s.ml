@@ -41,7 +41,11 @@ module type RAW_BASE = sig
 
   val add : Bytes.t -> Bytes.t -> Bytes.t
 
+  val add_noalloc : Bytes.t -> Bytes.t -> Bytes.t -> unit
+
   val mul : Bytes.t -> Bytes.t -> Bytes.t
+
+  val mul_noalloc : Bytes.t -> Bytes.t -> Bytes.t -> unit
 
   val unsafe_inverse : Bytes.t -> Bytes.t
 
@@ -122,6 +126,12 @@ module Make (Stubs : RAW_BASE) : Ff_sig.BASE = struct
     assert (Bytes.length res = Stubs.size_in_bytes) ;
     res
 
+  let add_noalloc dst x y =
+    assert (Bytes.length x = Stubs.size_in_bytes) ;
+    assert (Bytes.length y = Stubs.size_in_bytes) ;
+    assert (Bytes.length dst = Stubs.size_in_bytes) ;
+    Stubs.add_noalloc dst x y
+
   let ( + ) = add
 
   let mul x y =
@@ -130,6 +140,12 @@ module Make (Stubs : RAW_BASE) : Ff_sig.BASE = struct
     let res = Stubs.mul x y in
     assert (Bytes.length res = Stubs.size_in_bytes) ;
     res
+
+  let mul_noalloc dst x y =
+    assert (Bytes.length x = Stubs.size_in_bytes) ;
+    assert (Bytes.length y = Stubs.size_in_bytes) ;
+    assert (Bytes.length dst = Stubs.size_in_bytes) ;
+    Stubs.mul_noalloc dst x y
 
   let ( * ) = mul
 
@@ -156,6 +172,9 @@ module Make (Stubs : RAW_BASE) : Ff_sig.BASE = struct
   let ( - ) = negate
 
   let sub a b = add a (negate b)
+
+  let sub_noalloc dst x y =
+    Stubs.add_noalloc dst x (negate y)
 
   let square g =
     assert (Bytes.length g = Stubs.size_in_bytes) ;

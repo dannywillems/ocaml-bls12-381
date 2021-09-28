@@ -120,6 +120,12 @@ module G1 = struct
       (Unsigned.Size_t.of_int (32 * 8)) ;
     buffer
 
+  let add_noalloc _ _ _ = assert false
+
+  let mul_noalloc _ _ _ = assert false
+
+  let sub_noalloc _ _ _ = assert false
+
   let b = Fq.(one + one + one + one)
 
   let rec random ?state () =
@@ -189,9 +195,15 @@ module G1 = struct
 
       let mul = mul
 
+      let mul_noalloc = mul_noalloc
+
       let add = add
 
+      let add_noalloc = add_noalloc
+
       let sub x y = add x (negate y)
+
+      let sub_noalloc = sub_noalloc
 
       let inverse_exn_scalar = Scalar.inverse_exn
 
@@ -209,9 +221,15 @@ module G1 = struct
 
       let mul = mul
 
+      let mul_noalloc = mul_noalloc
+
       let add = add
 
+      let add_noalloc = add_noalloc
+
       let sub x y = add x (negate y)
+
+      let sub_noalloc = sub_noalloc
 
       let inverse_exn_scalar = Scalar.inverse_exn
 

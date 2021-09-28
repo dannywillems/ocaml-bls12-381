@@ -19,6 +19,8 @@
 (tests
  (names
   test_fr
+  try_fft
+  vectors_fft
   ; test_fq12
   test_g1
   test_g1_fft
@@ -31,6 +33,8 @@
   test_aggregated_signature)
  (modules
   test_fr
+  try_fft
+  vectors_fft
   ; test_fq12
   test_g1
   test_g1_fft

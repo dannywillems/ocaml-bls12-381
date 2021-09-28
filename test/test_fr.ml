@@ -306,6 +306,25 @@ module TestVector = struct
                (Bls12_381.Fr.of_string e2)
                (Bls12_381.Fr.of_string e1))
             (Bls12_381.Fr.of_string expected_result) ))
+      test_vectors;
+    let dst = Bls12_381.Fr.of_bytes_exn (Bytes.create 32) in
+    List.iter
+      (fun (e1, e2, expected_result) ->
+        assert (
+          Bls12_381.Fr.eq
+            (Bls12_381.Fr.add_noalloc dst
+               (Bls12_381.Fr.of_string e1) (Bls12_381.Fr.of_string e2);
+             dst)
+            (Bls12_381.Fr.of_string expected_result) ))
+      test_vectors;
+    List.iter
+      (fun (e1, e2, expected_result) ->
+        assert (
+          Bls12_381.Fr.eq
+            (Bls12_381.Fr.sub_noalloc dst
+               (Bls12_381.Fr.of_string e1) (Bls12_381.Fr.negate (Bls12_381.Fr.of_string e2));
+             dst)
+            (Bls12_381.Fr.of_string expected_result) ))
       test_vectors
 
   let test_mul () =
@@ -343,6 +362,16 @@ module TestVector = struct
             (Bls12_381.Fr.mul
                (Bls12_381.Fr.of_string e2)
                (Bls12_381.Fr.of_string e1))
+            (Bls12_381.Fr.of_string expected_result) ))
+      test_vectors;
+    let dst = Bls12_381.Fr.of_bytes_exn (Bytes.create 32) in
+    List.iter
+      (fun (e1, e2, expected_result) ->
+        assert (
+          Bls12_381.Fr.eq
+            (Bls12_381.Fr.mul_noalloc dst
+               (Bls12_381.Fr.of_string e1) (Bls12_381.Fr.of_string e2);
+             dst)
             (Bls12_381.Fr.of_string expected_result) ))
       test_vectors
 
@@ -453,6 +482,8 @@ module FFT = struct
     ```
   *)
   let test_fft_vectors () =
+    (* let vector = Vector_fft.vector in
+     * let _vectors = [vector] in *)
     let vectors =
       [ ( [| "27368034540955591518185075247638312229509481411752400387472688330662143761856";
              "19540886853600136773806888540031779652697522926951761090609474934921975120659";

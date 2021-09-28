@@ -248,6 +248,12 @@ struct
     assert (Bytes.length res = size_in_bytes) ;
     res
 
+  let add_noalloc _ _ _ = assert false
+
+  let mul_noalloc _ _ _ = assert false
+
+  let sub_noalloc _ _ _ = assert false
+
   let fft ~domain ~points =
     let module M = struct
       type group = t
@@ -258,9 +264,15 @@ struct
 
       let mul = mul
 
+      let mul_noalloc = mul_noalloc
+
       let add = add
 
+      let add_noalloc = add_noalloc
+
       let sub x y = add x (negate y)
+
+      let sub_noalloc = sub_noalloc
 
       let inverse_exn_scalar = Scalar.inverse_exn
 
@@ -278,9 +290,15 @@ struct
 
       let mul = mul
 
+      let mul_noalloc = mul_noalloc
+
       let add = add
 
+      let add_noalloc = add_noalloc
+
       let sub x y = add x (negate y)
+
+      let sub_noalloc = sub_noalloc
 
       let inverse_exn_scalar = Scalar.inverse_exn
 
