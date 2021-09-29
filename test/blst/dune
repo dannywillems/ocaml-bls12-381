@@ -1,7 +1,5 @@
 (copy_files ../{*.ml})
 
-(copy_files ../rust/{test_g1_fft.ml,test_g2_fft.ml})
-
 (copy_files ../test_vectors/{*})
 
 (copy_files ../test_vectors/hash_to_curve_g1/{*})
