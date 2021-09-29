@@ -29,6 +29,20 @@ module Fr = struct
 
   type t = Blst_bindings.Types.blst_fr_t Ctypes.ptr
 
+  let global_buffer = Blst_bindings.Types.allocate_fr ()
+
+  let sizeof_fr =
+    Unsigned.Size_t.of_int @@ Ctypes.sizeof Blst_bindings.Types.blst_fr_t
+
+  let copy dst src =
+    let src =
+      Ctypes.(coerce (ptr Blst_bindings.Types.blst_fr_t) (ptr void) src)
+    in
+    let dst =
+      Ctypes.(coerce (ptr Blst_bindings.Types.blst_fr_t) (ptr void) dst)
+    in
+    Stubs.memcpy dst src sizeof_fr
+
   let size_in_bytes = 32
 
   let order =
@@ -51,6 +65,7 @@ module Fr = struct
       let () =
         Stubs.scalar_of_bytes_le buffer_scalar (Ctypes.ocaml_bytes_start bs)
       in
+
       if Stubs.check_scalar buffer_scalar then (
         let buffer_fr = Blst_bindings.Types.allocate_fr () in
         Stubs.fr_of_scalar buffer_fr buffer_scalar ;
@@ -114,12 +129,20 @@ module Fr = struct
     Stubs.add buffer x y ;
     buffer
 
+  let add_inplace x y =
+    Stubs.add global_buffer x y ;
+    copy x global_buffer
+
   let ( + ) = add
 
   let mul x y =
     let buffer = Blst_bindings.Types.allocate_fr () in
     Stubs.mul buffer x y ;
     buffer
+
+  let mul_inplace x y =
+    Stubs.mul global_buffer x y ;
+    copy x global_buffer
 
   let ( * ) = mul
 
@@ -133,16 +156,37 @@ module Fr = struct
   let inverse_exn x =
     match inverse_opt x with None -> raise Division_by_zero | Some x -> x
 
+  let inverse_exn_inplace x =
+    if is_zero x then raise Division_by_zero
+    else Stubs.eucl_inverse global_buffer x ;
+    copy x global_buffer
+
   let sub a b =
     let buffer = Blst_bindings.Types.allocate_fr () in
     Stubs.sub buffer a b ;
     buffer
 
+  let sub_inplace x y =
+    Stubs.sub global_buffer x y ;
+    copy x global_buffer
+
   let square x = x * x
+
+  let square_inplace x =
+    Stubs.mul global_buffer x x ;
+    copy x global_buffer
 
   let double x = x + x
 
+  let double_inplace x =
+    Stubs.add global_buffer x x ;
+    copy x global_buffer
+
   let negate x = sub zero x
+
+  let negate_inplace x =
+    Stubs.sub global_buffer zero x ;
+    copy x global_buffer
 
   let ( - ) = negate
 

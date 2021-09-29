@@ -536,6 +536,9 @@ module StubsFr (S : Cstubs.FOREIGN) = struct
   let sqr =
     foreign "blst_fr_sqr" (ptr blst_fr_t @-> ptr blst_fr_t @-> returning void)
 
+  let memcpy =
+    foreign "memcpy" (ptr void @-> ptr void @-> size_t @-> returning void)
+
   (* blst_fr_inverse has the same implementation *)
   let eucl_inverse =
     foreign

@@ -138,6 +138,20 @@ module Fr : sig
   val fft : domain:t array -> points:t array -> t array
 
   val ifft : domain:t array -> points:t array -> t array
+
+  val add_inplace : t -> t -> unit
+
+  val sub_inplace : t -> t -> unit
+
+  val mul_inplace : t -> t -> unit
+
+  val inverse_exn_inplace : t -> unit
+
+  val double_inplace : t -> unit
+
+  val square_inplace : t -> unit
+
+  val negate_inplace : t -> unit
 end
 
 module G1 : sig

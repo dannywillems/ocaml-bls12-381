@@ -57,7 +57,95 @@ let rec repeat n f =
     repeat (n - 1) f )
 
 module Tests = Ff_pbt.MakeAll (Bls12_381.Fr)
-module ResidueTests = Ff_pbt.MakeQuadraticResidue (Bls12_381.Fr)
+
+module InplaceOperations = struct
+  let test_add_inplace () =
+    let x = Bls12_381.Fr.random () in
+    let y = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.add x y in
+    Bls12_381.Fr.add_inplace x y ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_double_inplace () =
+    let x = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.double x in
+    Bls12_381.Fr.double_inplace x ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_square_inplace () =
+    let x = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.square x in
+    Bls12_381.Fr.square_inplace x ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_negate_inplace () =
+    let x = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.negate x in
+    Bls12_381.Fr.negate_inplace x ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_inverse_inplace () =
+    let x = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.inverse_exn x in
+    Bls12_381.Fr.inverse_exn_inplace x ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_add_inplace_with_same_value () =
+    let x = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.add x x in
+    Bls12_381.Fr.add_inplace x x ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_sub_inplace () =
+    let x = Bls12_381.Fr.random () in
+    let y = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.sub x y in
+    Bls12_381.Fr.sub_inplace x y ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_sub_inplace_with_same_value () =
+    let x = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.sub x x in
+    Bls12_381.Fr.sub_inplace x x ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_mul_inplace () =
+    let x = Bls12_381.Fr.random () in
+    let y = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.mul x y in
+    Bls12_381.Fr.mul_inplace x y ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_mul_inplace_with_same_value () =
+    let x = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.mul x x in
+    Bls12_381.Fr.mul_inplace x x ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let get_tests () =
+    let txt = "Inplace operations" in
+    let open Alcotest in
+    ( txt,
+      [ test_case "add" `Quick (repeat 100 test_add_inplace);
+        test_case
+          "add with same value"
+          `Quick
+          (repeat 100 test_add_inplace_with_same_value);
+        test_case "square" `Quick (repeat 100 test_square_inplace);
+        test_case "negate" `Quick (repeat 100 test_negate_inplace);
+        test_case "double" `Quick (repeat 100 test_double_inplace);
+        test_case "inverse" `Quick (repeat 100 test_inverse_inplace);
+        test_case
+          "sub with same value"
+          `Quick
+          (repeat 100 test_sub_inplace_with_same_value);
+        test_case
+          "mul with same value"
+          `Quick
+          (repeat 100 test_mul_inplace_with_same_value);
+        test_case "sub" `Quick (repeat 100 test_sub_inplace);
+        test_case "mul" `Quick (repeat 100 test_mul_inplace) ] )
+end
 
 module StringRepresentation = struct
   let test_to_string_one () =
@@ -729,8 +817,9 @@ let () =
   let open Alcotest in
   run
     "Fr"
-    ( TestVector.get_tests () :: ResidueTests.get_tests ()
+    ( TestVector.get_tests ()
     :: ZRepresentation.get_tests ()
+    :: InplaceOperations.get_tests ()
     :: BytesRepresentation.get_tests ()
     :: StringRepresentation.get_tests ()
     :: FFT.get_tests () :: Tests.get_tests () )

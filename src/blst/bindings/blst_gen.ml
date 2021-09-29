@@ -22,7 +22,7 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-let c_headers = "#include \"blst.h\""
+let c_headers = "#include <string.h>\n #include \"blst.h\""
 
 module AllBindings (F : Cstubs.FOREIGN) = struct
   include Blst_bindings.StubsFr (F)
