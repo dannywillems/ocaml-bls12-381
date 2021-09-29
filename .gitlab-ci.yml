@@ -43,8 +43,6 @@ lint-js:
 .build-test: &build_definition
   stage: build
   before_script:
-    # Required to get the right Rust version.
-    - . $HOME/.cargo/env
     # Always update system package manager + setup OPAM env
     - sudo apt-get update
     - eval $(opam env)
@@ -57,7 +55,6 @@ lint-js:
     - nvm install 14.12.0
     - nvm use 14.12.0
     # List versions and environments
-    - rustc --version
     - ocaml --version
     - opam --version
     - node --version
@@ -69,14 +66,12 @@ lint-js:
     - opam pin add bls12-381-gen.dev . --no-action
     - opam pin add bls12-381.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
-    - opam pin add bls12-381-unix-rust.dev . --no-action
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     # Install the dependencies
     - opam install bls12-381-gen -y --with-test --deps-only
     - opam install bls12-381 -y --with-test --deps-only
     - opam install bls12-381-unix -y --with-test --deps-only
-    - opam install bls12-381-unix-rust -y --with-test --deps-only
     - opam install bls12-381-js-gen -y --with-test --deps-only
     - opam install bls12-381-js -y --with-test --deps-only
     - dune build @install
@@ -87,40 +82,37 @@ lint-js:
   rules:
     - when: always
 
-build-ocaml-4.08-rust-1.44.0:
+build-ocaml-4.08:
   <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.08-1.44.0
+  image: ocaml/opam:debian-ocaml-4.08
 
-build-ocaml-4.09-rust-1.44.0:
+build-ocaml-4.09:
   <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.44.0
+  image: ocaml/opam:debian-ocaml-4.09
 
-build-ocaml-4.10-rust-1.44.0:
+build-ocaml-4.10:
   <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.10-1.44.0
+  image: ocaml/opam:debian-ocaml-4.10
 
-build-ocaml-4.11-rust-1.44.0:
+build-ocaml-4.11:
   <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.11-1.44.0
+  image: ocaml/opam:debian-ocaml-4.11
 
 # Not using the same images than the others as it seems 4.12 images are too old
-build-ocaml-4.12-rust-1.44.0:
+build-ocaml-4.12:
   <<: *build_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.12-1.44.0
+  image: ocaml/opam:debian-ocaml-4.12
 
 # Benchmarks
 .benchmark: &benchmark_definition
   stage: benchmark
   before_script:
-    # Required to get the right Rust version.
-    - . $HOME/.cargo/env
     # Always update system package manager + setup OPAM env
     - sudo apt-get update && sudo apt-get upgrade -y
     - eval $(opam env)
     - opam repository set-url default https://opam.ocaml.org
     - opam update
     # List versions and environments
-    - rustc --version
     - ocaml --version
     - opam --version
     - echo $OPAM_SWITCH_PREFIX
@@ -150,20 +142,18 @@ build-ocaml-4.12-rust-1.44.0:
   rules:
     - when: always
 
-benchmark-ocaml-4.09-rust-1.44.0:
+benchmark-ocaml-4.09:
   <<: *benchmark_definition
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.44.0
+  image: ocaml/opam:debian-ocaml-4.09
 
 opam-install-and-remove:
   parallel:
     matrix:
-      - OPAM_PACKAGE: [bls12-381-gen, bls12-381, bls12-381-js-gen, bls12-381-unix, bls12-381-unix-rust, bls12-381-js]
+      - OPAM_PACKAGE: [bls12-381-gen, bls12-381, bls12-381-js-gen, bls12-381-unix, bls12-381-unix, bls12-381-js]
   stage: install
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.44.0
+  image: ocaml/opam:debian-ocaml-4.11
   before_script:
-    - . $HOME/.cargo/env
     # List versions and environments
-    - rustc --version
     - ocaml --version
     - opam --version
     - echo $OPAM_SWITCH_PREFIX
@@ -176,7 +166,6 @@ opam-install-and-remove:
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
-    - opam pin add bls12-381-unix-rust.dev . --no-action
 
     - opam depext $OPAM_PACKAGE.dev -y -v
     - opam install $OPAM_PACKAGE.dev -y -v --deps-only
@@ -188,17 +177,14 @@ opam-install-and-remove:
 opam-install-and-remove-local-switch:
   parallel:
     matrix:
-      - OPAM_PACKAGE: [bls12-381-gen, bls12-381, bls12-381-js-gen, bls12-381-unix, bls12-381-unix-rust, bls12-381-js]
+      - OPAM_PACKAGE: [bls12-381-gen, bls12-381, bls12-381-js-gen, bls12-381-unix, bls12-381-js]
   stage: install
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.09-1.44.0
+  image: ocaml/opam:debian-ocaml-4.09
   before_script:
     # Run everything in a local switch
     - opam switch create ./ 4.09.1 --no-install
     - eval $(opam config env)
-    # Load rust version
-    - . $HOME/.cargo/env
     # List versions and environments
-    - rustc --version
     - ocaml --version
     - opam --version
     - echo $OPAM_SWITCH_PREFIX
@@ -210,7 +196,6 @@ opam-install-and-remove-local-switch:
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
-    - opam pin add bls12-381-unix-rust.dev . --no-action
 
     - opam depext $OPAM_PACKAGE.dev -y -v
     - opam install $OPAM_PACKAGE.dev -y -v --deps-only
@@ -221,13 +206,13 @@ opam-install-and-remove-local-switch:
 
 doc:
   stage: doc
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.12-1.44.0
+  image: ocaml/opam:debian-ocaml-4.12
   before_script:
     - sudo apt-get update && sudo apt-get upgrade -y
     - eval $(opam env)
     - opam repository set-url default https://opam.ocaml.org
     - opam update
-    - opam depext -i -y zarith conf-libffi conf-rust conf-perl conf-pkg-config
+    - opam depext -i -y zarith conf-libffi conf-perl conf-pkg-config
     - sudo apt-get install m4 -y
     # Pin dev versions. Avoid clash with public opam-repository
     - opam pin add bls12-381-gen.dev . --no-action
@@ -235,7 +220,6 @@ doc:
     - opam pin add bls12-381-js-gen.dev . --no-action
     - opam pin add bls12-381-js.dev . --no-action
     - opam pin add bls12-381-unix.dev . --no-action
-    - opam pin add bls12-381-unix-rust.dev . --no-action
     - opam install odoc -y
     - opam install . -y --deps-only
   script:
@@ -249,7 +233,7 @@ doc:
 
 pages:
   stage: deploy
-  image: registry.gitlab.com/dannywillems/docker-ocaml-rust:4.12-1.44.0
+  image: ocaml/opam:debian-ocaml-4.12
   script:
     - cp -r _odoc public/
   artifacts:
