@@ -41,11 +41,7 @@ module type RAW_BASE = sig
 
   val add : Bytes.t -> Bytes.t -> Bytes.t
 
-  val add_noalloc : Bytes.t -> Bytes.t -> Bytes.t -> unit
-
   val mul : Bytes.t -> Bytes.t -> Bytes.t
-
-  val mul_noalloc : Bytes.t -> Bytes.t -> Bytes.t -> unit
 
   val unsafe_inverse : Bytes.t -> Bytes.t
 
@@ -58,6 +54,12 @@ module type RAW_BASE = sig
   val double : Bytes.t -> Bytes.t
 
   val pow : Bytes.t -> Bytes.t -> Bytes.t
+
+  val supports_noalloc : bool
+
+  val add_noalloc : Bytes.t -> Bytes.t -> Bytes.t -> unit
+
+  val mul_noalloc : Bytes.t -> Bytes.t -> Bytes.t -> unit
 end
 
 module Make (Stubs : RAW_BASE) : Ff_sig.BASE = struct
@@ -118,6 +120,8 @@ module Make (Stubs : RAW_BASE) : Ff_sig.BASE = struct
     ignore state ;
     let r = random () in
     if is_zero r then non_null_random () else r
+
+  let supports_noalloc = Stubs.supports_noalloc
 
   let add x y =
     assert (Bytes.length x = Stubs.size_in_bytes) ;

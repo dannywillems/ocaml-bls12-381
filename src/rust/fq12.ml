@@ -57,6 +57,8 @@ module Stubs = struct
     Fq12_stubs.random (Ctypes.ocaml_bytes_start bs) ;
     bs
 
+  let supports_noalloc = true
+
   let add_noalloc dst x y =
     Fq12_stubs.add
       (Ctypes.ocaml_bytes_start dst)

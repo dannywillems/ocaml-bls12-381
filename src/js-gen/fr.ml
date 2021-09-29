@@ -124,6 +124,8 @@ end) : Bls12_381_gen.S.RAW_BASE = struct
     in
     Jsoo_lib.Memory.Buffer.to_bytes res
 
+  let supports_noalloc = false
+
   let add_noalloc _dst _x _y = () (* TODO *)
 
   let mul x y =

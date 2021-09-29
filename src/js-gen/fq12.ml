@@ -129,8 +129,6 @@ end) : Bls12_381_gen.S.RAW_BASE = struct
     in
     Jsoo_lib.Memory.Buffer.to_bytes res
 
-  let add_noalloc _dst _x _y = assert false
-
   let mul x y =
     Jsoo_lib.Memory.copy_in_buffer
       (M.get_wasm_memory_buffer ())
@@ -153,8 +151,6 @@ end) : Bls12_381_gen.S.RAW_BASE = struct
       Jsoo_lib.Memory.Buffer.slice (M.get_wasm_memory_buffer ()) 0 size_in_bytes
     in
     Jsoo_lib.Memory.Buffer.to_bytes res
-
-  let mul_noalloc _dst _x _y = assert false
 
   let unsafe_inverse x =
     Jsoo_lib.Memory.copy_in_buffer
@@ -260,4 +256,10 @@ end) : Bls12_381_gen.S.RAW_BASE = struct
       Jsoo_lib.Memory.Buffer.slice (M.get_wasm_memory_buffer ()) 0 size_in_bytes
     in
     Jsoo_lib.Memory.Buffer.to_bytes res
+
+  let supports_noalloc = false
+
+  let add_noalloc _dst _a _b = failwith "add_noalloc not supported"
+
+  let mul_noalloc _dst _a _b = failwith "mul_noalloc not supported"
 end

@@ -109,6 +109,8 @@ module Fr = struct
     let r = random ?state () in
     if is_zero r then non_null_random ?state () else r
 
+  let supports_noalloc = true
+
   let add x y =
     let buffer = Blst_bindings.Types.allocate_fr () in
     Stubs.add buffer x y ;

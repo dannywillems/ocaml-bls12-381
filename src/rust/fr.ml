@@ -55,6 +55,8 @@ module Stubs = struct
     Fr_stubs.random (Ctypes.ocaml_bytes_start bs) ;
     bs
 
+  let supports_noalloc = true
+
   let add_noalloc dst x y =
     Fr_stubs.add
       (Ctypes.ocaml_bytes_start dst)
