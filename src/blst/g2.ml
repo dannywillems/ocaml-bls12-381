@@ -122,6 +122,11 @@ module G2 = struct
     Stubs.dadd buffer x y ;
     buffer
 
+  let add_bulk xs =
+    let buffer = Blst_bindings.Types.allocate_g2 () in
+    List.iter (fun x -> Stubs.dadd buffer buffer x) xs ;
+    buffer
+
   let double x =
     let buffer = Blst_bindings.Types.allocate_g2 () in
     Stubs.double buffer x ;

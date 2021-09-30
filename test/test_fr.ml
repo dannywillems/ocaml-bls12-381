@@ -370,6 +370,26 @@ module TestVector = struct
             (Bls12_381.Fr.of_string e) ))
       test_vectors
 
+  let test_add_bulk () =
+    let n = 10 + Random.int 1_000 in
+    let xs = List.init n (fun _ -> Bls12_381.Fr.random ()) in
+    assert (
+      Bls12_381.Fr.(
+        eq
+          (List.fold_left Bls12_381.Fr.add Bls12_381.Fr.zero xs)
+          (Bls12_381.Fr.add_bulk xs)) )
+
+  let test_mul_bulk () =
+    let n = 10 + Random.int 1_000 in
+    let xs = List.init n (fun _ -> Bls12_381.Fr.random ()) in
+    let left = List.fold_left Bls12_381.Fr.mul Bls12_381.Fr.one xs in
+    let right = Bls12_381.Fr.mul_bulk xs in
+    if not @@ Bls12_381.Fr.(eq left right) then
+      Alcotest.failf
+        "Expected result %s, computed %s\n"
+        (Bls12_381.Fr.to_string left)
+        (Bls12_381.Fr.to_string right)
+
   let test_add () =
     let test_vectors =
       [ ( "52078196679215712148218322720576334474579224383898730538745959257577939031988",
@@ -508,6 +528,8 @@ module TestVector = struct
     ( "Test vectors",
       [ test_case "inverse" `Quick test_inverse;
         test_case "add" `Quick test_add;
+        test_case "add bulk" `Quick test_add_bulk;
+        test_case "mul bulk" `Quick test_mul_bulk;
         test_case "opposite" `Quick test_opposite;
         test_case "pow" `Quick test_pow;
         test_case "multiplication" `Quick test_mul ] )

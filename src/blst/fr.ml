@@ -138,6 +138,11 @@ module Fr = struct
     Stubs.add global_buffer x y ;
     memcpy x global_buffer
 
+  let add_bulk xs =
+    let buffer = Blst_bindings.Types.allocate_fr () in
+    List.iter (fun x -> Stubs.add buffer buffer x) xs ;
+    buffer
+
   let ( + ) = add
 
   let mul x y =
@@ -148,6 +153,12 @@ module Fr = struct
   let mul_inplace x y =
     Stubs.mul global_buffer x y ;
     memcpy x global_buffer
+
+  let mul_bulk xs =
+    let buffer = Blst_bindings.Types.allocate_fr () in
+    Stubs.add buffer buffer one ;
+    List.iter (fun x -> Stubs.mul buffer buffer x) xs ;
+    buffer
 
   let ( * ) = mul
 

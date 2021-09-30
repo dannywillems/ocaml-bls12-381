@@ -93,6 +93,8 @@ module type G_SIG = sig
   (** Return the addition of two element *)
   val add : t -> t -> t
 
+  val add_bulk : t list -> t
+
   (** [double g] returns [2g] *)
   val double : t -> t
 
@@ -330,6 +332,11 @@ module MakeECProperties (G : G_SIG) = struct
     let s = G.random () in
     assert (G.(eq (double s) (add s s)))
 
+  let test_bulk_add () =
+    let n = 10 + Random.int 1_000 in
+    let xs = List.init n (fun _ -> G.random ()) in
+    assert (G.(eq (List.fold_left G.add G.zero xs) (G.add_bulk xs)))
+
   (** Returns the tests to be used with Alcotest *)
   let get_tests () =
     let open Alcotest in
@@ -337,6 +344,7 @@ module MakeECProperties (G : G_SIG) = struct
       [ test_case "check_bytes_random" `Quick (repeat 100 check_bytes_random);
         test_case "check_bytes_zero" `Quick (repeat 1 check_bytes_zero);
         test_case "check_bytes_one" `Quick (repeat 1 check_bytes_one);
+        test_case "bulk add" `Quick (repeat 100 test_bulk_add);
         test_case
           "check_bytes_random_double"
           `Quick

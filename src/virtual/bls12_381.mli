@@ -155,6 +155,10 @@ module Fr : sig
 
   (** [copy x] return a fresh copy of [x] *)
   val copy : t -> t
+
+  val add_bulk : t list -> t
+
+  val mul_bulk : t list -> t
 end
 
 module G1 : sig
@@ -219,6 +223,8 @@ module G1 : sig
 
   (** Return the addition of two element *)
   val add : t -> t -> t
+
+  val add_bulk : t list -> t
 
   (** [double g] returns [2g] *)
   val double : t -> t
@@ -323,6 +329,8 @@ module G2 : sig
 
   (** Return the addition of two element *)
   val add : t -> t -> t
+
+  val add_bulk : t list -> t
 
   (** [double g] returns [2g] *)
   val double : t -> t

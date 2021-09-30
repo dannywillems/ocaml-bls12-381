@@ -4,6 +4,21 @@
  (libraries bls12-381-unix core core_bench))
 
 (executable
+ (name bench_g1_bulk)
+ (modules bench_g1_bulk)
+ (libraries bls12-381-unix))
+
+(executable
+ (name bench_g2_bulk)
+ (modules bench_g2_bulk)
+ (libraries bls12-381-unix))
+
+(executable
+ (name bench_fr_bulk)
+ (modules bench_fr_bulk)
+ (libraries bls12-381-unix))
+
+(executable
  (name bench_g2)
  (modules bench_g2)
  (libraries bls12-381-unix core core_bench))
