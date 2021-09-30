@@ -58,6 +58,18 @@ let rec repeat n f =
 
 module Tests = Ff_pbt.MakeAll (Bls12_381.Fr)
 
+module Memory = struct
+  let test_copy () =
+    let x = Bls12_381.Fr.random () in
+    let y = Bls12_381.Fr.copy x in
+    assert (Bls12_381.Fr.eq x y)
+
+  let get_tests () =
+    let txt = "Memory" in
+    let open Alcotest in
+    (txt, [test_case "copy" `Quick (repeat 100 test_copy)])
+end
+
 module InplaceOperations = struct
   let test_add_inplace () =
     let x = Bls12_381.Fr.random () in
@@ -819,6 +831,7 @@ let () =
     "Fr"
     ( TestVector.get_tests ()
     :: ZRepresentation.get_tests ()
+    :: Memory.get_tests ()
     :: InplaceOperations.get_tests ()
     :: BytesRepresentation.get_tests ()
     :: StringRepresentation.get_tests ()

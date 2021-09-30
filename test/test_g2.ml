@@ -30,6 +30,18 @@ module IsZero = Test_ec_make.MakeIsZero (G2)
 module Equality = Test_ec_make.MakeEquality (G2)
 module ECProperties = Test_ec_make.MakeECProperties (G2)
 
+module Memory = struct
+  let test_copy () =
+    let x = Bls12_381.G2.random () in
+    let y = Bls12_381.G2.copy x in
+    assert (Bls12_381.G2.eq x y)
+
+  let get_tests () =
+    let txt = "Memory" in
+    let open Alcotest in
+    (txt, [test_case "copy" `Quick (Test_ec_make.repeat 100 test_copy)])
+end
+
 module Constructors = struct
   let test_of_z_one () =
     (* https://github.com/zcash/librustzcash/blob/0.1.0/pairing/src/bls12_381/fq.rs#L18 *)
@@ -312,6 +324,7 @@ let () =
       ValueGeneration.get_tests ();
       Equality.get_tests ();
       ECProperties.get_tests ();
+      Memory.get_tests ();
       UncompressedRepresentation.get_tests ();
       CompressedRepresentation.get_tests ();
       ArithmeticRegressionTests.get_tests ();

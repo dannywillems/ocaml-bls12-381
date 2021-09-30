@@ -23,6 +23,7 @@
 (*****************************************************************************)
 
 module Stubs = Blst_bindings.StubsG1 (Blst_stubs)
+module StubsFr = Blst_bindings.StubsFr (Blst_stubs)
 
 module G1 = struct
   exception Not_on_curve of Bytes.t
@@ -30,6 +31,23 @@ module G1 = struct
   type t = Blst_bindings.Types.blst_g1_t Ctypes.ptr
 
   let size_in_bytes = 96
+
+  let sizeof =
+    Unsigned.Size_t.of_int @@ Ctypes.sizeof Blst_bindings.Types.blst_g1_t
+
+  let memcpy dst src =
+    let src =
+      Ctypes.(coerce (ptr Blst_bindings.Types.blst_g1_t) (ptr void) src)
+    in
+    let dst =
+      Ctypes.(coerce (ptr Blst_bindings.Types.blst_g1_t) (ptr void) dst)
+    in
+    StubsFr.memcpy dst src sizeof
+
+  let copy src =
+    let dst = Blst_bindings.Types.allocate_g1 () in
+    memcpy dst src ;
+    dst
 
   module Scalar = Fr
 

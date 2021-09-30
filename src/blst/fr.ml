@@ -34,7 +34,7 @@ module Fr = struct
   let sizeof_fr =
     Unsigned.Size_t.of_int @@ Ctypes.sizeof Blst_bindings.Types.blst_fr_t
 
-  let copy dst src =
+  let memcpy dst src =
     let src =
       Ctypes.(coerce (ptr Blst_bindings.Types.blst_fr_t) (ptr void) src)
     in
@@ -42,6 +42,11 @@ module Fr = struct
       Ctypes.(coerce (ptr Blst_bindings.Types.blst_fr_t) (ptr void) dst)
     in
     Stubs.memcpy dst src sizeof_fr
+
+  let copy src =
+    let dst = Blst_bindings.Types.allocate_fr () in
+    memcpy dst src ;
+    dst
 
   let size_in_bytes = 32
 
@@ -131,7 +136,7 @@ module Fr = struct
 
   let add_inplace x y =
     Stubs.add global_buffer x y ;
-    copy x global_buffer
+    memcpy x global_buffer
 
   let ( + ) = add
 
@@ -142,7 +147,7 @@ module Fr = struct
 
   let mul_inplace x y =
     Stubs.mul global_buffer x y ;
-    copy x global_buffer
+    memcpy x global_buffer
 
   let ( * ) = mul
 
@@ -159,7 +164,7 @@ module Fr = struct
   let inverse_exn_inplace x =
     if is_zero x then raise Division_by_zero
     else Stubs.eucl_inverse global_buffer x ;
-    copy x global_buffer
+    memcpy x global_buffer
 
   let sub a b =
     let buffer = Blst_bindings.Types.allocate_fr () in
@@ -168,25 +173,25 @@ module Fr = struct
 
   let sub_inplace x y =
     Stubs.sub global_buffer x y ;
-    copy x global_buffer
+    memcpy x global_buffer
 
   let square x = x * x
 
   let square_inplace x =
     Stubs.mul global_buffer x x ;
-    copy x global_buffer
+    memcpy x global_buffer
 
   let double x = x + x
 
   let double_inplace x =
     Stubs.add global_buffer x x ;
-    copy x global_buffer
+    memcpy x global_buffer
 
   let negate x = sub zero x
 
   let negate_inplace x =
     Stubs.sub global_buffer zero x ;
-    copy x global_buffer
+    memcpy x global_buffer
 
   let ( - ) = negate
 

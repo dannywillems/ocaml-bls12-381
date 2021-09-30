@@ -152,6 +152,9 @@ module Fr : sig
   val square_inplace : t -> unit
 
   val negate_inplace : t -> unit
+
+  (** [copy x] return a fresh copy of [x] *)
+  val copy : t -> t
 end
 
 module G1 : sig
@@ -205,6 +208,9 @@ module G1 : sig
 
   (** Return [true] if the given element is zero *)
   val is_zero : t -> bool
+
+  (** [copy x] return a fresh copy of [x] *)
+  val copy : t -> t
 
   (** Generate a random element. The element is on the curve and in the prime
       subgroup.
@@ -297,6 +303,9 @@ module G2 : sig
 
   (** Return a compressed bytes representation *)
   val to_compressed_bytes : t -> Bytes.t
+
+  (** [copy x] return a fresh copy of [x] *)
+  val copy : t -> t
 
   (** Zero of the elliptic curve *)
   val zero : t
