@@ -133,9 +133,24 @@ module G1 = struct
     Stubs.double buffer x ;
     buffer
 
-  let mul g n =
-    let bytes = Fr.to_bytes n in
+  let add_mul_bulk xs =
     let buffer = Blst_bindings.Types.allocate_g1 () in
+    let tmp = Blst_bindings.Types.allocate_g1 () in
+    List.iter
+      (fun (g, n) ->
+        let bytes = Fr.to_bytes n in
+        Stubs.mult
+          tmp
+          g
+          (Ctypes.ocaml_bytes_start bytes)
+          (Unsigned.Size_t.of_int (32 * 8)) ;
+        Stubs.dadd buffer buffer tmp)
+      xs ;
+    buffer
+
+  let mul g n =
+    let buffer = Blst_bindings.Types.allocate_g1 () in
+    let bytes = Fr.to_bytes n in
     Stubs.mult
       buffer
       g

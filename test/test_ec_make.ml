@@ -95,6 +95,8 @@ module type G_SIG = sig
 
   val add_bulk : t list -> t
 
+  val add_mul_bulk : (t * Scalar.t) list -> t
+
   (** [double g] returns [2g] *)
   val double : t -> t
 
@@ -129,6 +131,29 @@ module type G_SIG = sig
   val ifft : domain:Scalar.t array -> points:t array -> t array
 
   val hash_to_curve : Bytes.t -> Bytes.t -> t
+end
+
+module MakeBulkOperations (G : G_SIG) = struct
+  let test_bulk_add () =
+    let n = 10 + Random.int 1_000 in
+    let xs = List.init n (fun _ -> G.random ()) in
+    assert (G.(eq (List.fold_left G.add G.zero xs) (G.add_bulk xs)))
+
+  let test_bulk_add_and_mul () =
+    let n = 10 in
+    let xs = List.init n (fun _ -> (G.random (), G.Scalar.random ())) in
+    let left =
+      List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
+    in
+    let right = G.add_mul_bulk xs in
+    assert (G.(eq left right))
+
+  let get_tests () =
+    let open Alcotest in
+    ( "Bulk operations",
+      [ test_case "bulk add" `Quick (repeat 100 test_bulk_add);
+        test_case "bulk add and mul" `Quick (repeat 100 test_bulk_add_and_mul)
+      ] )
 end
 
 module MakeEquality (G : G_SIG) = struct

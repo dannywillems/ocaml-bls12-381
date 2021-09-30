@@ -31,6 +31,7 @@ module ValueGeneration = Test_ec_make.MakeValueGeneration (G1)
 module IsZero = Test_ec_make.MakeIsZero (G1)
 module Equality = Test_ec_make.MakeEquality (G1)
 module ECProperties = Test_ec_make.MakeECProperties (G1)
+module BulkOperations = Test_ec_make.MakeBulkOperations (G1)
 
 module Memory = struct
   let test_copy () =
@@ -452,6 +453,7 @@ let () =
       Equality.get_tests ();
       ECProperties.get_tests ();
       Memory.get_tests ();
+      BulkOperations.get_tests ();
       UncompressedRepresentation.get_tests ();
       CompressedRepresentation.get_tests ();
       ArithmeticRegressionTests.get_tests ();

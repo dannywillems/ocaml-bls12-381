@@ -235,6 +235,8 @@ module G1 : sig
   (** Return [true] if the two elements are algebraically the same *)
   val eq : t -> t -> bool
 
+  val add_mul_bulk : (t * Scalar.t) list -> t
+
   (** Multiply an element by a scalar *)
   val mul : t -> Scalar.t -> t
 
@@ -340,6 +342,8 @@ module G2 : sig
 
   (** Return [true] if the two elements are algebraically the same *)
   val eq : t -> t -> bool
+
+  val add_mul_bulk : (t * Scalar.t) list -> t
 
   (** Multiply an element by a scalar *)
   val mul : t -> Scalar.t -> t

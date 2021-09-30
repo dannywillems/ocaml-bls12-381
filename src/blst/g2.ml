@@ -141,6 +141,21 @@ module G2 = struct
       (Unsigned.Size_t.of_int (Bytes.length bytes * 8)) ;
     buffer
 
+  let add_mul_bulk xs =
+    let buffer = Blst_bindings.Types.allocate_g2 () in
+    List.iter
+      (fun (g, n) ->
+        let bytes = Fr.to_bytes n in
+        let tmp = Blst_bindings.Types.allocate_g2 () in
+        Stubs.mult
+          tmp
+          g
+          (Ctypes.ocaml_bytes_start bytes)
+          (Unsigned.Size_t.of_int (32 * 8)) ;
+        Stubs.dadd buffer buffer tmp)
+      xs ;
+    buffer
+
   let mul g n =
     let bytes = Fr.to_bytes n in
     mul_bits g bytes
