@@ -93,6 +93,8 @@ module type G_SIG = sig
   (** Return the addition of two element *)
   val add : t -> t -> t
 
+  val add_inplace : t -> t -> unit
+
   val add_bulk : t list -> t
 
   val add_mul_bulk : (t * Scalar.t) list -> t
@@ -108,6 +110,8 @@ module type G_SIG = sig
 
   (** Multiply an element by a scalar *)
   val mul : t -> Scalar.t -> t
+
+  val mul_inplace : t -> Scalar.t -> unit
 
   (** [fft ~domain ~points] performs a Fourier transform on [points] using [domain]
       The domain should be of the form [w^{i}] where [w] is a principal root of
@@ -154,6 +158,29 @@ module MakeBulkOperations (G : G_SIG) = struct
       [ test_case "bulk add" `Quick (repeat 100 test_bulk_add);
         test_case "bulk add and mul" `Quick (repeat 100 test_bulk_add_and_mul)
       ] )
+end
+
+module MakeInplaceOperations (G : G_SIG) = struct
+  let test_mul_inplace () =
+    let n = G.Scalar.random () in
+    let g = G.random () in
+    let res = G.mul g n in
+    G.mul_inplace g n ;
+    assert (G.eq g res)
+
+  let test_add_inplace () =
+    let x = G.random () in
+    let y = G.random () in
+    let res = G.add x y in
+    G.add_inplace x y ;
+    assert (G.eq x res)
+
+  let get_tests () =
+    let txt = "Inplace operations" in
+    let open Alcotest in
+    ( txt,
+      [ test_case "mul inplace" `Quick (repeat 100 test_mul_inplace);
+        test_case "add inplace" `Quick (repeat 100 test_add_inplace) ] )
 end
 
 module MakeEquality (G : G_SIG) = struct

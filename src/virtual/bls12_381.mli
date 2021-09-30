@@ -224,6 +224,8 @@ module G1 : sig
   (** Return the addition of two element *)
   val add : t -> t -> t
 
+  val add_inplace : t -> t -> unit
+
   val add_bulk : t list -> t
 
   (** [double g] returns [2g] *)
@@ -239,6 +241,8 @@ module G1 : sig
 
   (** Multiply an element by a scalar *)
   val mul : t -> Scalar.t -> t
+
+  val mul_inplace : t -> Scalar.t -> unit
 
   (** [fft ~domain ~points] performs a Fourier transform on [points] using [domain]
       The domain should be of the form [w^{i}] where [w] is a principal root of
@@ -332,6 +336,8 @@ module G2 : sig
   (** Return the addition of two element *)
   val add : t -> t -> t
 
+  val add_inplace : t -> t -> unit
+
   val add_bulk : t list -> t
 
   (** [double g] returns [2g] *)
@@ -347,6 +353,8 @@ module G2 : sig
 
   (** Multiply an element by a scalar *)
   val mul : t -> Scalar.t -> t
+
+  val mul_inplace : t -> Scalar.t -> unit
 
   (** [fft ~domain ~points] performs a Fourier transform on [points] using [domain]
       The domain should be of the form [w^{i}] where [w] is a principal root of

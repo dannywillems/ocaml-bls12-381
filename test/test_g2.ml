@@ -30,6 +30,7 @@ module IsZero = Test_ec_make.MakeIsZero (G2)
 module Equality = Test_ec_make.MakeEquality (G2)
 module ECProperties = Test_ec_make.MakeECProperties (G2)
 module BulkOperations = Test_ec_make.MakeBulkOperations (G2)
+module InplaceOperations = Test_ec_make.MakeInplaceOperations (G2)
 
 module Memory = struct
   let test_copy () =
@@ -330,4 +331,5 @@ let () =
       UncompressedRepresentation.get_tests ();
       CompressedRepresentation.get_tests ();
       ArithmeticRegressionTests.get_tests ();
+      InplaceOperations.get_tests ();
       Constructors.get_tests () ]

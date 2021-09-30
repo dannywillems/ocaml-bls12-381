@@ -30,6 +30,8 @@ module G1 = struct
 
   type t = Blst_bindings.Types.blst_g1_t Ctypes.ptr
 
+  let global_buffer = Blst_bindings.Types.allocate_g1 ()
+
   let size_in_bytes = 96
 
   let sizeof =
@@ -123,6 +125,10 @@ module G1 = struct
     Stubs.dadd buffer x y ;
     buffer
 
+  let add_inplace x y =
+    Stubs.dadd global_buffer x y ;
+    memcpy x global_buffer
+
   let add_bulk xs =
     let buffer = Blst_bindings.Types.allocate_g1 () in
     List.iter (fun x -> Stubs.dadd buffer buffer x) xs ;
@@ -157,6 +163,14 @@ module G1 = struct
       (Ctypes.ocaml_bytes_start bytes)
       (Unsigned.Size_t.of_int (32 * 8)) ;
     buffer
+
+  let mul_inplace g n =
+    Stubs.mult
+      global_buffer
+      g
+      (Ctypes.ocaml_bytes_start (Fr.to_bytes n))
+      (Unsigned.Size_t.of_int (32 * 8)) ;
+    memcpy g global_buffer
 
   let b = Fq.(one + one + one + one)
 

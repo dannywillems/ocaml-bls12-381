@@ -49,6 +49,8 @@ module G2 = struct
     memcpy dst src ;
     dst
 
+  let global_buffer = Blst_bindings.Types.allocate_g2 ()
+
   module Scalar = Fr
 
   let empty () = Blst_bindings.Types.allocate_g2 ()
@@ -122,6 +124,10 @@ module G2 = struct
     Stubs.dadd buffer x y ;
     buffer
 
+  let add_inplace x y =
+    Stubs.dadd global_buffer x y ;
+    memcpy x global_buffer
+
   let add_bulk xs =
     let buffer = Blst_bindings.Types.allocate_g2 () in
     List.iter (fun x -> Stubs.dadd buffer buffer x) xs ;
@@ -159,6 +165,15 @@ module G2 = struct
   let mul g n =
     let bytes = Fr.to_bytes n in
     mul_bits g bytes
+
+  let mul_inplace g n =
+    let bytes = Fr.to_bytes n in
+    Stubs.mult
+      global_buffer
+      g
+      (Ctypes.ocaml_bytes_start bytes)
+      (Unsigned.Size_t.of_int (Bytes.length bytes * 8)) ;
+    memcpy g global_buffer
 
   let b =
     let buffer = Blst_bindings.Types.allocate_fq2 () in
