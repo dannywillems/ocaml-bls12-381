@@ -518,16 +518,6 @@ module StubsFr (S : Cstubs.FOREIGN) = struct
       "blst_fr_sub"
       (ptr blst_fr_t @-> ptr blst_fr_t @-> ptr blst_fr_t @-> returning void)
 
-  let lshift =
-    foreign
-      "blst_fr_lshift"
-      (ptr blst_fr_t @-> ptr blst_fr_t @-> size_t @-> returning void)
-
-  let rshift =
-    foreign
-      "blst_fr_rshift"
-      (ptr blst_fr_t @-> ptr blst_fr_t @-> size_t @-> returning void)
-
   let mul =
     foreign
       "blst_fr_mul"

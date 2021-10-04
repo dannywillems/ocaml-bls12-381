@@ -3,6 +3,14 @@ module StubsFr = Blst_bindings.StubsFr (Blst_stubs)
 module StubsG1 = Blst_bindings.StubsG1 (Blst_stubs)
 module StubsG2 = Blst_bindings.StubsG2 (Blst_stubs)
 
+external keygen_stubs :
+  Fr.scalar ->
+  Bytes.t ->
+  Unsigned.Size_t.t ->
+  Bytes.t ->
+  Unsigned.Size_t.t ->
+  unit = "blst_keygen"
+
 type signature = Bytes.t
 
 let check_unicity_lst list =
@@ -44,12 +52,12 @@ let with_aggregation_ctxt ciphersuite f =
     free_blst_pairing_t ctxt ;
     raise exn
 
-type sk = Blst_bindings.Types.blst_scalar_t Ctypes.ptr
+type sk = Fr.scalar
 
 type pk = Bytes.t
 
 let sk_of_bytes_exn bytes =
-  let buffer = Blst_bindings.Types.allocate_scalar () in
+  let buffer = Fr.allocate_scalar () in
   if Bytes.length bytes > 32 then
     raise
       (Invalid_argument
@@ -57,16 +65,16 @@ let sk_of_bytes_exn bytes =
           endian")
   else
     let sk = Fr.of_bytes_exn bytes in
-    StubsFr.scalar_of_fr buffer sk ;
+    Fr.scalar_of_fr buffer sk ;
     buffer
 
 let sk_to_bytes sk =
   let bytes = Bytes.make 32 '\000' in
-  StubsFr.scalar_to_bytes_le (Ctypes.ocaml_bytes_start bytes) sk ;
+  Fr.scalar_to_bytes_le bytes sk ;
   bytes
 
 let generate_sk ?(key_info = Bytes.empty) ikm =
-  let buffer_scalar = Blst_bindings.Types.allocate_scalar () in
+  let buffer_scalar = Fr.allocate_scalar () in
   let key_info_length = Bytes.length key_info in
   let ikm_length = Bytes.length ikm in
 
@@ -86,11 +94,11 @@ let generate_sk ?(key_info = Bytes.empty) ikm =
       (Invalid_argument
          "generate_sk: ikm argument must be at least 32 bytes long")
   else
-    Stubs.keygen
+    keygen_stubs
       buffer_scalar
-      (Ctypes.ocaml_bytes_start ikm)
+      ikm
       (Unsigned.Size_t.of_int ikm_length)
-      (Ctypes.ocaml_bytes_start key_info)
+      key_info
       (Unsigned.Size_t.of_int key_info_length) ;
   buffer_scalar
 

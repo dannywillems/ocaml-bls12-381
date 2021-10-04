@@ -27,4 +27,5 @@ module G1 = G1
 module G2 = G2
 module Fq12 = Fq12
 module Pairing = Pairing
-module Signature = Signature
+
+(* module Signature = Signature *)

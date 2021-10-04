@@ -6,6 +6,8 @@
 
 (copy_files bindings/blst_ctypes_c_stubs.c)
 
+(copy_files bindings/blst_bindings_stubs.c)
+
 (copy_files libblst/bindings/blst.h)
 
 (copy_files libblst/bindings/blst_aux.h)
@@ -44,7 +46,7 @@
   g1
   g2
   pairing
-  signature
+  ; signature
   ;; private
   fq
   fq2
@@ -60,4 +62,4 @@
  (foreign_archives blst)
  (foreign_stubs
   (language c)
-  (names blst_ctypes_c_stubs)))
+  (names blst_ctypes_c_stubs blst_bindings_stubs)))
