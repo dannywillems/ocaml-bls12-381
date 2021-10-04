@@ -27,6 +27,11 @@
  (libraries hex bls12-381-unix))
 
 (executable
+ (name generate_fr_test_vectors)
+ (modules generate_fr_test_vectors)
+ (libraries hex bls12-381-unix))
+
+(executable
  (name generate_g2_test_vectors)
  (modules generate_g2_test_vectors)
  (libraries hex bls12-381-unix))

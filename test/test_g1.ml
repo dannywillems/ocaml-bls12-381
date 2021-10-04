@@ -58,7 +58,12 @@ module Constructors = struct
         "1339506544944476473020471379941921221584933875938349620426543736416511423956333506472724655353366534992391756441569"
     in
     let g = G1.of_z_opt ~x ~y in
-    match g with Some g -> assert (G1.eq G1.one g) | None -> assert false
+    match g with
+    | Some g ->
+        Printf.printf "%s\n" Hex.(show (of_bytes (G1.to_bytes g))) ;
+        Printf.printf "%s\n" Hex.(show (of_bytes (G1.to_bytes G1.one))) ;
+        assert (G1.eq G1.one g)
+    | None -> assert false
 
   (* https://github.com/zcash/librustzcash/blob/0.1.0/pairing/src/bls12_381/ec.rs#L1196 *)
   (* https://github.com/zcash/librustzcash/blob/0.1.0/pairing/src/bls12_381/ec.rs#L1245 *)

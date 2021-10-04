@@ -12,11 +12,10 @@ depends: [
   "dune" {>= "2.8.4"}
   "dune-configurator" {build}
   "zarith" {>= "1.10" & < "2.0"}
-  "ctypes" {>= "0.18.0" & < "0.19.0"}
-  "ctypes-foreign"
   "bls12-381" {= version}
   "hex"
   "alcotest" {with-test}
+  "integers"
   "bisect_ppx" {with-test & >= "2.5"}
   "ff-pbt" {>= "0.6.0" & < "0.7.0" & with-test}
 ]

@@ -155,9 +155,9 @@ module MakeBulkOperations (G : G_SIG) = struct
   let get_tests () =
     let open Alcotest in
     ( "Bulk operations",
-      [ test_case "bulk add" `Quick (repeat 100 test_bulk_add);
-        test_case "bulk add and mul" `Quick (repeat 100 test_bulk_add_and_mul)
-      ] )
+      [ test_case "bulk add" `Quick (repeat 10 test_bulk_add);
+        test_case "bulk add and mul" `Quick (repeat 10 test_bulk_add_and_mul) ]
+    )
 end
 
 module MakeInplaceOperations (G : G_SIG) = struct

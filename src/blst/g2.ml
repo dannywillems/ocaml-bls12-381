@@ -22,50 +22,97 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-module Stubs = Blst_bindings.StubsG2 (Blst_stubs)
-module StubsFr = Blst_bindings.StubsFr (Blst_stubs)
+module Stubs = struct
+  type affine
+
+  type jacobian
+
+  external allocate_g2 : unit -> jacobian = "allocate_p2_stubs"
+
+  external allocate_g2_affine : unit -> affine = "allocate_p2_affine_stubs"
+
+  external from_affine : jacobian -> affine -> unit
+    = "caml_blst_p2_from_affine_stubs"
+
+  external to_affine : affine -> jacobian -> unit
+    = "caml_blst_p2_to_affine_stubs"
+
+  external double : jacobian -> jacobian -> unit = "caml_blst_p2_double_stubs"
+
+  external dadd : jacobian -> jacobian -> jacobian -> unit
+    = "caml_blst_p2_add_or_double_stubs"
+
+  external is_zero : jacobian -> bool = "caml_blst_p2_is_inf_stubs"
+
+  external in_g2 : jacobian -> bool = "caml_blst_p2_in_g2_stubs"
+
+  external equal : jacobian -> jacobian -> bool = "caml_blst_p2_equal_stubs"
+
+  external cneg : jacobian -> bool -> unit = "caml_blst_p2_cneg_stubs"
+
+  external mult : jacobian -> jacobian -> Bytes.t -> Unsigned.Size_t.t -> unit
+    = "caml_blst_p2_mult_stubs"
+
+  external deserialize : affine -> Bytes.t -> int
+    = "caml_blst_p2_deserialize_stubs"
+
+  external serialize : Bytes.t -> jacobian -> unit
+    = "caml_blst_p2_serialize_stubs"
+
+  external compress : Bytes.t -> jacobian -> unit
+    = "caml_blst_p2_compress_stubs"
+
+  external uncompress : affine -> Bytes.t -> int
+    = "caml_blst_p2_uncompress_stubs"
+
+  external hash_to_curve :
+    jacobian ->
+    Bytes.t ->
+    Unsigned.Size_t.t ->
+    Bytes.t ->
+    Unsigned.Size_t.t ->
+    Bytes.t ->
+    Unsigned.Size_t.t ->
+    unit
+    = "caml_blst_p2_hash_to_curve_stubs_bytecode" "caml_blst_p2_hash_to_curve_stubs"
+
+  external memcpy : jacobian -> jacobian -> unit = "caml_blst_p2_memcpy_stubs"
+
+  external set_affine_coordinates : affine -> Fq2.t -> Fq2.t -> unit
+    = "caml_blst_p2_set_coordinates_stubs"
+end
 
 module G2 = struct
-  type t = Blst_bindings.Types.blst_g2_t Ctypes.ptr
+  type t = Stubs.jacobian
 
   exception Not_on_curve of Bytes.t
 
   let size_in_bytes = 192
 
-  let sizeof =
-    Unsigned.Size_t.of_int @@ Ctypes.sizeof Blst_bindings.Types.blst_g2_t
-
-  let memcpy dst src =
-    let src =
-      Ctypes.(coerce (ptr Blst_bindings.Types.blst_g2_t) (ptr void) src)
-    in
-    let dst =
-      Ctypes.(coerce (ptr Blst_bindings.Types.blst_g2_t) (ptr void) dst)
-    in
-    StubsFr.memcpy dst src sizeof
+  let memcpy dst src = Stubs.memcpy dst src
 
   let copy src =
-    let dst = Blst_bindings.Types.allocate_g2 () in
+    let dst = Stubs.allocate_g2 () in
     memcpy dst src ;
     dst
 
-  let global_buffer = Blst_bindings.Types.allocate_g2 ()
+  let global_buffer = Stubs.allocate_g2 ()
 
   module Scalar = Fr
 
-  let empty () = Blst_bindings.Types.allocate_g2 ()
+  let empty () = Stubs.allocate_g2 ()
 
   let check_bytes bs =
-    let buffer = Blst_bindings.Types.allocate_g2_affine () in
-    Stubs.deserialize buffer (Ctypes.ocaml_bytes_start bs) = 0
+    let buffer = Stubs.allocate_g2_affine () in
+    Stubs.deserialize buffer bs = 0
 
   let of_bytes_opt bs =
-    let buffer_affine = Blst_bindings.Types.allocate_g2_affine () in
+    let buffer_affine = Stubs.allocate_g2_affine () in
     if Bytes.length bs <> size_in_bytes then None
     else
-      let res = Stubs.deserialize buffer_affine (Ctypes.ocaml_bytes_start bs) in
+      let res = Stubs.deserialize buffer_affine bs in
       if res = 0 then (
-        let buffer = Blst_bindings.Types.allocate_g2 () in
+        let buffer = Stubs.allocate_g2 () in
         Stubs.from_affine buffer buffer_affine ;
         let is_in_prime_subgroup = Stubs.in_g2 buffer in
         if is_in_prime_subgroup then Some buffer else None )
@@ -75,10 +122,10 @@ module G2 = struct
     match of_bytes_opt bs with None -> raise (Not_on_curve bs) | Some p -> p
 
   let of_compressed_bytes_opt bs =
-    let buffer_affine = Blst_bindings.Types.allocate_g2_affine () in
-    let res = Stubs.uncompress buffer_affine (Ctypes.ocaml_bytes_start bs) in
+    let buffer_affine = Stubs.allocate_g2_affine () in
+    let res = Stubs.uncompress buffer_affine bs in
     if res = 0 then (
-      let buffer = Blst_bindings.Types.allocate_g2 () in
+      let buffer = Stubs.allocate_g2 () in
       Stubs.from_affine buffer buffer_affine ;
       let is_in_prime_subgroup = Stubs.in_g2 buffer in
       if is_in_prime_subgroup then Some buffer else None )
@@ -108,19 +155,19 @@ module G2 = struct
 
   let to_bytes p =
     let buffer = Bytes.make size_in_bytes '\000' in
-    Stubs.serialize (Ctypes.ocaml_bytes_start buffer) p ;
+    Stubs.serialize buffer p ;
     buffer
 
   let to_compressed_bytes p =
     let buffer = Bytes.make (size_in_bytes / 2) '\000' in
-    Stubs.compress (Ctypes.ocaml_bytes_start buffer) p ;
+    Stubs.compress buffer p ;
     buffer
 
   let add x y =
     (* dadd must be used to be complete. add does not work when it is the same
        point
     *)
-    let buffer = Blst_bindings.Types.allocate_g2 () in
+    let buffer = Stubs.allocate_g2 () in
     Stubs.dadd buffer x y ;
     buffer
 
@@ -129,35 +176,27 @@ module G2 = struct
     memcpy x global_buffer
 
   let add_bulk xs =
-    let buffer = Blst_bindings.Types.allocate_g2 () in
+    let buffer = Stubs.allocate_g2 () in
     List.iter (fun x -> Stubs.dadd buffer buffer x) xs ;
     buffer
 
   let double x =
-    let buffer = Blst_bindings.Types.allocate_g2 () in
+    let buffer = Stubs.allocate_g2 () in
     Stubs.double buffer x ;
     buffer
 
   let mul_bits g bytes =
-    let buffer = Blst_bindings.Types.allocate_g2 () in
-    Stubs.mult
-      buffer
-      g
-      (Ctypes.ocaml_bytes_start bytes)
-      (Unsigned.Size_t.of_int (Bytes.length bytes * 8)) ;
+    let buffer = Stubs.allocate_g2 () in
+    Stubs.mult buffer g bytes (Unsigned.Size_t.of_int (Bytes.length bytes * 8)) ;
     buffer
 
   let add_mul_bulk xs =
-    let buffer = Blst_bindings.Types.allocate_g2 () in
+    let buffer = Stubs.allocate_g2 () in
     List.iter
       (fun (g, n) ->
         let bytes = Fr.to_bytes n in
-        let tmp = Blst_bindings.Types.allocate_g2 () in
-        Stubs.mult
-          tmp
-          g
-          (Ctypes.ocaml_bytes_start bytes)
-          (Unsigned.Size_t.of_int (32 * 8)) ;
+        let tmp = Stubs.allocate_g2 () in
+        Stubs.mult tmp g bytes (Unsigned.Size_t.of_int (32 * 8)) ;
         Stubs.dadd buffer buffer tmp)
       xs ;
     buffer
@@ -171,14 +210,15 @@ module G2 = struct
     Stubs.mult
       global_buffer
       g
-      (Ctypes.ocaml_bytes_start bytes)
+      bytes
       (Unsigned.Size_t.of_int (Bytes.length bytes * 8)) ;
     memcpy g global_buffer
 
   let b =
-    let buffer = Blst_bindings.Types.allocate_fq2 () in
+    let buffer = Fq2.Stubs.allocate_fp2 () in
     let fq_four = Fq.(one + one + one + one) in
-    Blst_bindings.Types.fq2_assign buffer fq_four fq_four ;
+    let bytes = Fq.to_bytes fq_four in
+    Fq2.Stubs.of_bytes_components buffer bytes bytes ;
     buffer
 
   let clear_cofactor p =
@@ -202,11 +242,15 @@ module G2 = struct
     | None -> random ()
     | Some y ->
         let y = if Random.bool () then y else Fq2.negate y in
-        let p_affine = Blst_bindings.Types.allocate_g2_affine () in
-        Blst_bindings.Types.g2_affine_set_x p_affine x ;
-        Blst_bindings.Types.g2_affine_set_y p_affine y ;
-        let p = Blst_bindings.Types.allocate_g2 () in
+        (* Printf.printf *)
+        (*   "x = %s\ny = %s\n" *)
+        (*   Hex.(show (Hex.of_bytes (Fq2.to_bytes x))) *)
+        (*   Hex.(show (Hex.of_bytes (Fq2.to_bytes y))) ; *)
+        let p_affine = Stubs.allocate_g2_affine () in
+        Stubs.set_affine_coordinates p_affine x y ;
+        let p = Stubs.allocate_g2 () in
         Stubs.from_affine p p_affine ;
+        (* Printf.printf "Serialized: %s\n" (Hex.show (Hex.of_bytes (to_bytes p))) ; *)
         let p = clear_cofactor p in
         p
 
@@ -217,25 +261,24 @@ module G2 = struct
   let order_minus_one = Scalar.(negate one)
 
   let negate g =
-    let buffer = Blst_bindings.Types.g2_copy g in
+    let buffer = copy g in
     Stubs.cneg buffer true ;
     buffer
 
   let of_z_opt ~x ~y =
     let (x1, x2) = x in
     let (y1, y2) = y in
-    let p_affine = Blst_bindings.Types.allocate_g2_affine () in
-    let x1 = Fq.of_z x1 in
-    let x2 = Fq.of_z x2 in
-    let y1 = Fq.of_z y1 in
-    let y2 = Fq.of_z y2 in
-    let x = Blst_bindings.Types.allocate_fq2 () in
-    let y = Blst_bindings.Types.allocate_fq2 () in
-    Blst_bindings.Types.fq2_assign x x1 x2 ;
-    Blst_bindings.Types.fq2_assign y y1 y2 ;
-    Blst_bindings.Types.g2_affine_set_x p_affine x ;
-    Blst_bindings.Types.g2_affine_set_y p_affine y ;
-    let p = Blst_bindings.Types.allocate_g2 () in
+    let x1_bytes = Bytes.of_string (Z.to_bits x1) in
+    let x2_bytes = Bytes.of_string (Z.to_bits x2) in
+    let y1_bytes = Bytes.of_string (Z.to_bits y1) in
+    let y2_bytes = Bytes.of_string (Z.to_bits y2) in
+    let x = Fq2.Stubs.allocate_fp2 () in
+    let y = Fq2.Stubs.allocate_fp2 () in
+    Fq2.Stubs.of_bytes_components x x1_bytes x2_bytes ;
+    Fq2.Stubs.of_bytes_components y y1_bytes y2_bytes ;
+    let p_affine = Stubs.allocate_g2_affine () in
+    Stubs.set_affine_coordinates p_affine x y ;
+    let p = Stubs.allocate_g2 () in
     Stubs.from_affine p p_affine ;
     let is_ok = Stubs.in_g2 p in
     if is_ok then Some p else None
@@ -283,14 +326,14 @@ module G2 = struct
   let hash_to_curve message dst =
     let message_length = Bytes.length message in
     let dst_length = Bytes.length dst in
-    let buffer = Blst_bindings.Types.allocate_g2 () in
+    let buffer = Stubs.allocate_g2 () in
     Stubs.hash_to_curve
       buffer
-      (Ctypes.ocaml_bytes_start message)
+      message
       (Unsigned.Size_t.of_int message_length)
-      (Ctypes.ocaml_bytes_start dst)
+      dst
       (Unsigned.Size_t.of_int dst_length)
-      (Ctypes.ocaml_bytes_start Bytes.empty)
+      Bytes.empty
       Unsigned.Size_t.zero ;
     buffer
 end

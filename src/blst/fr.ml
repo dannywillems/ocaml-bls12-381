@@ -22,30 +22,54 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-module Stubs = Blst_bindings.StubsFr (Blst_stubs)
+module Stubs = struct
+  type fr
+
+  type scalar
+
+  external allocate_scalar : unit -> scalar = "allocate_scalar_stubs"
+
+  external allocate_fr : unit -> fr = "allocate_fr_stubs"
+
+  external scalar_of_fr : scalar -> fr -> unit
+    = "caml_blst_scalar_from_fr_stubs"
+
+  external fr_of_scalar : fr -> scalar -> unit
+    = "caml_blst_fr_from_scalar_stubs"
+
+  external scalar_of_bytes_le : scalar -> Bytes.t -> unit
+    = "caml_blst_scalar_of_bytes_stubs"
+
+  external scalar_to_bytes_le : Bytes.t -> scalar -> unit
+    = "caml_blst_scalar_to_bytes_stubs"
+
+  external check_scalar : scalar -> bool = "caml_blst_check_scalar_stubs"
+
+  external add : fr -> fr -> fr -> unit = "caml_blst_fr_add_stubs"
+
+  external sub : fr -> fr -> fr -> unit = "caml_blst_fr_sub_stubs"
+
+  external mul : fr -> fr -> fr -> unit = "caml_blst_fr_mul_stubs"
+
+  external sqr : fr -> fr -> unit = "caml_blst_fr_sqr_stubs"
+
+  external eucl_inverse : fr -> fr -> unit = "caml_blst_fr_eucl_inverse_stubs"
+
+  external memcpy : fr -> fr -> unit = "caml_blst_fr_memcpy_stubs"
+end
+
+(* module = Blst_bindings.r (Blst_stubs) *)
 
 module Fr = struct
   exception Not_in_field of Bytes.t
 
-  type t = Blst_bindings.Types.blst_fr_t Ctypes.ptr
+  type t = Stubs.fr
 
-  let global_buffer = Blst_bindings.Types.allocate_fr ()
-
-  let sizeof_fr =
-    Unsigned.Size_t.of_int @@ Ctypes.sizeof Blst_bindings.Types.blst_fr_t
-
-  let memcpy dst src =
-    let src =
-      Ctypes.(coerce (ptr Blst_bindings.Types.blst_fr_t) (ptr void) src)
-    in
-    let dst =
-      Ctypes.(coerce (ptr Blst_bindings.Types.blst_fr_t) (ptr void) dst)
-    in
-    Stubs.memcpy dst src sizeof_fr
+  let global_buffer = Stubs.allocate_fr ()
 
   let copy src =
-    let dst = Blst_bindings.Types.allocate_fr () in
-    memcpy dst src ;
+    let dst = Stubs.allocate_fr () in
+    Stubs.memcpy dst src ;
     dst
 
   let size_in_bytes = 32
@@ -66,13 +90,10 @@ module Fr = struct
     if Bytes.length bs > size_in_bytes then None
     else
       let bs = pad_if_require bs in
-      let buffer_scalar = Blst_bindings.Types.allocate_scalar () in
-      let () =
-        Stubs.scalar_of_bytes_le buffer_scalar (Ctypes.ocaml_bytes_start bs)
-      in
-
+      let buffer_scalar = Stubs.allocate_scalar () in
+      let () = Stubs.scalar_of_bytes_le buffer_scalar bs in
       if Stubs.check_scalar buffer_scalar then (
-        let buffer_fr = Blst_bindings.Types.allocate_fr () in
+        let buffer_fr = Stubs.allocate_fr () in
         Stubs.fr_of_scalar buffer_fr buffer_scalar ;
         Some buffer_fr )
       else None
@@ -85,8 +106,8 @@ module Fr = struct
 
   let check_bytes bs =
     if Bytes.length bs = size_in_bytes then (
-      let buffer_scalar = Blst_bindings.Types.allocate_scalar () in
-      Stubs.scalar_of_bytes_le buffer_scalar (Ctypes.ocaml_bytes_start bs) ;
+      let buffer_scalar = Stubs.allocate_scalar () in
+      Stubs.scalar_of_bytes_le buffer_scalar bs ;
       Stubs.check_scalar buffer_scalar )
     else false
 
@@ -99,11 +120,9 @@ module Fr = struct
 
   let to_bytes x =
     let buffer_bytes = Bytes.make size_in_bytes '\000' in
-    let buffer_scalar = Blst_bindings.Types.allocate_scalar () in
+    let buffer_scalar = Stubs.allocate_scalar () in
     Stubs.scalar_of_fr buffer_scalar x ;
-    Stubs.scalar_to_bytes_le
-      (Ctypes.ocaml_bytes_start buffer_bytes)
-      buffer_scalar ;
+    Stubs.scalar_to_bytes_le buffer_bytes buffer_scalar ;
     buffer_bytes
 
   let eq x y =
@@ -130,32 +149,32 @@ module Fr = struct
     if is_zero r then non_null_random ?state () else r
 
   let add x y =
-    let buffer = Blst_bindings.Types.allocate_fr () in
+    let buffer = Stubs.allocate_fr () in
     Stubs.add buffer x y ;
     buffer
 
   let add_inplace x y =
     Stubs.add global_buffer x y ;
-    memcpy x global_buffer
+    Stubs.memcpy x global_buffer
 
   let add_bulk xs =
-    let buffer = Blst_bindings.Types.allocate_fr () in
+    let buffer = Stubs.allocate_fr () in
     List.iter (fun x -> Stubs.add buffer buffer x) xs ;
     buffer
 
   let ( + ) = add
 
   let mul x y =
-    let buffer = Blst_bindings.Types.allocate_fr () in
+    let buffer = Stubs.allocate_fr () in
     Stubs.mul buffer x y ;
     buffer
 
   let mul_inplace x y =
     Stubs.mul global_buffer x y ;
-    memcpy x global_buffer
+    Stubs.memcpy x global_buffer
 
   let mul_bulk xs =
-    let buffer = Blst_bindings.Types.allocate_fr () in
+    let buffer = Stubs.allocate_fr () in
     Stubs.add buffer buffer one ;
     List.iter (fun x -> Stubs.mul buffer buffer x) xs ;
     buffer
@@ -165,7 +184,7 @@ module Fr = struct
   let inverse_opt x =
     if is_zero x then None
     else
-      let buffer = Blst_bindings.Types.allocate_fr () in
+      let buffer = Stubs.allocate_fr () in
       Stubs.eucl_inverse buffer x ;
       Some buffer
 
@@ -175,34 +194,34 @@ module Fr = struct
   let inverse_exn_inplace x =
     if is_zero x then raise Division_by_zero
     else Stubs.eucl_inverse global_buffer x ;
-    memcpy x global_buffer
+    Stubs.memcpy x global_buffer
 
   let sub a b =
-    let buffer = Blst_bindings.Types.allocate_fr () in
+    let buffer = Stubs.allocate_fr () in
     Stubs.sub buffer a b ;
     buffer
 
   let sub_inplace x y =
     Stubs.sub global_buffer x y ;
-    memcpy x global_buffer
+    Stubs.memcpy x global_buffer
 
   let square x = x * x
 
   let square_inplace x =
     Stubs.mul global_buffer x x ;
-    memcpy x global_buffer
+    Stubs.memcpy x global_buffer
 
   let double x = x + x
 
   let double_inplace x =
     Stubs.add global_buffer x x ;
-    memcpy x global_buffer
+    Stubs.memcpy x global_buffer
 
   let negate x = sub zero x
 
   let negate_inplace x =
     Stubs.sub global_buffer zero x ;
-    memcpy x global_buffer
+    Stubs.memcpy x global_buffer
 
   let ( - ) = negate
 

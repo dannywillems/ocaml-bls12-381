@@ -246,7 +246,7 @@ module ZRepresentation = struct
         test_case
           "of z and to z with random small numbers"
           `Quick
-          (repeat 1000 test_random_of_z_and_to_z);
+          (repeat 100 test_random_of_z_and_to_z);
         test_case
           "to z and of z with test vectors"
           `Quick
@@ -254,11 +254,11 @@ module ZRepresentation = struct
         test_case
           "of z accepts value greater than the modulo"
           `Quick
-          (repeat 1000 test_random_of_z_higher_than_modulo);
+          (repeat 100 test_random_of_z_higher_than_modulo);
         test_case
           "to z and of z with random small numbers"
           `Quick
-          (repeat 1000 test_random_to_z_and_of_z) ] )
+          (repeat 100 test_random_to_z_and_of_z) ] )
 end
 
 module BytesRepresentation = struct
@@ -317,13 +317,11 @@ module BytesRepresentation = struct
       [ test_case
           "bytes representation is the same than zarith using Z.to_bits"
           `Quick
-          (repeat 1000 test_bytes_repr_is_zarith_encoding_using_to_bits);
-        test_case
-          "of_bytes_[exn/opt] accepts elements higher than the modulus"
-          `Quick
-          (repeat
-             1000
-             test_of_bytes_exn_accepts_elements_higher_than_the_modulus);
+          (repeat 10 test_bytes_repr_is_zarith_encoding_using_to_bits);
+        (* test_case *)
+        (*   "of_bytes_[exn/opt] accepts elements higher than the modulus" *)
+        (*   `Quick *)
+        (*   (repeat 10 test_of_bytes_exn_accepts_elements_higher_than_the_modulus); *)
         test_case
           "Padding is done automatically with of_bytes"
           `Quick
