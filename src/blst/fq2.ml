@@ -22,28 +22,44 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-module Stubs = Blst_bindings.StubsFq2 (Blst_stubs)
+module Stubs = struct
+  type t
+
+  external allocate_fp2 : unit -> t = "allocate_fp2_stubs"
+
+  external add : t -> t -> t -> unit = "caml_blst_fp2_add_stubs"
+
+  external mul : t -> t -> t -> unit = "caml_blst_fp2_mul_stubs"
+
+  external sqrt : t -> t -> bool = "caml_blst_fp2_sqrt_stubs"
+
+  external cneg : t -> t -> bool -> unit = "caml_blst_fp2_cneg_stubs"
+
+  external to_bytes : Bytes.t -> t -> unit = "caml_blst_fp2_to_bytes_stubs"
+
+  external of_bytes_components : t -> Bytes.t -> Bytes.t -> unit
+    = "caml_blst_fp2_of_bytes_components_stubs"
+
+  external zero : t -> unit = "caml_blst_fp2_zero_stubs"
+
+  external one : t -> unit = "caml_blst_fp2_one_stubs"
+end
 
 module Fq2 = struct
   exception Not_in_field of Bytes.t
 
-  type t = Blst_bindings.Types.blst_fq2_t Ctypes.ptr
+  type t = Stubs.t
 
   let size_in_bytes = 96
 
   let of_bytes_opt bs =
     if Bytes.length bs <> size_in_bytes then None
     else
-      let buffer = Blst_bindings.Types.allocate_fq2 () in
+      let buffer = Stubs.allocate_fp2 () in
       let x_bytes = Bytes.sub bs 0 48 in
       let y_bytes = Bytes.sub bs 48 48 in
-      let x_opt = Fq.of_bytes_opt x_bytes in
-      let y_opt = Fq.of_bytes_opt y_bytes in
-      match (x_opt, y_opt) with
-      | (None, _) | (_, None) -> None
-      | (Some x, Some y) ->
-          Blst_bindings.Types.fq2_assign buffer x y ;
-          Some buffer
+      Stubs.of_bytes_components buffer x_bytes y_bytes ;
+      Some buffer
 
   let of_bytes_exn bs : t =
     let buffer_opt = of_bytes_opt bs in
@@ -52,51 +68,51 @@ module Fq2 = struct
     | Some buffer -> buffer
 
   let zero =
-    let buffer = Blst_bindings.Types.allocate_fq2 () in
-    Blst_bindings.Types.fq2_assign buffer Fq.zero Fq.zero ;
+    let buffer = Stubs.allocate_fp2 () in
+    Stubs.zero buffer ;
     buffer
 
   let one =
-    let buffer = Blst_bindings.Types.allocate_fq2 () in
-    Blst_bindings.Types.fq2_assign buffer Fq.one Fq.zero ;
+    let buffer = Stubs.allocate_fp2 () in
+    Stubs.one buffer ;
     buffer
 
   let to_bytes p =
-    let x = Blst_bindings.Types.fq2_get_x p in
-    let y = Blst_bindings.Types.fq2_get_y p in
-    let x_bytes = Fq.to_bytes x in
-    let y_bytes = Fq.to_bytes y in
-    Bytes.concat Bytes.empty [x_bytes; y_bytes]
+    let buffer = Bytes.make size_in_bytes '\000' in
+    Stubs.to_bytes buffer p ;
+    buffer
 
   let random ?state () =
     (match state with None -> () | Some state -> Random.set_state state) ;
     let x = Fq.random () in
     let y = Fq.random () in
-    let buffer = Blst_bindings.Types.allocate_fq2 () in
-    Blst_bindings.Types.fq2_assign buffer x y ;
+    let buffer = Stubs.allocate_fp2 () in
+    let x_bytes = Fq.to_bytes x in
+    let y_bytes = Fq.to_bytes y in
+    Stubs.of_bytes_components buffer x_bytes y_bytes ;
     buffer
 
   let add x y =
-    let buffer = Blst_bindings.Types.allocate_fq2 () in
+    let buffer = Stubs.allocate_fp2 () in
     Stubs.add buffer x y ;
     buffer
 
   let ( + ) = add
 
   let mul x y =
-    let buffer = Blst_bindings.Types.allocate_fq2 () in
+    let buffer = Stubs.allocate_fp2 () in
     Stubs.mul buffer x y ;
     buffer
 
   let ( * ) = mul
 
   let sqrt_opt x =
-    let buffer = Blst_bindings.Types.allocate_fq2 () in
+    let buffer = Stubs.allocate_fp2 () in
     let res = Stubs.sqrt buffer x in
     if res then Some buffer else None
 
   let negate x =
-    let buffer = Blst_bindings.Types.allocate_fq2 () in
+    let buffer = Stubs.allocate_fp2 () in
     Stubs.cneg buffer x true ;
     buffer
 end

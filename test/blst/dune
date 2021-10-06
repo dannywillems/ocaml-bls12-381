@@ -25,8 +25,8 @@
   test_pairing
   test_random_state
   test_hash_to_curve
-  ; test_signature
-  ; test_aggregated_signature
+  test_signature
+  test_aggregated_signature
   )
  (modules
   test_fr

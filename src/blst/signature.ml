@@ -1,15 +1,56 @@
-module Stubs = Blst_bindings.StubsSignature (Blst_stubs)
-module StubsFr = Blst_bindings.StubsFr (Blst_stubs)
-module StubsG1 = Blst_bindings.StubsG1 (Blst_stubs)
-module StubsG2 = Blst_bindings.StubsG2 (Blst_stubs)
+module Stubs = struct
+  type ctxt
 
-external keygen_stubs :
-  Fr.scalar ->
-  Bytes.t ->
-  Unsigned.Size_t.t ->
-  Bytes.t ->
-  Unsigned.Size_t.t ->
-  unit = "blst_keygen"
+  external keygen :
+    Fr.Stubs.scalar ->
+    Bytes.t ->
+    Unsigned.Size_t.t ->
+    Bytes.t ->
+    Unsigned.Size_t.t ->
+    unit = "caml_blst_signature_keygen_stubs"
+
+  external sk_to_pk : G1.t -> Fr.Stubs.scalar -> unit
+    = "caml_blst_sk_to_pk_in_g1_stubs"
+
+  external sign : G2.t -> G2.t -> Fr.Stubs.scalar -> unit
+    = "caml_blst_sign_pk_in_g1_stubs"
+
+  external allocate_ctxt : unit -> ctxt = "allocate_pairing_stubs"
+
+  external pairing_init : ctxt -> bool -> Bytes.t -> Unsigned.Size_t.t -> unit
+    = "caml_blst_pairing_init_stubs"
+
+  external aggregate_signature :
+    ctxt ->
+    G1.t ->
+    G2.t ->
+    Bytes.t ->
+    Unsigned.Size_t.t ->
+    Bytes.t ->
+    Unsigned.Size_t.t ->
+    int
+    = "caml_blst_aggregate_signature_bytecode_stubs" "caml_blst_aggregate_signature_stubs"
+
+  external pairing_commit : ctxt -> unit = "caml_blst_pairing_commit_stubs"
+
+  external pairing_finalverify : ctxt -> bool
+    = "caml_blst_pairing_finalverify_stubs"
+
+  external pairing_chk_n_mul_n_aggr_pk_in_g1 :
+    ctxt ->
+    G1.Stubs.affine ->
+    bool ->
+    G2.Stubs.affine option ->
+    bool ->
+    Bytes.t ->
+    Unsigned.Size_t.t ->
+    Bytes.t ->
+    Unsigned.Size_t.t ->
+    Bytes.t ->
+    Unsigned.Size_t.t ->
+    int
+    = "caml_blst_pairing_chk_n_mul_n_aggr_pk_in_g1_stubs_bytecode" "caml_blst_pairing_chk_n_mul_n_aggr_pk_in_g1_stubs"
+end
 
 type signature = Bytes.t
 
@@ -23,41 +64,21 @@ let check_unicity_lst list =
     list
 
 let with_aggregation_ctxt ciphersuite f =
-  let allocate_blst_pairing_t () =
-    let allocated_memory = Stubs.malloc (Stubs.sizeof_pairing ()) in
-    Ctypes.(
-      coerce
-        (ptr void)
-        (ptr Blst_bindings.Types.blst_pairing_t)
-        allocated_memory)
-  in
-  let free_blst_pairing_t ctxt =
-    let ctxt =
-      Ctypes.(coerce (ptr Blst_bindings.Types.blst_pairing_t) (ptr void) ctxt)
-    in
-    Stubs.free ctxt
-  in
-  let ctxt = allocate_blst_pairing_t () in
+  let ctxt = Stubs.allocate_ctxt () in
   let ciphersuite_length = Bytes.length ciphersuite in
   Stubs.pairing_init
     ctxt
     true
-    (Ctypes.ocaml_bytes_start ciphersuite)
+    ciphersuite
     (Unsigned.Size_t.of_int ciphersuite_length) ;
-  try
-    let res = f ctxt in
-    free_blst_pairing_t ctxt ;
-    res
-  with exn ->
-    free_blst_pairing_t ctxt ;
-    raise exn
+  f ctxt
 
-type sk = Fr.scalar
+type sk = Fr.Stubs.scalar
 
 type pk = Bytes.t
 
 let sk_of_bytes_exn bytes =
-  let buffer = Fr.allocate_scalar () in
+  let buffer = Fr.Stubs.allocate_scalar () in
   if Bytes.length bytes > 32 then
     raise
       (Invalid_argument
@@ -65,16 +86,16 @@ let sk_of_bytes_exn bytes =
           endian")
   else
     let sk = Fr.of_bytes_exn bytes in
-    Fr.scalar_of_fr buffer sk ;
+    Fr.Stubs.scalar_of_fr buffer sk ;
     buffer
 
 let sk_to_bytes sk =
   let bytes = Bytes.make 32 '\000' in
-  Fr.scalar_to_bytes_le bytes sk ;
+  Fr.Stubs.scalar_to_bytes_le bytes sk ;
   bytes
 
 let generate_sk ?(key_info = Bytes.empty) ikm =
-  let buffer_scalar = Fr.allocate_scalar () in
+  let buffer_scalar = Fr.Stubs.allocate_scalar () in
   let key_info_length = Bytes.length key_info in
   let ikm_length = Bytes.length ikm in
 
@@ -94,7 +115,7 @@ let generate_sk ?(key_info = Bytes.empty) ikm =
       (Invalid_argument
          "generate_sk: ikm argument must be at least 32 bytes long")
   else
-    keygen_stubs
+    Stubs.keygen
       buffer_scalar
       ikm
       (Unsigned.Size_t.of_int ikm_length)
@@ -122,29 +143,25 @@ let pk_of_bytes_opt pk_bytes =
 let pk_to_bytes pk_bytes = Bytes.copy pk_bytes
 
 let derive_pk sk =
-  let buffer_g1 = Blst_bindings.Types.allocate_g1 () in
+  let buffer_g1 = G1.Stubs.allocate_g1 () in
   Stubs.sk_to_pk buffer_g1 sk ;
   G1.to_compressed_bytes buffer_g1
 
 let core_sign sk message ciphersuite =
   let hash = G2.hash_to_curve message ciphersuite in
-  let buffer = Blst_bindings.Types.allocate_g2 () in
+  let buffer = G2.Stubs.allocate_g2 () in
   Stubs.sign buffer hash sk ;
   G2.to_compressed_bytes buffer
 
 let core_verify pk msg signature_bytes ciphersuite =
   with_aggregation_ctxt ciphersuite (fun ctxt ->
       let msg_length = Bytes.length msg in
-      let unsafe_signature_affine = Blst_bindings.Types.allocate_g2_affine () in
+      let unsafe_signature_affine = G2.Stubs.allocate_g2_affine () in
       let res_signature =
-        StubsG2.uncompress
-          unsafe_signature_affine
-          (Ctypes.ocaml_bytes_start signature_bytes)
+        G2.Stubs.uncompress unsafe_signature_affine signature_bytes
       in
-      let unsafe_pk_affine = Blst_bindings.Types.allocate_g1_affine () in
-      let res_pk =
-        StubsG1.uncompress unsafe_pk_affine (Ctypes.ocaml_bytes_start pk)
-      in
+      let unsafe_pk_affine = G1.Stubs.allocate_g1_affine () in
+      let res_pk = G1.Stubs.uncompress unsafe_pk_affine pk in
       if res_signature = 0 && res_pk = 0 then
         let res =
           Stubs.pairing_chk_n_mul_n_aggr_pk_in_g1
@@ -161,27 +178,25 @@ let core_verify pk msg signature_bytes ciphersuite =
                the verification will fail.
             *)
             true
-            unsafe_signature_affine
+            (Some unsafe_signature_affine)
             (* the signature argument might not be in the subgroup even if the
                decompression went successfull. `true` means the function must
                verify the point is in the prime subgroup.
             *)
             true
             (* scalar *)
-            (Ctypes.ocaml_bytes_start Bytes.empty)
+            Bytes.empty
             Unsigned.Size_t.zero
             (* msg *)
-            (Ctypes.ocaml_bytes_start msg)
+            msg
             (Unsigned.Size_t.of_int msg_length)
             (* aug *)
-            (Ctypes.ocaml_bytes_start Bytes.empty)
+            Bytes.empty
             Unsigned.Size_t.zero
         in
         if res = 0 then (
           Stubs.pairing_commit ctxt ;
-          Stubs.pairing_finalverify
-            ctxt
-            Ctypes.(from_voidp Blst_bindings.Types.blst_fq12_t null) )
+          Stubs.pairing_finalverify ctxt )
         else false
       else false)
 
@@ -201,10 +216,6 @@ let aggregate_signature_opt signatures =
   Option.map G2.to_compressed_bytes res
 
 let core_aggregate_verify pks_with_msgs aggregated_signature ciphersuite =
-  (* creating only once a null value of blst_g2_affine_t for the recursive call *)
-  let null_pointer_g2_affine =
-    Ctypes.(from_voidp Blst_bindings.Types.blst_g2_affine_t null)
-  in
   let rec aux aggregated_signature pks_with_msgs ctxt =
     match pks_with_msgs with
     | (unsafe_pk_affine, msg) :: rest ->
@@ -225,18 +236,18 @@ let core_aggregate_verify pks_with_msgs aggregated_signature ciphersuite =
             *)
             false
             (* scalar *)
-            (Ctypes.ocaml_bytes_start Bytes.empty)
+            Bytes.empty
             Unsigned.Size_t.zero
             (* msg *)
-            (Ctypes.ocaml_bytes_start msg)
+            msg
             (Unsigned.Size_t.of_int msg_length)
             (* aug *)
-            (Ctypes.ocaml_bytes_start Bytes.empty)
+            Bytes.empty
             Unsigned.Size_t.zero
         in
         if res = 0 then
           (* signature: must be null except the first one *)
-          aux null_pointer_g2_affine rest ctxt
+          aux None rest ctxt
         else false
     | [] -> true
   in
@@ -254,10 +265,8 @@ let core_aggregate_verify pks_with_msgs aggregated_signature ciphersuite =
   let unsafe_pks_affine =
     List.map
       (fun pk_bytes ->
-        let pk_affine = Blst_bindings.Types.allocate_g1_affine () in
-        let res =
-          StubsG1.uncompress pk_affine (Ctypes.ocaml_bytes_start pk_bytes)
-        in
+        let pk_affine = G1.Stubs.allocate_g1_affine () in
+        let res = G1.Stubs.uncompress pk_affine pk_bytes in
         are_pks_on_curve := res = 0 && !are_pks_on_curve ;
         pk_affine)
       pks
@@ -273,14 +282,12 @@ let core_aggregate_verify pks_with_msgs aggregated_signature ciphersuite =
     | None -> false
     | Some aggregated_signature ->
         with_aggregation_ctxt ciphersuite (fun ctxt ->
-            let signature_affine = Blst_bindings.Types.allocate_g2_affine () in
-            StubsG2.to_affine signature_affine aggregated_signature ;
-            let res = aux signature_affine pks_with_msgs ctxt in
+            let signature_affine = G2.Stubs.allocate_g2_affine () in
+            G2.Stubs.to_affine signature_affine aggregated_signature ;
+            let res = aux (Some signature_affine) pks_with_msgs ctxt in
             if res then (
               Stubs.pairing_commit ctxt ;
-              Stubs.pairing_finalverify
-                ctxt
-                Ctypes.(from_voidp Blst_bindings.Types.blst_fq12_t null) )
+              Stubs.pairing_finalverify ctxt )
             else false)
   else false
 

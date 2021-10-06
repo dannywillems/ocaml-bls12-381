@@ -803,13 +803,6 @@ module StubsSignature (S : Cstubs.FOREIGN) = struct
       "blst_pairing_init"
       (ptr blst_pairing_t @-> bool @-> ocaml_bytes @-> size_t @-> returning void)
 
-  let core_verify =
-    foreign
-      "blst_core_verify_pk_in_g1"
-      ( ptr blst_g1_affine_t @-> ptr blst_g2_affine_t @-> bool @-> ocaml_bytes
-      @-> size_t @-> ocaml_bytes @-> size_t @-> ocaml_bytes @-> size_t
-      @-> returning int )
-
   let aggregate_signature =
     foreign
       "blst_pairing_aggregate_pk_in_g1"

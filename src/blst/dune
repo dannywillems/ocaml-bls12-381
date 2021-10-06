@@ -39,6 +39,7 @@
 (library
  (public_name bls12-381-unix)
  (name bls12_381_unix)
+ (modes native)
  (modules
   bls12_381
   fr
@@ -46,7 +47,7 @@
   g1
   g2
   pairing
-  ; signature
+  signature
   ;; private
   fq
   fq2

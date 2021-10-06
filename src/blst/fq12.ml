@@ -22,12 +22,32 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-module StubsFq12 = Blst_bindings.StubsFq12 (Blst_stubs)
+module Stubs = struct
+  type fp12
+
+  external allocate_fq12 : unit -> fp12 = "allocate_fp12_stubs"
+
+  external mul : fp12 -> fp12 -> fp12 -> unit = "caml_blst_fp12_mul_stubs"
+
+  external one : fp12 -> unit = "caml_blst_fp12_one_stubs"
+
+  external equal : fp12 -> fp12 -> bool = "caml_blst_fp12_is_equal_stubs"
+
+  external is_one : fp12 -> bool = "caml_blst_fp12_is_one_stubs"
+
+  external inverse : fp12 -> fp12 -> unit = "caml_blst_fp12_inverse_stubs"
+
+  external sqr : fp12 -> fp12 -> unit = "caml_blst_fp12_sqr_stubs"
+
+  external to_bytes : Bytes.t -> fp12 -> unit = "caml_blst_fp12_to_bytes_stubs"
+
+  external of_bytes : fp12 -> Bytes.t -> unit = "caml_blst_fp12_of_bytes_stubs"
+end
 
 module Fq12 = struct
   exception Not_in_field of Bytes.t
 
-  type t = Blst_bindings.Types.blst_fq12_t Ctypes.ptr
+  type t = Stubs.fp12
 
   let order =
     let fq_order =
@@ -39,115 +59,75 @@ module Fq12 = struct
   let size_in_bytes = 48 * 12
 
   let to_bytes p =
-    let fill_fp_bytes buffer i bs = Bytes.blit bs 0 buffer i Fq.size_in_bytes in
     let buffer = Bytes.make size_in_bytes '\000' in
-    (* Copy paste for readability *)
-    let (fq6_x0, fq6_x1) = Blst_bindings.Types.fq12_get_fq_components p in
-    let (fq2_x0, fq2_x1, fq2_x2) = fq6_x0 in
-    let (fq_x0, fq_x1) = fq2_x0 in
-    fill_fp_bytes buffer 0 (Fq.to_bytes fq_x0) ;
-    fill_fp_bytes buffer Fq.size_in_bytes (Fq.to_bytes fq_x1) ;
-    let (fq_x0, fq_x1) = fq2_x1 in
-    fill_fp_bytes buffer (2 * Fq.size_in_bytes) (Fq.to_bytes fq_x0) ;
-    fill_fp_bytes buffer (3 * Fq.size_in_bytes) (Fq.to_bytes fq_x1) ;
-    let (fq_x0, fq_x1) = fq2_x2 in
-    fill_fp_bytes buffer (4 * Fq.size_in_bytes) (Fq.to_bytes fq_x0) ;
-    fill_fp_bytes buffer (5 * Fq.size_in_bytes) (Fq.to_bytes fq_x1) ;
-    let (fq2_x0, fq2_x1, fq2_x2) = fq6_x1 in
-    let (fq_x0, fq_x1) = fq2_x0 in
-    fill_fp_bytes buffer (6 * Fq.size_in_bytes) (Fq.to_bytes fq_x0) ;
-    fill_fp_bytes buffer (7 * Fq.size_in_bytes) (Fq.to_bytes fq_x1) ;
-    let (fq_x0, fq_x1) = fq2_x1 in
-    fill_fp_bytes buffer (8 * Fq.size_in_bytes) (Fq.to_bytes fq_x0) ;
-    fill_fp_bytes buffer (9 * Fq.size_in_bytes) (Fq.to_bytes fq_x1) ;
-    let (fq_x0, fq_x1) = fq2_x2 in
-    fill_fp_bytes buffer (10 * Fq.size_in_bytes) (Fq.to_bytes fq_x0) ;
-    fill_fp_bytes buffer (11 * Fq.size_in_bytes) (Fq.to_bytes fq_x1) ;
+    Stubs.to_bytes buffer p ;
     buffer
 
   let of_bytes_opt bs =
     if Bytes.length bs <> size_in_bytes then None
     else
-      let buffer = Blst_bindings.Types.allocate_fq12 () in
-      for i = 0 to 11 do
-        let bytes = Bytes.sub bs (i * Fq.size_in_bytes) Fq.size_in_bytes in
-        let x = Fq.of_bytes_exn bytes in
-        Blst_bindings.Types.fq12_assign_fq_component buffer i x
-      done ;
+      let buffer = Stubs.allocate_fq12 () in
+      Stubs.of_bytes buffer bs ;
       Some buffer
 
   let random ?state () =
     (match state with None -> () | Some state -> Random.set_state state) ;
-    let buffer = Blst_bindings.Types.allocate_fq12 () in
-    for i = 0 to 11 do
-      let x = Fq.random () in
-      Blst_bindings.Types.fq12_assign_fq_component buffer i x
-    done ;
+    let buffer = Stubs.allocate_fq12 () in
+    let bs =
+      Bytes.concat
+        Bytes.empty
+        (List.init 12 (fun _ -> Fq.(to_bytes (random ()))))
+    in
+    Stubs.of_bytes buffer bs ;
     buffer
 
   let of_bytes_exn bs =
     match of_bytes_opt bs with None -> raise (Not_in_field bs) | Some p -> p
 
   let one =
-    let bs = Bytes.make size_in_bytes '\000' in
-    Bytes.set bs 0 '\001' ;
-    of_bytes_exn bs
+    let buffer = Stubs.allocate_fq12 () in
+    Stubs.one buffer ;
+    buffer
 
-  let zero =
-    let bs = Bytes.make size_in_bytes '\000' in
-    of_bytes_exn bs
+  let zero = Stubs.allocate_fq12 ()
 
-  let eq x y = StubsFq12.equal x y
+  let eq x y =
+    let res = Stubs.equal x y in
+    res
 
-  let is_zero p = eq p zero
+  let is_zero p =
+    let res = eq p zero in
+    res
 
-  let is_one p = eq p one
+  let is_one p = Stubs.is_one p
 
   let mul x y =
-    let buffer = Blst_bindings.Types.allocate_fq12 () in
-    StubsFq12.mul buffer x y ;
+    let buffer = Stubs.allocate_fq12 () in
+    Stubs.mul buffer x y ;
     buffer
 
   let inverse_opt x =
     if is_zero x then None
     else
-      let buffer = Blst_bindings.Types.allocate_fq12 () in
-      StubsFq12.inverse buffer x ;
+      let buffer = Stubs.allocate_fq12 () in
+      Stubs.inverse buffer x ;
       Some buffer
 
   let inverse_exn x =
     if is_zero x then raise Division_by_zero
     else
-      let buffer = Blst_bindings.Types.allocate_fq12 () in
-      StubsFq12.inverse buffer x ;
+      let buffer = Stubs.allocate_fq12 () in
+      Stubs.inverse buffer x ;
       buffer
 
   let of_z x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 =
-    let x0 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x0)) in
-    let x1 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x1)) in
-    let x2 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x2)) in
-    let x3 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x3)) in
-    let x4 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x4)) in
-    let x5 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x5)) in
-    let x6 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x6)) in
-    let x7 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x7)) in
-    let x8 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x8)) in
-    let x9 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x9)) in
-    let x10 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x10)) in
-    let x11 = Fq.of_bytes_exn (Bytes.of_string (Z.to_bits x11)) in
-    let buffer = Blst_bindings.Types.allocate_fq12 () in
-    Blst_bindings.Types.fq12_assign_fq_component buffer 0 x0 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 1 x1 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 2 x2 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 3 x3 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 4 x4 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 5 x5 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 6 x6 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 7 x7 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 8 x8 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 9 x9 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 10 x10 ;
-    Blst_bindings.Types.fq12_assign_fq_component buffer 11 x11 ;
+    let coordinates = [x0; x1; x2; x3; x4; x5; x6; x7; x8; x9; x10; x11] in
+    let coordinates =
+      List.map (fun x -> Bytes.of_string (Z.to_bits x)) coordinates
+    in
+    let bs = Bytes.concat Bytes.empty coordinates in
+    let buffer = Stubs.allocate_fq12 () in
+    Stubs.of_bytes buffer bs ;
     buffer
 
   let of_string x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 =

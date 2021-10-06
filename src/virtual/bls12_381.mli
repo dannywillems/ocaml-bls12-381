@@ -414,7 +414,6 @@ module Pairing : sig
   val final_exponentiation_exn : Fq12.t -> Fq12.t
 end
 
-(*
 (** Follow https://tools.ietf.org/pdf/draft-irtf-cfrg-bls-signature-04.pdf *)
 module Signature : sig
   (** Type of the secret keys. *)
@@ -564,4 +563,3 @@ module Signature : sig
     val aggregate_verify : (pk * proof) list -> Bytes.t -> signature -> bool
   end
 end
-*)
