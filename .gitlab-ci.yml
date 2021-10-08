@@ -28,6 +28,19 @@ lint:
   rules:
     - when: always
 
+lint-c:
+  stage: lint
+  image: ubuntu:20.04
+  script:
+    - apt-get update -y
+    - apt-get install clang-format-12 git -y
+    - clang-format-12 --version
+    - clang-format-12 src/blst/bindings/*.c -i
+    # Check if a file has been modified and uncommited
+    - git diff --exit-code
+  rules:
+    - when: always
+
 .build-test: &build_definition
   stage: build
   before_script:
