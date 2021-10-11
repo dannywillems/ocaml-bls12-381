@@ -4,3 +4,4 @@ _opam
 *.merlin
 _coverage
 node_modules
+*.o
