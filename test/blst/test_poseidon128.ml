@@ -33,3 +33,5 @@ let () =
     "Poseidon128"
     [ ( "Consistency with MEC",
         [test_case "vectors" `Quick test_consistent_with_mec] ) ]
+
+let () = Bls12_381.Poseidon128.finalize ()

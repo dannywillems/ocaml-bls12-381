@@ -19,3 +19,5 @@ let t1 =
 let command = Bench.make_command [t1]
 
 let () = Core.Command.run command
+
+let () = Bls12_381.Poseidon128.finalize ()
