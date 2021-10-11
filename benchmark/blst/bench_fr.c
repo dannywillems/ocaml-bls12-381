@@ -93,9 +93,78 @@ void bench_substraction(void) {
   printf("Fr substraction: %ld ns\n", total_elapsed / NB_RUN);
 }
 
+void bench_negate(void) {
+  blst_fr *a = (blst_fr *)malloc(sizeof(blst_fr));
+
+  long int total_elapsed;
+
+  for (int i = 0; i < NB_RUN; i++) {
+    generate_random_fr(a);
+
+    auto begin = std::chrono::high_resolution_clock::now();
+    blst_fr *result = (blst_fr *)malloc(sizeof(blst_fr));
+    blst_fr_cneg(result, a, true);
+    auto end = std::chrono::high_resolution_clock::now();
+    free(result);
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    total_elapsed += elapsed.count();
+  }
+  free(a);
+
+  printf("Fr opposite: %ld ns\n", total_elapsed / NB_RUN);
+}
+
+void bench_square(void) {
+  blst_fr *a = (blst_fr *)malloc(sizeof(blst_fr));
+
+  long int total_elapsed;
+
+  for (int i = 0; i < NB_RUN; i++) {
+    generate_random_fr(a);
+
+    auto begin = std::chrono::high_resolution_clock::now();
+    blst_fr *result = (blst_fr *)malloc(sizeof(blst_fr));
+    blst_fr_sqr(result, a);
+    auto end = std::chrono::high_resolution_clock::now();
+    free(result);
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    total_elapsed += elapsed.count();
+  }
+  free(a);
+
+  printf("Fr square: %ld ns\n", total_elapsed / NB_RUN);
+}
+
+void bench_inverse(void) {
+  blst_fr *a = (blst_fr *)malloc(sizeof(blst_fr));
+
+  long int total_elapsed;
+
+  for (int i = 0; i < NB_RUN; i++) {
+    generate_random_fr(a);
+
+    auto begin = std::chrono::high_resolution_clock::now();
+    blst_fr *result = (blst_fr *)malloc(sizeof(blst_fr));
+    blst_fr_eucl_inverse(result, a);
+    auto end = std::chrono::high_resolution_clock::now();
+    free(result);
+    auto elapsed =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    total_elapsed += elapsed.count();
+  }
+  free(a);
+
+  printf("Fr inverse: %ld ns\n", total_elapsed / NB_RUN);
+}
+
 int main(void) {
   srand(time(NULL));
   bench_addition();
   bench_multiplication();
   bench_substraction();
+  bench_negate();
+  bench_square();
+  bench_inverse();
 }
