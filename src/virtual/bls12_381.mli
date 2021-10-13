@@ -576,4 +576,6 @@ module Poseidon128 : sig
 
   (** Return the current scalar elements in the state *)
   val get : ctxt -> Fr.t array
+
+  val finalize : unit -> unit
 end

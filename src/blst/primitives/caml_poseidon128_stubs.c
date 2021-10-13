@@ -41,6 +41,12 @@ CAMLprim value caml_poseidon128_constants_init_stubs(value unit) {
   CAMLreturn(Val_unit);
 }
 
+CAMLprim value caml_poseidon128_finalize_stubs(value unit) {
+  CAMLparam1(unit);
+  poseidon128_finalize();
+  CAMLreturn(Val_unit);
+}
+
 CAMLprim value caml_poseidon128_init_stubs(value ctxt, value a, value b,
                                            value c) {
   CAMLparam4(ctxt, a, b, c);

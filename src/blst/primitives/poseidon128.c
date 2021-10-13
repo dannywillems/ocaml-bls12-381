@@ -7,9 +7,17 @@
 blst_fr ARK[NB_CONSTANTS];
 blst_fr MDS[WIDTH][WIDTH];
 
+blst_fr *buffer;
+blst_fr *res_mds[WIDTH];
+
 uint64_t ZERO[4] = {0, 0, 0, 0};
 
 void poseidon128_constants_init(void) {
+  buffer = (blst_fr *)calloc(1, sizeof(blst_scalar));
+  for (int i = 0; i < WIDTH; i++) {
+    res_mds[i] = (blst_fr *)calloc(1, sizeof(blst_scalar));
+  }
+
   blst_scalar *scalar = (blst_scalar *)calloc(1, sizeof(blst_scalar));
   for (int i = 0; i < NB_CONSTANTS; i++) {
     blst_scalar_from_lendian(scalar, ARK_BYTES[i]);
@@ -22,6 +30,13 @@ void poseidon128_constants_init(void) {
     }
   }
   free(scalar);
+}
+
+void poseidon128_finalize(void) {
+  free(buffer);
+  for (int i = 0; i < WIDTH; i++) {
+    free(res_mds[i]);
+  }
 }
 
 void poseidon128_init(poseidon128_ctxt_t *ctxt, blst_fr *a, blst_fr *b,
@@ -65,12 +80,7 @@ void apply_cst(poseidon128_ctxt_t *ctxt) {
 
 void poseidon128_apply_perm(poseidon128_ctxt_t *ctxt) {
   // Could we allocate it outside of apply_perm?
-  blst_fr *buffer = (blst_fr *)calloc(1, sizeof(blst_fr));
-  blst_fr *res_mds[WIDTH];
-  for (int i = 0; i < WIDTH; i++) {
-    res_mds[i] = (blst_fr *)calloc(1, sizeof(blst_fr));
-  }
-
+  ctxt->i_round_key = 0;
   for (int i = 0; i < NB_FULL_ROUNDS / 2; i++) {
     apply_cst(ctxt);
     apply_sbox(ctxt, buffer, 1);
@@ -86,10 +96,6 @@ void poseidon128_apply_perm(poseidon128_ctxt_t *ctxt) {
     apply_sbox(ctxt, buffer, 1);
     apply_matrix_multiplication(ctxt, buffer, res_mds);
   }
-  for (int i = 0; i < WIDTH; i++) {
-    free(res_mds[i]);
-  }
-  free(buffer);
 }
 
 void poseidon128_get_state(blst_fr *a, blst_fr *b, blst_fr *c,
