@@ -56,6 +56,9 @@ module Stubs = struct
   external eucl_inverse : fr -> fr -> unit = "caml_blst_fr_eucl_inverse_stubs"
 
   external memcpy : fr -> fr -> unit = "caml_blst_fr_memcpy_stubs"
+
+  external fft_inplace : fr array -> fr array -> int -> unit
+    = "caml_fft_fr_inplace_stubs"
 end
 
 (* module = Blst_bindings.r (Blst_stubs) *)
@@ -319,45 +322,31 @@ module Fr = struct
         in
         Some (aux s c (pow x q) (pow x (Z.divexact (Z.succ q) two_z)))
 
-  let fft ~domain ~points =
-    let module M = struct
-      type group = t
+  module M = struct
+    type group = t
 
-      type scalar = t
+    type scalar = t
 
-      let zero = zero
+    let zero = zero
 
-      let mul = mul
+    let mul = mul
 
-      let add = add
+    let add = add
 
-      let sub x y = add x (negate y)
+    let sub x y = add x (negate y)
 
-      let inverse_exn_scalar = inverse_exn
+    let inverse_exn_scalar = inverse_exn
 
-      let scalar_of_z = of_z
-    end in
-    Fft.fft (module M) ~domain ~points
+    let scalar_of_z = of_z
 
-  let ifft ~domain ~points =
-    let module M = struct
-      type group = t
+    let fft_inplace = Stubs.fft_inplace
 
-      type scalar = t
+    let copy = copy
+  end
 
-      let zero = zero
+  let fft ~domain ~points = Fft.fft (module M) ~domain ~points
 
-      let mul = mul
-
-      let add = add
-
-      let sub x y = add x (negate y)
-
-      let inverse_exn_scalar = inverse_exn
-
-      let scalar_of_z = of_z
-    end in
-    Fft.ifft (module M) ~domain ~points
+  let ifft ~domain ~points = Fft.ifft (module M) ~domain ~points
 end
 
 include Fr

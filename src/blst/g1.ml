@@ -81,6 +81,9 @@ module Stubs = struct
 
   external set_affine_coordinates : affine -> Fq.t -> Fq.t -> unit
     = "caml_blst_p1_set_coordinates_stubs"
+
+  external fft_inplace : jacobian array -> Fr.Stubs.fr array -> int -> unit
+    = "caml_fft_g1_inplace_stubs"
 end
 
 module G1 = struct
@@ -247,45 +250,31 @@ module G1 = struct
     Stubs.from_affine buffer buffer_affine ;
     if Stubs.in_g1 buffer then Some buffer else None
 
-  let fft ~domain ~points =
-    let module M = struct
-      type group = t
+  module M = struct
+    type group = t
 
-      type scalar = Scalar.t
+    type scalar = Scalar.t
 
-      let zero = zero
+    let zero = zero
 
-      let mul = mul
+    let mul = mul
 
-      let add = add
+    let add = add
 
-      let sub x y = add x (negate y)
+    let sub x y = add x (negate y)
 
-      let inverse_exn_scalar = Scalar.inverse_exn
+    let inverse_exn_scalar = Scalar.inverse_exn
 
-      let scalar_of_z = Scalar.of_z
-    end in
-    Fft.fft (module M) ~domain ~points
+    let scalar_of_z = Scalar.of_z
 
-  let ifft ~domain ~points =
-    let module M = struct
-      type group = t
+    let fft_inplace = Stubs.fft_inplace
 
-      type scalar = Scalar.t
+    let copy = copy
+  end
 
-      let zero = zero
+  let fft ~domain ~points = Fft.fft (module M) ~domain ~points
 
-      let mul = mul
-
-      let add = add
-
-      let sub x y = add x (negate y)
-
-      let inverse_exn_scalar = Scalar.inverse_exn
-
-      let scalar_of_z = Scalar.of_z
-    end in
-    Fft.ifft (module M) ~domain ~points
+  let ifft ~domain ~points = Fft.ifft (module M) ~domain ~points
 
   let hash_to_curve message dst =
     let message_length = Bytes.length message in

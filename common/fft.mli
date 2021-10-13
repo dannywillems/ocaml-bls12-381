@@ -14,6 +14,8 @@ module type C = sig
 
   val zero : group
 
+  val copy : group -> group
+
   val mul : group -> scalar -> group
 
   val add : group -> group -> group
@@ -23,6 +25,8 @@ module type C = sig
   val inverse_exn_scalar : scalar -> scalar
 
   val scalar_of_z : Z.t -> scalar
+
+  val fft_inplace : group array -> scalar array -> int -> unit
 end
 
 val fft :
