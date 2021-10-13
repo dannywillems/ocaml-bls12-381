@@ -13,4 +13,9 @@ let t1 =
   Core_bench.Bench.Test.create ~name:"FFT on Fr elements" (fun () ->
       ignore @@ Bls12_381.Fr.fft ~domain ~points)
 
-let () = Core.Command.run (Core_bench.Bench.make_command [t1])
+let t2 =
+  let points = Array.init n (fun _ -> Bls12_381.Fr.random ()) in
+  Core_bench.Bench.Test.create ~name:"IFFT on Fr elements" (fun () ->
+      ignore @@ Bls12_381.Fr.ifft ~domain ~points)
+
+let () = Core.Command.run (Core_bench.Bench.make_command [t1; t2])
