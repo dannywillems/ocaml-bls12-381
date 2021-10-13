@@ -52,6 +52,13 @@ void fft_fr_inplace(value coefficients, value domain, int log_domain_size) {
   free(buffer);
 }
 
+void mul_map_fr_inplace(value coefficients, value factor, int domain_size) {
+  for (int i = 0; i < domain_size; i++) {
+    blst_fr_mul(Fr_val_k(coefficients, i), Fr_val_k(coefficients, i),
+                Blst_fr_val(factor));
+  }
+}
+
 // G1
 void reorg_g1_coefficients(int n, int logn, value coefficients,
                            blst_p1 *buffer) {
@@ -103,6 +110,20 @@ void fft_g1_inplace(value coefficients, value domain, int log_domain_size) {
   free(scalar);
 }
 
+void mul_map_g1_inplace(value coefficients, value factor, int domain_size) {
+  blst_scalar *scalar = (blst_scalar *)calloc(1, sizeof(blst_scalar));
+  byte le_scalar[32];
+
+  blst_scalar_from_fr(scalar, Blst_fr_val(factor));
+  blst_lendian_from_scalar(le_scalar, scalar);
+
+  for (int i = 0; i < domain_size; i++) {
+    blst_p1_mult(G1_val_k(coefficients, i), G1_val_k(coefficients, i),
+                 le_scalar, 256);
+  }
+  free(scalar);
+}
+
 // G1
 void reorg_g2_coefficients(int n, int logn, value coefficients,
                            blst_p2 *buffer) {
@@ -151,5 +172,19 @@ void fft_g2_inplace(value coefficients, value domain, int log_domain_size) {
   }
   free(buffer);
   free(buffer_neg);
+  free(scalar);
+}
+
+void mul_map_g2_inplace(value coefficients, value factor, int domain_size) {
+  blst_scalar *scalar = (blst_scalar *)calloc(1, sizeof(blst_scalar));
+  byte le_scalar[32];
+
+  blst_scalar_from_fr(scalar, Blst_fr_val(factor));
+  blst_lendian_from_scalar(le_scalar, scalar);
+
+  for (int i = 0; i < domain_size; i++) {
+    blst_p2_mult(G2_val_k(coefficients, i), G2_val_k(coefficients, i),
+                 le_scalar, 256);
+  }
   free(scalar);
 }

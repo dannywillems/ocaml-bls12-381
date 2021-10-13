@@ -18,6 +18,8 @@ module type C = sig
   val scalar_of_z : Z.t -> scalar
 
   val fft_inplace : group array -> scalar array -> int -> unit
+
+  val mul_map_inplace : group array -> scalar -> int -> unit
 end
 
 let fft (type a b) (module G : C with type group = a and type scalar = b)
@@ -51,4 +53,5 @@ let ifft (type a b) (module G : C with type group = a and type scalar = b)
   assert (power = Array.length points) ;
   let points = fft (module G) ~domain ~points in
   let power_inv = G.inverse_exn_scalar (G.scalar_of_z (Z.of_int power)) in
-  Array.map (fun g -> G.mul g power_inv) points
+  G.mul_map_inplace points power_inv power ;
+  points

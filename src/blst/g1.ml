@@ -88,6 +88,9 @@ module Stubs = struct
   external pippenger :
     jacobian -> jacobian array -> Unsigned.Size_t.t -> Fr.t array -> unit
     = "caml_blst_g1_pippenger"
+
+  external mul_map_inplace : jacobian array -> Fr.Stubs.fr -> int -> unit
+    = "caml_mul_map_g1_inplace_stubs"
 end
 
 module G1 = struct
@@ -261,6 +264,8 @@ module G1 = struct
     let scalar_of_z = Scalar.of_z
 
     let fft_inplace = Stubs.fft_inplace
+
+    let mul_map_inplace = Stubs.mul_map_inplace
 
     let copy = copy
   end

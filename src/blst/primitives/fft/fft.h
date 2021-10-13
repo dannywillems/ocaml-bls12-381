@@ -25,8 +25,14 @@
 // going to be modified.
 void fft_fr_inplace(value coefficients, value domain, int log_domain_size);
 
+void mul_map_fr_inplace(value coefficients, value factor, int log_domain_size);
+
 void fft_g1_inplace(value coefficients, value domain, int log_domain_size);
 
+void mul_map_g1_inplace(value coefficients, value factor, int log_domain_size);
+
 void fft_g2_inplace(value coefficients, value domain, int log_domain_size);
+
+void mul_map_g2_inplace(value coefficients, value factor, int log_domain_size);
 
 #endif
