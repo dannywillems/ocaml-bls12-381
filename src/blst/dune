@@ -1,5 +1,8 @@
 (copy_files ../../common/{fft.ml,fft.mli})
 
+(copy_files
+  primitives/{ark_128.h,caml_poseidon128_stubs.c,mds_128.h,poseidon128.h,poseidon128.c})
+
 (copy_files bindings/blst_bindings_stubs.c)
 
 (copy_files libblst/bindings/blst.h)
@@ -45,7 +48,8 @@
   ;; private
   fq
   fq2
-  fft)
+  fft
+  poseidon128)
  (implements bls12-381)
  (instrumentation
   (backend bisect_ppx))
@@ -55,4 +59,4 @@
  (foreign_archives blst)
  (foreign_stubs
   (language c)
-  (names blst_bindings_stubs)))
+  (names blst_bindings_stubs caml_poseidon128_stubs poseidon128)))
