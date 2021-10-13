@@ -61,5 +61,7 @@
  (foreign_archives blst)
  (foreign_stubs
   (language c)
+  ;; For pippenger binding, avoid warnings related to const usage
+  (flags -Wno-incompatible-pointer-types)
   (names blst_bindings_stubs caml_poseidon128_stubs poseidon128 fft
     caml_fft_stubs)))

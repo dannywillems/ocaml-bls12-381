@@ -83,6 +83,10 @@ module Stubs = struct
 
   external fft_inplace : jacobian array -> Fr.Stubs.fr array -> int -> unit
     = "caml_fft_g2_inplace_stubs"
+
+  external pippenger :
+    jacobian -> jacobian array -> Unsigned.Size_t.t -> Fr.t array -> unit
+    = "caml_blst_g2_pippenger"
 end
 
 module G2 = struct
@@ -191,17 +195,6 @@ module G2 = struct
   let mul_bits g bytes =
     let buffer = Stubs.allocate_g2 () in
     Stubs.mult buffer g bytes (Unsigned.Size_t.of_int (Bytes.length bytes * 8)) ;
-    buffer
-
-  let add_mul_bulk xs =
-    let buffer = Stubs.allocate_g2 () in
-    List.iter
-      (fun (g, n) ->
-        let bytes = Fr.to_bytes n in
-        let tmp = Stubs.allocate_g2 () in
-        Stubs.mult tmp g bytes (Unsigned.Size_t.of_int (32 * 8)) ;
-        Stubs.dadd buffer buffer tmp)
-      xs ;
     buffer
 
   let mul g n =
@@ -324,6 +317,12 @@ module G2 = struct
       (Unsigned.Size_t.of_int dst_length)
       Bytes.empty
       Unsigned.Size_t.zero ;
+    buffer
+
+  let pippenger ps ss =
+    let n = Array.length ps in
+    let buffer = Stubs.allocate_g2 () in
+    Stubs.pippenger buffer ps (Unsigned.Size_t.of_int n) ss ;
     buffer
 end
 

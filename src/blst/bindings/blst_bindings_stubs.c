@@ -906,3 +906,73 @@ CAMLprim value caml_blst_signature_keygen_stubs(value buffer, value ikm,
               ctypes_size_t_val(key_info_length));
   CAMLreturn(Val_unit);
 }
+
+CAMLprim value caml_blst_g1_pippenger(value buffer, value jacobian_list,
+                                      value npoints, value scalars) {
+  CAMLparam4(buffer, jacobian_list, npoints, scalars);
+  size_t npoints_c = ctypes_size_t_val(npoints);
+
+  blst_p1_affine **ps =
+      (const blst_p1_affine **)calloc(1, sizeof(blst_p1_affine *) * npoints_c);
+  byte **scalars_bs = (byte **)calloc(1, sizeof(byte *) * npoints_c);
+  blst_scalar *scalar = (blst_scalar *)calloc(1, sizeof(blst_scalar));
+
+  for (int i = 0; i < npoints_c; i++) {
+    ps[i] = (blst_p1_affine *)calloc(1, sizeof(blst_p1_affine));
+    blst_p1_to_affine(ps[i], Blst_p1_val(Field(jacobian_list, i)));
+    scalars_bs[i] = (byte *)calloc(1, sizeof(byte) * 32);
+    blst_scalar_from_fr(scalar, Blst_fr_val(Field(scalars, i)));
+    blst_lendian_from_scalar(scalars_bs[i], scalar);
+  }
+  void *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(npoints_c));
+
+  blst_p1s_mult_pippenger(Blst_p1_val(buffer), ps, npoints_c, scalars_bs, 256,
+                          scratch);
+
+  for (int i = 0; i < npoints_c; i++) {
+    free(ps[i]);
+    free(scalars_bs[i]);
+  }
+
+  free(scalar);
+  free(scalars_bs);
+  free(ps);
+  free(scratch);
+
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
+                                      value npoints, value scalars) {
+  CAMLparam4(buffer, jacobian_list, npoints, scalars);
+  size_t npoints_c = ctypes_size_t_val(npoints);
+
+  blst_p2_affine **ps =
+      (const blst_p2_affine **)calloc(1, sizeof(blst_p2_affine *) * npoints_c);
+  byte **scalars_bs = (byte **)calloc(1, sizeof(byte *) * npoints_c);
+  blst_scalar *scalar = (blst_scalar *)calloc(1, sizeof(blst_scalar));
+
+  for (int i = 0; i < npoints_c; i++) {
+    ps[i] = (blst_p2_affine *)calloc(1, sizeof(blst_p2_affine));
+    blst_p2_to_affine(ps[i], Blst_p2_val(Field(jacobian_list, i)));
+    scalars_bs[i] = (byte *)calloc(1, sizeof(byte) * 32);
+    blst_scalar_from_fr(scalar, Blst_fr_val(Field(scalars, i)));
+    blst_lendian_from_scalar(scalars_bs[i], scalar);
+  }
+  void *scratch = calloc(1, blst_p2s_mult_pippenger_scratch_sizeof(npoints_c));
+
+  blst_p2s_mult_pippenger(Blst_p2_val(buffer), ps, npoints_c, scalars_bs, 256,
+                          scratch);
+
+  for (int i = 0; i < npoints_c; i++) {
+    free(ps[i]);
+    free(scalars_bs[i]);
+  }
+
+  free(scalar);
+  free(scalars_bs);
+  free(ps);
+  free(scratch);
+
+  CAMLreturn(Val_unit);
+}

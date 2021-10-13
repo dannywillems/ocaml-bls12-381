@@ -237,8 +237,6 @@ module G1 : sig
   (** Return [true] if the two elements are algebraically the same *)
   val eq : t -> t -> bool
 
-  val add_mul_bulk : (t * Scalar.t) list -> t
-
   (** Multiply an element by a scalar *)
   val mul : t -> Scalar.t -> t
 
@@ -271,6 +269,8 @@ module G1 : sig
     [None] is return. The points must be given modulo the order of Fq. To create
     the point at infinity, use [zero ()] *)
   val of_z_opt : x:Z.t -> y:Z.t -> t option
+
+  val pippenger : t array -> Scalar.t array -> t
 end
 
 module G2 : sig
@@ -349,8 +349,6 @@ module G2 : sig
   (** Return [true] if the two elements are algebraically the same *)
   val eq : t -> t -> bool
 
-  val add_mul_bulk : (t * Scalar.t) list -> t
-
   (** Multiply an element by a scalar *)
   val mul : t -> Scalar.t -> t
 
@@ -384,6 +382,8 @@ module G2 : sig
       points are in the form (c0, c1) where x = c1 * X + c0 and y = c1 * X +
       c0. To create the point at infinity, use [zero ()] *)
   val of_z_opt : x:Z.t * Z.t -> y:Z.t * Z.t -> t option
+
+  val pippenger : t array -> Scalar.t array -> t
 end
 
 module Pairing : sig

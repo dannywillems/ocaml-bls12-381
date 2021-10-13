@@ -97,8 +97,6 @@ module type G_SIG = sig
 
   val add_bulk : t list -> t
 
-  val add_mul_bulk : (t * Scalar.t) list -> t
-
   (** [double g] returns [2g] *)
   val double : t -> t
 
@@ -135,6 +133,8 @@ module type G_SIG = sig
   val ifft : domain:Scalar.t array -> points:t array -> t array
 
   val hash_to_curve : Bytes.t -> Bytes.t -> t
+
+  val pippenger : t array -> Scalar.t array -> t
 end
 
 module MakeBulkOperations (G : G_SIG) = struct
@@ -143,21 +143,22 @@ module MakeBulkOperations (G : G_SIG) = struct
     let xs = List.init n (fun _ -> G.random ()) in
     assert (G.(eq (List.fold_left G.add G.zero xs) (G.add_bulk xs)))
 
-  let test_bulk_add_and_mul () =
+  let test_pippenger () =
     let n = 10 in
-    let xs = List.init n (fun _ -> (G.random (), G.Scalar.random ())) in
+    let ps = Array.init n (fun _ -> G.random ()) in
+    let ss = Array.init n (fun _ -> G.Scalar.random ()) in
+    let xs = List.init n (fun i -> (ps.(i), ss.(i))) in
     let left =
       List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
     in
-    let right = G.add_mul_bulk xs in
+    let right = G.pippenger ps ss in
     assert (G.(eq left right))
 
   let get_tests () =
     let open Alcotest in
     ( "Bulk operations",
       [ test_case "bulk add" `Quick (repeat 10 test_bulk_add);
-        test_case "bulk add and mul" `Quick (repeat 10 test_bulk_add_and_mul) ]
-    )
+        test_case "pippenger" `Quick (repeat 10 test_pippenger) ] )
 end
 
 module MakeInplaceOperations (G : G_SIG) = struct
