@@ -28,4 +28,3 @@ module G2 = G2
 module Fq12 = Fq12
 module Pairing = Pairing
 module Signature = Signature
-module Poseidon128 = Poseidon128

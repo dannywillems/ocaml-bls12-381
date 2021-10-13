@@ -563,19 +563,3 @@ module Signature : sig
     val aggregate_verify : (pk * proof) list -> Bytes.t -> signature -> bool
   end
 end
-
-module Poseidon128 : sig
-  (** The state of the strategy *)
-  type ctxt
-
-  (** Initialize the state with the given input. The input must be the same length than the width *)
-  val init : Fr.t array -> ctxt
-
-  (** Apply a permutation round *)
-  val apply_perm : ctxt -> unit
-
-  (** Return the current scalar elements in the state *)
-  val get : ctxt -> Fr.t array
-
-  val finalize : unit -> unit
-end
