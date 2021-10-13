@@ -1,7 +1,7 @@
 (copy_files ../../common/{fft.ml,fft.mli})
 
 (copy_files
-  primitives/{ark_128.h,caml_poseidon128_stubs.c,mds_128.h,poseidon128.h,poseidon128.c})
+  primitives/poseidon128/{ark_128.h,caml_poseidon128_stubs.c,mds_128.h,poseidon128.h,poseidon128.c})
 
 (copy_files primitives/fft/{fft.c,fft.h,caml_fft_stubs.c})
 
