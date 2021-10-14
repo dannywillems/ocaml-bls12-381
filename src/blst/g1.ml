@@ -272,6 +272,13 @@ module G1 = struct
 
   let ifft ~domain ~points = Fft.ifft (module M) ~domain ~points
 
+  let ifft_inplace ~domain ~points =
+    let n = Array.length points in
+    let logn = Z.log2 (Z.of_int n) in
+    let n_inv = Fr.inverse_exn (Fr.of_z (Z.of_int n)) in
+    Stubs.fft_inplace points domain logn ;
+    Stubs.mul_map_inplace points n_inv n
+
   let hash_to_curve message dst =
     let message_length = Bytes.length message in
     let dst_length = Bytes.length dst in

@@ -74,11 +74,17 @@ module FFT = struct
     let m = power2 power in
     let omega_domain = generate_domain power m true in
     let g2_elements = parse_group_elements_from_file m "test_vector_g2_2" in
+    let g2_elements_copy = Array.map G2.copy g2_elements in
     let result = G2.ifft ~domain:omega_domain ~points:g2_elements in
     let expected_result =
       parse_group_elements_from_file m "ifft_test_vector_g2_2"
     in
-    Array.iter2 (fun p1 p2 -> assert (G2.eq p1 p2)) result expected_result
+    Array.iter2 (fun p1 p2 -> assert (G2.eq p1 p2)) result expected_result ;
+    let () = G2.ifft_inplace ~domain:omega_domain ~points:g2_elements_copy in
+    Array.iter2
+      (fun p1 p2 -> assert (G2.eq p1 p2))
+      g2_elements_copy
+      expected_result
 
   let test_fft_with_greater_domain () =
     (* Vectors generated with the following program:

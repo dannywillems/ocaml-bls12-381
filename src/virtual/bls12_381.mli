@@ -171,6 +171,8 @@ module Fr : sig
   *)
   val ifft : domain:t array -> points:t array -> t array
 
+  val ifft_inplace : domain:t array -> points:t array -> unit
+
   val add_inplace : t -> t -> unit
 
   val sub_inplace : t -> t -> unit
@@ -310,6 +312,8 @@ module G1 : sig
   *)
   val ifft : domain:Scalar.t array -> points:t array -> t array
 
+  val ifft_inplace : domain:Scalar.t array -> points:t array -> unit
+
   val hash_to_curve : Bytes.t -> Bytes.t -> t
 
   (** Create a point from the coordinates. If the point is not on the curve,
@@ -436,6 +440,8 @@ module G2 : sig
       not modified.
   *)
   val ifft : domain:Scalar.t array -> points:t array -> t array
+
+  val ifft_inplace : domain:Scalar.t array -> points:t array -> unit
 
   val hash_to_curve : Bytes.t -> Bytes.t -> t
 

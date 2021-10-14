@@ -350,6 +350,13 @@ module Fr = struct
     Stubs.fft_inplace points domain logn
 
   let ifft ~domain ~points = Fft.ifft (module M) ~domain ~points
+
+  let ifft_inplace ~domain ~points =
+    let n = Array.length points in
+    let logn = Z.log2 (Z.of_int n) in
+    let n_inv = inverse_exn (of_z (Z.of_int n)) in
+    Stubs.fft_inplace points domain logn ;
+    Stubs.mul_map_inplace points n_inv n
 end
 
 include Fr
