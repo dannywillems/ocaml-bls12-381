@@ -6,7 +6,7 @@
     https://github.com/ethereum/research/blob/master/kzg_data_availability/fk20_single.py#L53
     More generally, see
     https://gitlab.com/dannywillems/ocaml-polynomial/-/blob/8351c266c4eae185823ab87d74ecb34c0ce70afe/src/polynomial.ml#L428
-  *)
+*)
 module type C = sig
   type group
 
@@ -15,12 +15,6 @@ module type C = sig
   val zero : group
 
   val copy : group -> group
-
-  val mul : group -> scalar -> group
-
-  val add : group -> group -> group
-
-  val sub : group -> group -> group
 
   val inverse_exn_scalar : scalar -> scalar
 

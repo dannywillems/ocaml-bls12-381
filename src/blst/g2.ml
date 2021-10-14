@@ -289,12 +289,6 @@ module G2 = struct
 
     let zero = zero
 
-    let mul = mul
-
-    let add = add
-
-    let sub x y = add x (negate y)
-
     let inverse_exn_scalar = Scalar.inverse_exn
 
     let scalar_of_z = Scalar.of_z
@@ -309,6 +303,10 @@ module G2 = struct
   let fft ~domain ~points = Fft.fft (module M) ~domain ~points
 
   let ifft ~domain ~points = Fft.ifft (module M) ~domain ~points
+
+  let fft_inplace ~domain ~points =
+    let logn = Z.log2 (Z.of_int (Array.length points)) in
+    Stubs.fft_inplace points domain logn
 
   let hash_to_curve message dst =
     let message_length = Bytes.length message in

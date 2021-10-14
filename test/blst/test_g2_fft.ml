@@ -44,7 +44,7 @@ module FFT = struct
   let parse_group_elements_from_file n f =
     let ic = open_in_bin f in
     let group_elements =
-      List.init n (fun _i ->
+      Array.init n (fun _i ->
           let bytes_buf = Bytes.create G2.size_in_bytes in
           Stdlib.really_input ic bytes_buf 0 G2.size_in_bytes ;
           G2.of_bytes_exn bytes_buf)
@@ -57,30 +57,28 @@ module FFT = struct
     let m = power2 power in
     let omega_domain = generate_domain power m false in
     let g2_elements = parse_group_elements_from_file m "test_vector_g2_2" in
-    let result =
-      G2.fft ~domain:omega_domain ~points:(Array.of_list g2_elements)
-    in
+    let g2_elements_copy = Array.map G2.copy g2_elements in
+    let result = G2.fft ~domain:omega_domain ~points:g2_elements in
     let expected_result =
       parse_group_elements_from_file m "fft_test_vector_g2_2"
     in
-    let result = Array.to_list result in
-    let l = List.combine result expected_result in
-    List.iter (fun (p1, p2) -> assert (G2.eq p1 p2)) l
+    Array.iter2 (fun p1 p2 -> assert (G2.eq p1 p2)) result expected_result ;
+    let () = G2.fft_inplace ~domain:omega_domain ~points:g2_elements_copy in
+    Array.iter2
+      (fun p1 p2 -> assert (G2.eq p1 p2))
+      g2_elements_copy
+      expected_result
 
   let test_ifft () =
     let power = 2 in
     let m = power2 power in
     let omega_domain = generate_domain power m true in
     let g2_elements = parse_group_elements_from_file m "test_vector_g2_2" in
-    let result =
-      G2.ifft ~domain:omega_domain ~points:(Array.of_list g2_elements)
-    in
+    let result = G2.ifft ~domain:omega_domain ~points:g2_elements in
     let expected_result =
       parse_group_elements_from_file m "ifft_test_vector_g2_2"
     in
-    let result = Array.to_list result in
-    let l = List.combine result expected_result in
-    List.iter (fun (p1, p2) -> assert (G2.eq p1 p2)) l
+    Array.iter2 (fun p1 p2 -> assert (G2.eq p1 p2)) result expected_result
 
   let test_fft_with_greater_domain () =
     (* Vectors generated with the following program:

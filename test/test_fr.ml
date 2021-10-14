@@ -651,6 +651,7 @@ module FFT = struct
       (fun (points, expected_fft_results, root, n) ->
         let root = Bls12_381.Fr.of_string root in
         let points = Array.map Bls12_381.Fr.of_string points in
+        let copy_points = Array.map Bls12_381.Fr.copy points in
         let expected_fft_results =
           Array.map Bls12_381.Fr.of_string expected_fft_results
         in
@@ -658,6 +659,7 @@ module FFT = struct
           Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int i))
         in
         let fft_results = Bls12_381.Fr.fft ~domain ~points in
+        let () = Bls12_381.Fr.fft_inplace ~domain ~points:copy_points in
         Array.iter2
           (fun p1 p2 ->
             if not (Bls12_381.Fr.eq p1 p2) then
@@ -667,6 +669,15 @@ module FFT = struct
                 (Bls12_381.Fr.to_string p2))
           expected_fft_results
           fft_results ;
+        Array.iter2
+          (fun p1 p2 ->
+            if not (Bls12_381.Fr.eq p1 p2) then
+              Alcotest.failf
+                "Expected FFT result %s\nbut the computed value is %s\n"
+                (Bls12_381.Fr.to_string p1)
+                (Bls12_381.Fr.to_string p2))
+          expected_fft_results
+          copy_points ;
         let idomain =
           Array.init n (fun i -> if i = 0 then domain.(0) else domain.(n - i))
         in

@@ -7,12 +7,6 @@ module type C = sig
 
   val copy : group -> group
 
-  val mul : group -> scalar -> group
-
-  val add : group -> group -> group
-
-  val sub : group -> group -> group
-
   val inverse_exn_scalar : scalar -> scalar
 
   val scalar_of_z : Z.t -> scalar
