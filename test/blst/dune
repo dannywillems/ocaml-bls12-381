@@ -127,4 +127,4 @@
   pop_g2_fips_186_3_P384_blst
   pop_g2_fips_186_3_P521_blst
   pop_g2_rfc6979_blst)
- (libraries bls12-381-unix alcotest ff-pbt hex))
+ (libraries bls12-381-unix alcotest ff-pbt hex integers))

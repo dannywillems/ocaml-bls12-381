@@ -147,6 +147,16 @@ module Fr : sig
    *)
   val fft : domain:t array -> points:t array -> t array
 
+  type fr_array
+
+  val allocate_fr_array : Unsigned.Size_t.t -> fr_array
+
+  val to_fr_array : fr_array -> t array -> Unsigned.Size_t.t -> unit
+
+  val of_fr_array : t array -> fr_array -> Unsigned.Size_t.t -> unit
+
+  val fft_fr_array : domain:fr_array -> points:fr_array -> int -> unit
+
   (** [fft_inplace ~domain ~points] performs a Fourier transform on [points] using [domain]
       The domain should be of the form [w^{i}] where [w] is a principal root of
       unity. If the domain is of size [n], [w] must be a [n]-th principal root

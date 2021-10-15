@@ -660,6 +660,17 @@ module FFT = struct
         in
         let fft_results = Bls12_381.Fr.fft ~domain ~points in
         let () = Bls12_381.Fr.fft_inplace ~domain ~points:copy_points in
+        let logn = Z.log2 (Z.of_int n) in
+        let n_size_t = Unsigned.Size_t.of_int n in
+        let domain_c = Bls12_381.Fr.allocate_fr_array n_size_t in
+        Bls12_381.Fr.to_fr_array domain_c domain n_size_t ;
+        let points_c = Bls12_381.Fr.allocate_fr_array n_size_t in
+        Bls12_381.Fr.to_fr_array points_c points n_size_t ;
+        Bls12_381.Fr.fft_fr_array ~domain:domain_c ~points:points_c logn ;
+        let results_fft_fr_array =
+          Array.init n (fun _ -> Bls12_381.Fr.(copy zero))
+        in
+        Bls12_381.Fr.of_fr_array results_fft_fr_array points_c n_size_t ;
         Array.iter2
           (fun p1 p2 ->
             if not (Bls12_381.Fr.eq p1 p2) then
@@ -678,6 +689,16 @@ module FFT = struct
                 (Bls12_381.Fr.to_string p2))
           expected_fft_results
           copy_points ;
+        Array.iter2
+          (fun p1 p2 ->
+            if not (Bls12_381.Fr.eq p1 p2) then
+              Alcotest.failf
+                "Fr array: expected FFT result %s\n\
+                 but the computed value is %s\n"
+                (Bls12_381.Fr.to_string p1)
+                (Bls12_381.Fr.to_string p2))
+          expected_fft_results
+          results_fft_fr_array ;
         let idomain =
           Array.init n (fun i -> if i = 0 then domain.(0) else domain.(n - i))
         in

@@ -51,4 +51,4 @@
 (executable
  (name bench_fft_great_domain)
  (modules bench_fft_great_domain)
- (libraries bls12-381-unix))
+ (libraries bls12-381-unix integers))

@@ -62,6 +62,20 @@ module Stubs = struct
 
   external mul_map_inplace : fr array -> fr -> int -> unit
     = "caml_mul_map_fr_inplace_stubs"
+
+  type fr_array
+
+  external allocate_fr_array : Unsigned.Size_t.t -> fr_array
+    = "caml_allocate_fr_array_stubs"
+
+  external to_fr_array : fr_array -> fr array -> Unsigned.Size_t.t -> unit
+    = "caml_to_fr_array_stubs"
+
+  external of_fr_array : fr array -> fr_array -> Unsigned.Size_t.t -> unit
+    = "caml_of_fr_array_stubs"
+
+  external fft_on_fr_array : fr_array -> fr_array -> int -> unit
+    = "caml_blst_fft_on_fr_array_stubs"
 end
 
 (* module = Blst_bindings.r (Blst_stubs) *)
@@ -70,6 +84,8 @@ module Fr = struct
   exception Not_in_field of Bytes.t
 
   type t = Stubs.fr
+
+  type fr_array = Stubs.fr_array
 
   let global_buffer = Stubs.allocate_fr ()
 
@@ -357,6 +373,15 @@ module Fr = struct
     let n_inv = inverse_exn (of_z (Z.of_int n)) in
     Stubs.fft_inplace points domain logn ;
     Stubs.mul_map_inplace points n_inv n
+
+  let allocate_fr_array = Stubs.allocate_fr_array
+
+  let to_fr_array = Stubs.to_fr_array
+
+  let of_fr_array = Stubs.of_fr_array
+
+  let fft_fr_array ~domain ~points logn =
+    Stubs.fft_on_fr_array points domain logn
 end
 
 include Fr
