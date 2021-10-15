@@ -295,9 +295,11 @@ module G1 = struct
 
   let pippenger ps ss =
     let n = Array.length ps in
-    let buffer = Stubs.allocate_g1 () in
-    Stubs.pippenger buffer ps (Unsigned.Size_t.of_int n) ss ;
-    buffer
+    if n = 1 then mul ps.(0) ss.(0)
+    else
+      let buffer = Stubs.allocate_g1 () in
+      Stubs.pippenger buffer ps (Unsigned.Size_t.of_int n) ss ;
+      buffer
 end
 
 include G1

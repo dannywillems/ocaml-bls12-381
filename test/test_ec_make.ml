@@ -144,7 +144,7 @@ module MakeBulkOperations (G : G_SIG) = struct
     assert (G.(eq (List.fold_left G.add G.zero xs) (G.add_bulk xs)))
 
   let test_pippenger () =
-    let n = 10 in
+    let n = 1 + Random.int 5 in
     let ps = Array.init n (fun _ -> G.random ()) in
     let ss = Array.init n (fun _ -> G.Scalar.random ()) in
     let xs = List.init n (fun i -> (ps.(i), ss.(i))) in
