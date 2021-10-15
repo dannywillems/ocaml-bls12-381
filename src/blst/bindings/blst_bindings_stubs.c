@@ -913,14 +913,14 @@ CAMLprim value caml_blst_g1_pippenger(value buffer, value jacobian_list,
   size_t npoints_c = ctypes_size_t_val(npoints);
 
   blst_p1_affine **ps =
-      (const blst_p1_affine **)calloc(1, sizeof(blst_p1_affine *) * npoints_c);
-  byte **scalars_bs = (byte **)calloc(1, sizeof(byte *) * npoints_c);
+      (const blst_p1_affine **)calloc(npoints_c, sizeof(blst_p1_affine *));
+  byte **scalars_bs = (byte **)calloc(npoints_c, sizeof(byte *));
   blst_scalar *scalar = (blst_scalar *)calloc(1, sizeof(blst_scalar));
 
   for (int i = 0; i < npoints_c; i++) {
     ps[i] = (blst_p1_affine *)calloc(1, sizeof(blst_p1_affine));
     blst_p1_to_affine(ps[i], Blst_p1_val(Field(jacobian_list, i)));
-    scalars_bs[i] = (byte *)calloc(1, sizeof(byte) * 32);
+    scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
     blst_scalar_from_fr(scalar, Blst_fr_val(Field(scalars, i)));
     blst_lendian_from_scalar(scalars_bs[i], scalar);
   }
@@ -948,14 +948,14 @@ CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
   size_t npoints_c = ctypes_size_t_val(npoints);
 
   blst_p2_affine **ps =
-      (const blst_p2_affine **)calloc(1, sizeof(blst_p2_affine *) * npoints_c);
-  byte **scalars_bs = (byte **)calloc(1, sizeof(byte *) * npoints_c);
+      (const blst_p2_affine **)calloc(npoints_c, sizeof(blst_p2_affine *));
+  byte **scalars_bs = (byte **)calloc(npoints_c, sizeof(byte *));
   blst_scalar *scalar = (blst_scalar *)calloc(1, sizeof(blst_scalar));
 
   for (int i = 0; i < npoints_c; i++) {
     ps[i] = (blst_p2_affine *)calloc(1, sizeof(blst_p2_affine));
     blst_p2_to_affine(ps[i], Blst_p2_val(Field(jacobian_list, i)));
-    scalars_bs[i] = (byte *)calloc(1, sizeof(byte) * 32);
+    scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
     blst_scalar_from_fr(scalar, Blst_fr_val(Field(scalars, i)));
     blst_lendian_from_scalar(scalars_bs[i], scalar);
   }
