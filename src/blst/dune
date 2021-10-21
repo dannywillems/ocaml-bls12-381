@@ -65,3 +65,8 @@
   (flags -Wno-incompatible-pointer-types)
   (names blst_bindings_stubs caml_poseidon128_stubs poseidon128 fft
     caml_fft_stubs)))
+
+(install
+ (files libblst/bindings/blst.h libblst/bindings/blst_aux.h)
+ (section lib)
+ (package bls12-381-unix))
