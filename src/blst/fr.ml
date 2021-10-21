@@ -47,6 +47,12 @@ module Stubs = struct
 
   external add : fr -> fr -> fr -> unit = "caml_blst_fr_add_stubs"
 
+  external eq : fr -> fr -> bool = "caml_blst_fr_is_equal_stubs"
+
+  external is_zero : fr -> bool = "caml_blst_fr_is_zero_stubs"
+
+  external is_one : fr -> bool = "caml_blst_fr_is_one_stubs"
+
   external sub : fr -> fr -> fr -> unit = "caml_blst_fr_sub_stubs"
 
   external mul : fr -> fr -> fr -> unit = "caml_blst_fr_mul_stubs"
@@ -131,16 +137,13 @@ module Fr = struct
     Stubs.scalar_to_bytes_le buffer_bytes buffer_scalar ;
     buffer_bytes
 
-  let eq x y =
-    let x_bytes = to_bytes x in
-    let y_bytes = to_bytes y in
-    Bytes.equal x_bytes y_bytes
+  let eq x y = Stubs.eq x y
 
   let ( = ) = eq
 
-  let is_zero s = eq s zero
+  let is_zero s = Stubs.is_zero s
 
-  let is_one s = eq s one
+  let is_one s = Stubs.is_one s
 
   let rec random ?state () =
     (match state with None -> () | Some state -> Random.set_state state) ;

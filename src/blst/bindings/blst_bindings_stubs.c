@@ -72,6 +72,54 @@ CAMLprim value allocate_scalar_stubs(value unit) {
   CAMLreturn(block);
 }
 
+// Additional functions for Fr.eq, Fr.is_zero and Fr.is_one
+bool blst_fr_is_equal(blst_fr *x, blst_fr *y) {
+  u_int64_t x_uint_64[4];
+  blst_uint64_from_fr(x_uint_64, x);
+
+  u_int64_t y_uint_64[4];
+  blst_uint64_from_fr(y_uint_64, y);
+  bool is_equal =
+      ((y_uint_64[0] == x_uint_64[0])) && ((y_uint_64[1] == x_uint_64[1])) &&
+      ((y_uint_64[2] == x_uint_64[2])) && ((y_uint_64[3] == x_uint_64[3]));
+  return (is_equal);
+}
+
+bool blst_fr_is_zero(blst_fr *x) {
+  u_int64_t x_uint_64[4];
+  blst_uint64_from_fr(x_uint_64, x);
+  bool is_zero = (x_uint_64[0] == 0lu) && (x_uint_64[1] == 0lu) &&
+                 (x_uint_64[2] == 0lu) && (x_uint_64[3] == 0lu);
+  return (is_zero);
+}
+
+bool blst_fr_is_one(blst_fr *x) {
+  u_int64_t x_uint_64[4];
+  blst_uint64_from_fr(x_uint_64, x);
+  bool is_one = (x_uint_64[0] == 1lu) && (x_uint_64[1] == 0lu) &&
+                (x_uint_64[2] == 0lu) && (x_uint_64[3] == 0lu);
+  return (is_one);
+}
+
+CAMLprim value caml_blst_fr_is_equal_stubs(value x, value y) {
+  CAMLparam2(x, y);
+  blst_fr *x_c = Blst_fr_val(x);
+  blst_fr *y_c = Blst_fr_val(y);
+  CAMLreturn(Val_bool(blst_fr_is_equal(x_c, y_c)));
+}
+
+CAMLprim value caml_blst_fr_is_zero_stubs(value x) {
+  CAMLparam1(x);
+  blst_fr *x_c = Blst_fr_val(x);
+  CAMLreturn(Val_bool(blst_fr_is_zero(x_c)));
+}
+
+CAMLprim value caml_blst_fr_is_one_stubs(value x) {
+  CAMLparam1(x);
+  blst_fr *x_c = Blst_fr_val(x);
+  CAMLreturn(Val_bool(blst_fr_is_one(x_c)));
+}
+
 CAMLprim value allocate_fr_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
