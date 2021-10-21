@@ -176,6 +176,27 @@ opam-install-and-remove-local-switch:
   rules:
     - when: always
 
+check-blst-headers-are-installed:
+  stage: install
+  image: ocaml/opam:debian-ocaml-4.12
+  before_script:
+    # List versions and environments
+    - ocaml --version
+    - opam --version
+    - echo $OPAM_SWITCH_PREFIX
+    - opam repository set-url default https://opam.ocaml.org
+    - opam update
+  script:
+    - opam pin add bls12-381.dev . --no-action
+    - opam pin add bls12-381-unix.dev . --no-action
+
+    - opam depext bls12-381-unix.dev -y -v
+    - opam install bls12-381-unix.dev -y
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381-unix/blst.h
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381-unix/blst_aux.h
+  rules:
+    - when: always
+
 doc:
   stage: doc
   image: ocaml/opam:debian-ocaml-4.12
