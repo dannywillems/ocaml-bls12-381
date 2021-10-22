@@ -193,6 +193,10 @@ module Fr : sig
   val add_bulk : t list -> t
 
   val mul_bulk : t list -> t
+
+  (** [compare a b] compares the elements [a] and [b] based on their bytes
+      representation *)
+  val compare : t -> t -> int
 end
 
 module G1 : sig

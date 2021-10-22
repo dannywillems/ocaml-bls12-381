@@ -360,6 +360,8 @@ module Fr = struct
     let n_inv = inverse_exn (of_z (Z.of_int n)) in
     Stubs.fft_inplace points domain logn ;
     Stubs.mul_map_inplace points n_inv n
+
+  let compare x y = Stdlib.compare (to_bytes x) (to_bytes y)
 end
 
 include Fr
