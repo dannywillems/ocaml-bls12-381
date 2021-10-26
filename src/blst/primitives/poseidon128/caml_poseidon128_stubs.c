@@ -12,6 +12,10 @@
 
 #define Poseidon128_ctxt_val(v) (*((poseidon128_ctxt_t **)Data_custom_val(v)))
 
+#define Fr_val_i(v, i) Blst_fr_val(Field(v, i))
+
+#define Fr_val_ij(v, i, j) Blst_fr_val(Field(Field(v, i), j))
+
 static void finalize_free_poseidon128_ctxt(value v) {
   free(Poseidon128_ctxt_val(v));
 }
@@ -35,10 +39,38 @@ CAMLprim value caml_poseidon128_allocate_ctxt_stubs(value unit) {
   CAMLreturn(block);
 }
 
-CAMLprim value caml_poseidon128_constants_init_stubs(value unit) {
-  CAMLparam1(unit);
-  poseidon128_constants_init();
-  CAMLreturn(Val_unit);
+CAMLprim value caml_poseidon128_constants_init_stubs(value vark, value vmds,
+                                                     value vark_len,
+                                                     value vmds_nb_rows,
+                                                     value vmds_nb_cols) {
+
+  CAMLparam5(vark, vmds, vark_len, vmds_nb_rows, vmds_nb_cols);
+  int ark_len = Int_val(vark_len);
+  int mds_nb_rows = Int_val(vmds_nb_rows);
+  int mds_nb_cols = Int_val(vmds_nb_cols);
+
+  blst_fr *ark = (blst_fr *)calloc(ark_len, sizeof(blst_fr));
+  blst_fr **mds = (blst_fr **)calloc(mds_nb_rows, sizeof(blst_fr *));
+  for (int i = 0; i < mds_nb_rows; i++) {
+    mds[i] = (blst_fr *)calloc(mds_nb_cols, sizeof(blst_fr));
+    for (int j = 0; j < mds_nb_cols; j++) {
+      memcpy(&mds[i][j], Fr_val_ij(vmds, i, j), sizeof(blst_fr));
+    }
+  }
+
+  for (int i = 0; i < ark_len; i++) {
+    memcpy(ark + i, Fr_val_i(vark, i), sizeof(blst_fr));
+  }
+
+  int res =
+      poseidon128_constants_init(ark, mds, ark_len, mds_nb_rows, mds_nb_cols);
+
+  free(ark);
+  for (int i = 0; i < mds_nb_rows; i++) {
+    free(mds[i]);
+  }
+  free(mds);
+  CAMLreturn(Val_int(res));
 }
 
 CAMLprim value caml_poseidon128_finalize_stubs(value unit) {

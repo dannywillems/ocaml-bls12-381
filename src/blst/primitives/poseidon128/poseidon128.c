@@ -1,6 +1,4 @@
 #include "poseidon128.h"
-#include "ark_128.h"
-#include "mds_128.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -8,34 +6,37 @@ blst_fr ARK[NB_CONSTANTS];
 blst_fr MDS[WIDTH][WIDTH];
 
 blst_fr *buffer;
-blst_fr *res_mds[WIDTH];
+blst_fr *buffer_mds[WIDTH];
 
 uint64_t ZERO[4] = {0, 0, 0, 0};
 
-void poseidon128_constants_init(void) {
-  buffer = (blst_fr *)calloc(1, sizeof(blst_scalar));
-  for (int i = 0; i < WIDTH; i++) {
-    res_mds[i] = (blst_fr *)calloc(1, sizeof(blst_scalar));
+int poseidon128_constants_init(blst_fr *ark, blst_fr **mds, int ark_len,
+                               int mds_nb_rows, int mds_nb_cols) {
+  if (NB_CONSTANTS != ark_len || mds_nb_rows != WIDTH || mds_nb_cols != WIDTH) {
+    return 1;
   }
 
-  blst_scalar *scalar = (blst_scalar *)calloc(1, sizeof(blst_scalar));
-  for (int i = 0; i < NB_CONSTANTS; i++) {
-    blst_scalar_from_lendian(scalar, ARK_BYTES[i]);
-    blst_fr_from_scalar(ARK + i, scalar);
+  buffer = (blst_fr *)calloc(1, sizeof(blst_fr));
+  for (int i = 0; i < WIDTH; i++) {
+    buffer_mds[i] = (blst_fr *)calloc(1, sizeof(blst_fr));
   }
+
+  for (int i = 0; i < NB_CONSTANTS; i++) {
+    memcpy(ARK + i, ark + i, sizeof(blst_fr));
+  }
+
   for (int i = 0; i < WIDTH; i++) {
     for (int j = 0; j < WIDTH; j++) {
-      blst_scalar_from_lendian(scalar, MDS_BYTES[i][j]);
-      blst_fr_from_scalar(&MDS[i][j], scalar);
+      memcpy(&MDS[i][j], &mds[i][j], sizeof(blst_fr));
     }
   }
-  free(scalar);
+  return 0;
 }
 
 void poseidon128_finalize(void) {
   free(buffer);
   for (int i = 0; i < WIDTH; i++) {
-    free(res_mds[i]);
+    free(buffer_mds[i]);
   }
 }
 
@@ -84,17 +85,17 @@ void poseidon128_apply_perm(poseidon128_ctxt_t *ctxt) {
   for (int i = 0; i < NB_FULL_ROUNDS / 2; i++) {
     apply_cst(ctxt);
     apply_sbox(ctxt, buffer, 1);
-    apply_matrix_multiplication(ctxt, buffer, res_mds);
+    apply_matrix_multiplication(ctxt, buffer, buffer_mds);
   }
   for (int i = 0; i < NB_PARTIAL_ROUNDS; i++) {
     apply_cst(ctxt);
     apply_sbox(ctxt, buffer, 0);
-    apply_matrix_multiplication(ctxt, buffer, res_mds);
+    apply_matrix_multiplication(ctxt, buffer, buffer_mds);
   }
   for (int i = 0; i < NB_FULL_ROUNDS / 2; i++) {
     apply_cst(ctxt);
     apply_sbox(ctxt, buffer, 1);
-    apply_matrix_multiplication(ctxt, buffer, res_mds);
+    apply_matrix_multiplication(ctxt, buffer, buffer_mds);
   }
 }
 

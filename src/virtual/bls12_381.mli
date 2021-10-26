@@ -667,6 +667,20 @@ module Signature : sig
   end
 end
 
+module Poseidon128 : sig
+  type ctxt
+
+  val constants_init : Fr.t array -> Fr.t array array -> unit
+
+  val init : Fr.t array -> ctxt
+
+  val apply_perm : ctxt -> unit
+
+  val get : ctxt -> Fr.t array
+
+  val finalize : unit -> unit
+end
+
 (** Return [true] if the environment variable `BLST_PORTABLE` was set when
     building the library, otherwise [false].
     Can be used to detect if the backend blst has been optimised with ADX on

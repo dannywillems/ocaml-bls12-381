@@ -3,7 +3,8 @@ module Stubs = struct
 
   external allocate_ctxt : unit -> ctxt = "caml_poseidon128_allocate_ctxt_stubs"
 
-  external constants_init : unit -> unit
+  external constants_init :
+    Fr.t array -> Fr.t array array -> int -> int -> int -> int
     = "caml_poseidon128_constants_init_stubs"
 
   external finalize : unit -> unit = "caml_poseidon128_finalize_stubs"
@@ -19,7 +20,12 @@ end
 
 type ctxt = Stubs.ctxt
 
-let () = Stubs.constants_init ()
+let constants_init ark mds =
+  let ark_len = Array.length ark in
+  let mds_nb_rows = Array.length mds in
+  assert (mds_nb_rows > 0) ;
+  let mds_nb_cols = Array.length mds.(0) in
+  assert (0 = Stubs.constants_init ark mds ark_len mds_nb_rows mds_nb_cols)
 
 let init s =
   let ctxt = Stubs.allocate_ctxt () in

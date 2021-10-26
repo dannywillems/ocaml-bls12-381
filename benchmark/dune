@@ -38,10 +38,12 @@
  (modules bench_signature)
  (libraries bls12-381-unix core core_bench))
 
-; (executable
-;  (name bench_poseidon128)
-;  (modules bench_poseidon128)
-;  (libraries bls12-381-unix core core_bench))
+(copy_files ../test/blst/{*128*.ml})
+
+(executable
+ (name bench_poseidon128)
+ (modules bench_poseidon128 ark128 mds128)
+ (libraries bls12-381-unix core core_bench))
 
 (executable
  (name bench_fft)

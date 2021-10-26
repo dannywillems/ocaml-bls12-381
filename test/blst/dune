@@ -27,7 +27,7 @@
   test_hash_to_curve
   test_signature
   test_aggregated_signature
-  ; test_poseidon128
+  test_poseidon128
   )
  (modules
   test_fr
@@ -41,7 +41,9 @@
   test_random_state
   test_hash_to_curve
   test_signature
-  ; test_poseidon128
+  test_poseidon128
+  ark128
+  mds128
   test_aggregated_signature)
  (package bls12-381-unix)
  (deps

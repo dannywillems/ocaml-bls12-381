@@ -1,6 +1,8 @@
 open Core
 open Core_bench
 
+let () = Bls12_381.Poseidon128.constants_init Ark128.v Mds128.v
+
 let t1 =
   let n = 3 in
   let inputs = Array.init n ~f:(fun _i -> Bls12_381.Fr.random ()) in

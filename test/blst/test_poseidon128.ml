@@ -45,6 +45,7 @@ let test_consistent_with_mec () =
     (fun (inputs, expected_output) ->
       let inputs = Array.map Bls12_381.Fr.of_string inputs in
       let expected_output = Array.map Bls12_381.Fr.of_string expected_output in
+      Bls12_381.Poseidon128.constants_init Ark128.v Mds128.v ;
       let ctxt = Bls12_381.Poseidon128.init inputs in
       let () = Bls12_381.Poseidon128.apply_perm ctxt in
       let output = Bls12_381.Poseidon128.get ctxt in

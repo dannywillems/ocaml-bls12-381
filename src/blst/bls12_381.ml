@@ -28,5 +28,6 @@ module G2 = G2
 module Fq12 = Fq12
 module Pairing = Pairing
 module Signature = Signature
+module Poseidon128 = Poseidon128
 
 let built_with_blst_portable = Option.is_some (Sys.getenv_opt "BLST_PORTABLE")
