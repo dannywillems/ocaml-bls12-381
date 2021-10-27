@@ -38,7 +38,6 @@
 (library
  (public_name bls12-381-unix)
  (name bls12_381_unix)
- (modes native)
  (modules
   bls12_381
   fr
