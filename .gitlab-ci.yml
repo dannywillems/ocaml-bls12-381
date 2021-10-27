@@ -62,6 +62,9 @@ lint-c:
     # Install the dependencies
     - opam install bls12-381 -y --with-test --deps-only
     - opam install bls12-381-unix -y --with-test --deps-only
+    # For benchmark repository
+    - opam install core_bench
+    - dune build
     - dune build @install
     - dune runtest
   rules:
