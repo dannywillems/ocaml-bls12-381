@@ -214,7 +214,10 @@ module Fr = struct
     Stubs.sub global_buffer x y ;
     Stubs.memcpy x global_buffer
 
-  let square x = x * x
+  let square x =
+    let buffer = Stubs.allocate_fr () in
+    Stubs.sqr buffer x ;
+    buffer
 
   let square_inplace x =
     Stubs.mul global_buffer x x ;
