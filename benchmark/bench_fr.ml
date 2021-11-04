@@ -49,6 +49,12 @@ module MakeBenchBlst = struct
     let e = F.random () in
     Bench.Test.create ~name:"to_bytes Fr" (fun () -> ignore (F.to_bytes e))
 
+  let test_sqrt_opt =
+    let e = F.random () in
+    let ee = F.square e in
+    Bench.Test.create ~name:"square root when exists" (fun () ->
+        ignore (F.sqrt_opt ee))
+
   let get_benches () =
     [ test_addition;
       test_multiplication;
@@ -59,7 +65,8 @@ module MakeBenchBlst = struct
       test_pow;
       test_double;
       test_of_bytes_exn;
-      test_to_bytes ]
+      test_to_bytes;
+      test_sqrt_opt ]
 end
 
 let () =
