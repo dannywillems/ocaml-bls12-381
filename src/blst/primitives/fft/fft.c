@@ -95,11 +95,11 @@ void fft_g1_inplace(value coefficients, value domain, int log_domain_size) {
 
         memcpy(buffer_neg, buffer, sizeof(blst_p1));
         blst_p1_cneg(buffer_neg, 1);
-        blst_p1_add(G1_val_k(coefficients, k + j + m),
-                    G1_val_k(coefficients, k + j), buffer_neg);
+        blst_p1_add_or_double(G1_val_k(coefficients, k + j + m),
+                              G1_val_k(coefficients, k + j), buffer_neg);
 
-        blst_p1_add(G1_val_k(coefficients, k + j),
-                    G1_val_k(coefficients, k + j), buffer);
+        blst_p1_add_or_double(G1_val_k(coefficients, k + j),
+                              G1_val_k(coefficients, k + j), buffer);
       }
       k = k + (2 * m);
     }
@@ -160,11 +160,11 @@ void fft_g2_inplace(value coefficients, value domain, int log_domain_size) {
 
         memcpy(buffer_neg, buffer, sizeof(blst_p2));
         blst_p2_cneg(buffer_neg, 1);
-        blst_p2_add(G2_val_k(coefficients, k + j + m),
-                    G2_val_k(coefficients, k + j), buffer_neg);
+        blst_p2_add_or_double(G2_val_k(coefficients, k + j + m),
+                              G2_val_k(coefficients, k + j), buffer_neg);
 
-        blst_p2_add(G2_val_k(coefficients, k + j),
-                    G2_val_k(coefficients, k + j), buffer);
+        blst_p2_add_or_double(G2_val_k(coefficients, k + j),
+                              G2_val_k(coefficients, k + j), buffer);
       }
       k = k + (2 * m);
     }
