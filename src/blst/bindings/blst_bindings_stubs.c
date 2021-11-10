@@ -32,9 +32,42 @@
 
 static void finalize_free_fr(value v) { free(Blst_fr_val(v)); }
 
+static int blst_fr_compare(value s, value t) {
+  u_int64_t s_uint64[4];
+  u_int64_t t_uint64[4];
+  blst_scalar *buffer = (blst_scalar *)(calloc(1, sizeof(blst_scalar)));
+
+  blst_fr *s_c = Blst_fr_val(s);
+  blst_scalar_from_fr(buffer, s_c);
+  blst_uint64_from_scalar(s_uint64, buffer);
+
+  blst_fr *t_c = Blst_fr_val(t);
+  blst_scalar_from_fr(buffer, t_c);
+  blst_uint64_from_scalar(t_uint64, buffer);
+
+  free(buffer);
+
+  // Check first it is equal. To get constant time, decomposing on individual
+  // lines
+  bool is_equal = 1;
+  is_equal = is_equal && (s_uint64[0] == t_uint64[0]);
+  is_equal = is_equal && (s_uint64[1] == t_uint64[1]);
+  is_equal = is_equal && (s_uint64[2] == t_uint64[2]);
+  is_equal = is_equal && (s_uint64[3] == t_uint64[3]);
+  if (is_equal == 1) {
+    return (0);
+  }
+  bool lt = 1;
+  lt = lt && (s_uint64[0] <= t_uint64[0]);
+  lt = lt && (s_uint64[1] <= t_uint64[1]);
+  lt = lt && (s_uint64[2] <= t_uint64[2]);
+  lt = lt && (s_uint64[3] <= t_uint64[3]);
+  return (lt ? -1 : 1);
+}
+
 static struct custom_operations blst_fr_ops = {"blst_fr",
                                                finalize_free_fr,
-                                               custom_compare_default,
+                                               blst_fr_compare,
                                                custom_hash_default,
                                                custom_serialize_default,
                                                custom_deserialize_default,

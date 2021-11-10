@@ -860,6 +860,107 @@ module FFT = struct
           test_fft_with_greater_domain_vectors ] )
 end
 
+module OCamlComparisonOperators = struct
+  let test_fr_equal_with_same_random_element () =
+    let x = Bls12_381.Fr.random () in
+    if not (x = x) then
+      Alcotest.failf
+        "(=) Expected comparison on the same random element must be true, got \
+         false"
+
+  let test_fr_equal_with_zero () =
+    if not (Bls12_381.Fr.zero = Bls12_381.Fr.zero) then
+      Alcotest.failf "(=) Expected comparison on zero must be true, got false"
+
+  let test_fr_equal_with_one () =
+    if not (Bls12_381.Fr.one = Bls12_381.Fr.one) then
+      Alcotest.failf "(=) Expected comparison on one must be true, got false"
+
+  let test_fr_not_equal_with_random () =
+    let x = Bls12_381.Fr.random () in
+    let y = Bls12_381.Fr.(x + one) in
+    if not (x != y) then
+      Alcotest.failf
+        "(!=) Expected comparison on a random element and its successor must \
+         be true, got false"
+
+  let test_fr_equality_failing_test_with_random () =
+    let x = Bls12_381.Fr.random () in
+    let y = Bls12_381.Fr.(x + one) in
+    if x = y then
+      Alcotest.failf
+        "(=) Expected comparison on a random element and its successor must be \
+         false, got true"
+
+  let test_fr_different_failing_test_with_same_random_element () =
+    let x = Bls12_381.Fr.random () in
+    if x != x then
+      Alcotest.failf
+        "(!=) Expected comparison on a random element must be false, got true"
+
+  let test_fr_zero_is_smaller_than_one () =
+    if not (Bls12_381.Fr.zero < Bls12_381.Fr.one) then
+      Alcotest.failf "(<) zero is expected to be smaller than one"
+
+  let test_fr_zero_is_not_greater_than_one () =
+    if Bls12_381.Fr.zero > Bls12_381.Fr.one then
+      Alcotest.failf "(>) zero is not expected to be greater than one"
+
+  let test_fr_one_is_greater_than_zero () =
+    if not (Bls12_381.Fr.one > Bls12_381.Fr.zero) then
+      Alcotest.failf "(>) one is expected to be greater than zero"
+
+  let test_fr_one_is_not_smaller_than_zero () =
+    if Bls12_381.Fr.one < Bls12_381.Fr.zero then
+      Alcotest.failf "(<) one is not expected to be smaller than zero"
+
+  let test_fr_successor_is_greater () =
+    let x = Bls12_381.Fr.random () in
+    if not (Bls12_381.Fr.(x + one) > x) then
+      Alcotest.failf "(>) the successor of an element is expected to be greater"
+
+  let test_fr_random_element_is_smaller_than_its_successor () =
+    let x = Bls12_381.Fr.random () in
+    if not (x < Bls12_381.Fr.(x + one)) then
+      Alcotest.failf
+        "(<) a random element (when smaller than order - 1) is smaller than \
+         its succesor"
+
+  let get_tests () =
+    let open Alcotest in
+    ( "Test comparison operators",
+      [ test_case
+          "(=) operator on random element"
+          `Quick
+          (repeat 100 test_fr_equal_with_same_random_element);
+        test_case
+          "(=) operator on random element: failing test"
+          `Quick
+          (repeat 100 test_fr_equality_failing_test_with_random);
+        test_case
+          "(!=) operator on random element: failing test"
+          `Quick
+          (repeat 100 test_fr_different_failing_test_with_same_random_element);
+        test_case "(=) operator on zero" `Quick test_fr_equal_with_zero;
+        test_case "(=) operator on one" `Quick test_fr_equal_with_one;
+        test_case "(<) 0 < 1" `Quick test_fr_zero_is_smaller_than_one;
+        test_case
+          "(>) 0 > 1: failing test"
+          `Quick
+          test_fr_zero_is_not_greater_than_one;
+        test_case "(>) successor is greater" `Quick test_fr_successor_is_greater;
+        test_case "(>) 1 > 0" `Quick test_fr_one_is_greater_than_zero;
+        test_case
+          "(<) 1 < 0: failing test"
+          `Quick
+          test_fr_one_is_not_smaller_than_zero;
+        test_case
+          "(<) x < x + 1"
+          `Quick
+          test_fr_random_element_is_smaller_than_its_successor;
+        test_case "(=) operator on one" `Quick test_fr_equal_with_one ] )
+end
+
 let () =
   let open Alcotest in
   run
@@ -869,5 +970,6 @@ let () =
     :: Memory.get_tests ()
     :: InplaceOperations.get_tests ()
     :: BytesRepresentation.get_tests ()
+    :: OCamlComparisonOperators.get_tests ()
     :: StringRepresentation.get_tests ()
     :: FFT.get_tests () :: Tests.get_tests () )
