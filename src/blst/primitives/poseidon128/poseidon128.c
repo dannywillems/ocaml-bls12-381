@@ -12,7 +12,7 @@ blst_fr *res_mds[WIDTH];
 
 uint64_t ZERO[4] = {0, 0, 0, 0};
 
-void poseidon128_constants_init(void) {
+void ocaml_bls12_381_poseidon128_constants_init(void) {
   buffer = (blst_fr *)calloc(1, sizeof(blst_scalar));
   for (int i = 0; i < WIDTH; i++) {
     res_mds[i] = (blst_fr *)calloc(1, sizeof(blst_scalar));
@@ -32,21 +32,22 @@ void poseidon128_constants_init(void) {
   free(scalar);
 }
 
-void poseidon128_finalize(void) {
+void ocaml_bls12_381_poseidon128_finalize(void) {
   free(buffer);
   for (int i = 0; i < WIDTH; i++) {
     free(res_mds[i]);
   }
 }
 
-void poseidon128_init(poseidon128_ctxt_t *ctxt, blst_fr *a, blst_fr *b,
-                      blst_fr *c) {
+void ocaml_bls12_381_poseidon128_init(ocaml_bls12_381_poseidon128_ctxt_t *ctxt,
+                                      blst_fr *a, blst_fr *b, blst_fr *c) {
   memcpy(&ctxt->s[0], a, sizeof(blst_fr));
   memcpy(&ctxt->s[1], b, sizeof(blst_fr));
   memcpy(&ctxt->s[2], c, sizeof(blst_fr));
 }
 
-void apply_sbox(poseidon128_ctxt_t *ctxt, blst_fr *buffer, int full) {
+void apply_sbox(ocaml_bls12_381_poseidon128_ctxt_t *ctxt, blst_fr *buffer,
+                int full) {
   int begin_idx = full ? 0 : PARTIAL_ROUND_IDX_SBOX;
   int end_idx = full ? WIDTH : PARTIAL_ROUND_IDX_SBOX + 1;
   for (int i = begin_idx; i < end_idx; i++) {
@@ -57,8 +58,8 @@ void apply_sbox(poseidon128_ctxt_t *ctxt, blst_fr *buffer, int full) {
   }
 }
 
-void apply_matrix_multiplication(poseidon128_ctxt_t *ctxt, blst_fr *buffer,
-                                 blst_fr *res[WIDTH]) {
+void apply_matrix_multiplication(ocaml_bls12_381_poseidon128_ctxt_t *ctxt,
+                                 blst_fr *buffer, blst_fr *res[WIDTH]) {
   for (int i = 0; i < WIDTH; i++) {
     blst_fr_from_uint64(res[i], ZERO);
     for (int j = 0; j < WIDTH; j++) {
@@ -71,14 +72,15 @@ void apply_matrix_multiplication(poseidon128_ctxt_t *ctxt, blst_fr *buffer,
   }
 }
 
-void apply_cst(poseidon128_ctxt_t *ctxt) {
+void apply_cst(ocaml_bls12_381_poseidon128_ctxt_t *ctxt) {
   for (int i = 0; i < WIDTH; i++) {
     blst_fr_add(&ctxt->s[i], &ctxt->s[i], ARK + ctxt->i_round_key);
     ctxt->i_round_key++;
   }
 }
 
-void poseidon128_apply_perm(poseidon128_ctxt_t *ctxt) {
+void ocaml_bls12_381_poseidon128_apply_perm(
+    ocaml_bls12_381_poseidon128_ctxt_t *ctxt) {
   // Could we allocate it outside of apply_perm?
   ctxt->i_round_key = 0;
   for (int i = 0; i < NB_FULL_ROUNDS / 2; i++) {
@@ -98,8 +100,9 @@ void poseidon128_apply_perm(poseidon128_ctxt_t *ctxt) {
   }
 }
 
-void poseidon128_get_state(blst_fr *a, blst_fr *b, blst_fr *c,
-                           poseidon128_ctxt_t *ctxt) {
+void ocaml_bls12_381_poseidon128_get_state(
+    blst_fr *a, blst_fr *b, blst_fr *c,
+    ocaml_bls12_381_poseidon128_ctxt_t *ctxt) {
   memcpy(a, &ctxt->s[0], sizeof(blst_fr));
   memcpy(b, &ctxt->s[1], sizeof(blst_fr));
   memcpy(c, &ctxt->s[2], sizeof(blst_fr));
