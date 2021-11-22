@@ -17,18 +17,13 @@
 
 (rule
  (deps
-  (source_tree libblst))
+  (source_tree libblst)
+  build_blst.sh)
  (targets libblst.a dllblst.so)
  (action
   (no-infer
    (progn
-    (chdir
-     libblst
-     ;; If you update the build.sh flags, you must also update
-     ;; .github/workflows/build-blst-on-macos accordingly
-     ;; Adding -Wno-missing-braces for clang-11 (and also should be for clang-10, but clang 10
-     ;; is not officially supported). See .github/workflows/build-blst-on-macos for the reason
-     (run ./build.sh -shared -Wno-missing-braces))
+    (run ./build_blst.sh)
     (run cp libblst/libblst.a libblst.a)
     (with-accepted-exit-codes
      (or 0 1)
