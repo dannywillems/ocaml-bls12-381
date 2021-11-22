@@ -74,10 +74,10 @@ CAMLprim value allocate_scalar_stubs(value unit) {
 
 // Additional functions for Fr.eq, Fr.is_zero and Fr.is_one
 bool blst_fr_is_equal(blst_fr *x, blst_fr *y) {
-  u_int64_t x_uint_64[4];
+  uint64_t x_uint_64[4];
   blst_uint64_from_fr(x_uint_64, x);
 
-  u_int64_t y_uint_64[4];
+  uint64_t y_uint_64[4];
   blst_uint64_from_fr(y_uint_64, y);
   bool is_equal =
       ((y_uint_64[0] == x_uint_64[0])) && ((y_uint_64[1] == x_uint_64[1])) &&
@@ -86,7 +86,7 @@ bool blst_fr_is_equal(blst_fr *x, blst_fr *y) {
 }
 
 bool blst_fr_is_zero(blst_fr *x) {
-  u_int64_t x_uint_64[4];
+  uint64_t x_uint_64[4];
   blst_uint64_from_fr(x_uint_64, x);
   bool is_zero = (x_uint_64[0] == 0lu) && (x_uint_64[1] == 0lu) &&
                  (x_uint_64[2] == 0lu) && (x_uint_64[3] == 0lu);
@@ -94,7 +94,7 @@ bool blst_fr_is_zero(blst_fr *x) {
 }
 
 bool blst_fr_is_one(blst_fr *x) {
-  u_int64_t x_uint_64[4];
+  uint64_t x_uint_64[4];
   blst_uint64_from_fr(x_uint_64, x);
   bool is_one = (x_uint_64[0] == 1lu) && (x_uint_64[1] == 0lu) &&
                 (x_uint_64[2] == 0lu) && (x_uint_64[3] == 0lu);
