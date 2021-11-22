@@ -328,7 +328,7 @@ CAMLprim value caml_blst_fp2_assign_stubs(value p, value x1, value x2) {
 
 CAMLprim value caml_blst_fp2_zero_stubs(value buffer) {
   CAMLparam1(buffer);
-  byte zero_bytes[32] = {0};
+  byte zero_bytes[48] = {0};
   blst_fp2 *buffer_c = Blst_fp2_val(buffer);
   blst_fp_from_lendian(&buffer_c->fp[0], zero_bytes);
   blst_fp_from_lendian(&buffer_c->fp[1], zero_bytes);
@@ -337,7 +337,7 @@ CAMLprim value caml_blst_fp2_zero_stubs(value buffer) {
 
 CAMLprim value caml_blst_fp2_one_stubs(value buffer) {
   CAMLparam1(buffer);
-  byte bytes[32] = {0};
+  byte bytes[48] = {0};
   blst_fp2 *buffer_c = Blst_fp2_val(buffer);
   blst_fp_from_lendian(&buffer_c->fp[0], bytes);
   bytes[0] = 1;
