@@ -5,6 +5,6 @@
 
 bool blst_fr_is_one(blst_fr *x);
 bool blst_fr_is_zero(blst_fr *x);
-bool blst_fr_is_equal(blst_fr *x);
+bool blst_fr_is_equal(blst_fr *x, blst_fr *y);
 
 #endif
