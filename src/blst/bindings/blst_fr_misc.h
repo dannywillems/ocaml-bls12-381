@@ -1,4 +1,4 @@
-#ifndefine BLST_FR_MISC
+#ifndef BLST_FR_MISC
 #define BLST_FR_MISC
 
 #include "blst.h"
