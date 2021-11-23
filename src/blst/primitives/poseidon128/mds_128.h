@@ -1,6 +1,10 @@
 #ifndef MDS_128_H
 #define MDS_128_H
 
+// to get the typedef for byte
+#include "blst.h"
+#include "poseidon128.h"
+
 byte MDS_BYTES[WIDTH][WIDTH][32] = {
     {
         {183, 91, 22,  4,   20,  173, 128, 84,  221, 81,  225,

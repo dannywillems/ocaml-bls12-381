@@ -1,6 +1,10 @@
 #ifndef ARK_128_H
 #define ARK_128_H
 
+// to get the typedef for byte
+#include "blst.h"
+#include "poseidon128.h"
+
 byte ARK_BYTES[NB_CONSTANTS][32] = {
     {164, 55,  183, 17,  5,  76, 144, 97, 239, 94, 139, 198, 33,  64, 223, 55,
      145, 203, 22,  114, 56, 3,  241, 33, 83,  15, 7,   215, 251, 43, 44,  47},
