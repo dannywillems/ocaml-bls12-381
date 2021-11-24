@@ -12,13 +12,7 @@
 
 // From ocaml-ctypes:
 // https://github.com/ocamllabs/ocaml-ctypes/blob/9048ac78b885cc3debeeb020c56ea91f459a4d33/src/ctypes/ctypes_primitives.h#L110
-#if SIZE_MAX == UINT16_MAX
-#define ctypes_size_t_val Uint16_val
-#define ctypes_copy_size_t Integers_val_uint16
-#elif SIZE_MAX == UINT32_MAX
-#define ctypes_size_t_val Uint32_val
-#define ctypes_copy_size_t integers_copy_uint32
-#elif SIZE_MAX == UINT64_MAX
+#if SIZE_MAX == UINT64_MAX
 #define ctypes_size_t_val Uint64_val
 #define ctypes_copy_size_t integers_copy_uint64
 #else
