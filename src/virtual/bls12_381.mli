@@ -644,3 +644,10 @@ module Signature : sig
     val aggregate_verify : (pk * proof) list -> Bytes.t -> signature -> bool
   end
 end
+
+(** Return [true] if the environment variable `BLST_PORTABLE` was set when
+    building the library, otherwise [false].
+    Can be used to detect if the backend blst has been optimised with ADX on
+    ADX-supported platforms.
+*)
+val built_with_blst_portable : bool
