@@ -35,10 +35,22 @@ is the compressed encoding of a point.
 # if you implement a library and you don't need an actual implementation
 opam install bls12-381
 # to target UNIX
-opam insall bls12-381-unix
+opam install bls12-381-unix
 ```
 
-See below how to use in your project.
+By default, if the architecture supports ADX, `bls12-381-unix` with be compiled using ADX
+opcodes (giving optimisations up to 20% for some arithmetic operations). If you
+don't want to build using ADX, you can add the environment variable
+`BLST_PORTABLE` and set it to any value.
+For instance,
+```
+BLST_PORTABLE=y opam install bls12-381-unix
+```
+will instruct to build bls12-381-unix without ADX. This might be useful if you
+build docker images on ADX machines but you need the image to be portable on
+architecture not supporting ADX.
+
+If the architecture does not support ADX, `bls12-381-unix` will be compiled without ADX opcodes.
 
 ## Run tests
 
@@ -60,13 +72,15 @@ However, if you are writing a binary, three packages are relevant:
 
 ## Run the benchmarks
 
+Install `core_bench`:
+
 ```
 opam install core_bench
-dune exec benchmark/bench_fr.exe
-dune exec benchmark/bench_g1.exe
-dune exec benchmark/bench_g2.exe
-dune exec benchmark/bench_pairing.exe
-dune exec benchmark/bench_signature.exe
+```
+
+See files listed in the directory `benchmark` and execute it with `dune exec`. For instance:
+```
+dune exec ./benchmark/bench_fr.exe
 ```
 
 ## Documentation
