@@ -58,7 +58,7 @@ If the architecture does not support ADX, `bls12-381-unix` will be compiled with
 dune runtest
 ```
 
-To get the coverage (only ok for bls12-381-unix and bls12-381-gen)
+To get the coverage:
 ```
 dune runtest --instrument-with bisect_ppx --force
 bisect-ppx-report html
