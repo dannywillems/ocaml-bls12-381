@@ -29,6 +29,8 @@ module Stubs = struct
 
   external allocate_g2 : unit -> jacobian = "allocate_p2_stubs"
 
+  external sizeof_g2 : unit -> int = "caml_blst_sizeof_g2_stubs"
+
   external allocate_g2_affine : unit -> affine = "allocate_p2_affine_stubs"
 
   external from_affine : jacobian -> affine -> unit
@@ -96,6 +98,13 @@ module G2 = struct
   type t = Stubs.jacobian
 
   exception Not_on_curve of Bytes.t
+
+  let size_in_memory =
+    (* 1 word for the OCaml block header + 1 word for the C pointer + the number
+       of bytes for the actual size of a C value of type blst_g2.
+    *)
+    let sizeof = Stubs.sizeof_g2 () in
+    sizeof + (2 * Sys.word_size / 8)
 
   let size_in_bytes = 192
 

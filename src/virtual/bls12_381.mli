@@ -132,6 +132,9 @@ end
 module Fr : sig
   include Ff_sig.PRIME
 
+  (** Actual number of bytes allocated for a value of type t *)
+  val size_in_memory : int
+
   (** Check if a point, represented as a byte array, is in the field **)
   val check_bytes : Bytes.t -> bool
 
@@ -204,6 +207,9 @@ module G1 : sig
 
   (** The type of the element in the elliptic curve *)
   type t
+
+  (** Actual number of bytes allocated for a value of type t *)
+  val size_in_memory : int
 
   (** The size of a point representation, in bytes *)
   val size_in_bytes : int
@@ -333,6 +339,9 @@ module G2 : sig
 
   (** The type of the element in the elliptic curve *)
   type t
+
+  (** Actual number of bytes allocated for a value of type t *)
+  val size_in_memory : int
 
   (** The size of a point representation, in bytes *)
   val size_in_bytes : int

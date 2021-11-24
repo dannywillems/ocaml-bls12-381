@@ -38,10 +38,14 @@ module Memory = struct
     let y = Bls12_381.G2.copy x in
     assert (Bls12_381.G2.eq x y)
 
+  let test_size_in_memory () = assert (Bls12_381.G2.size_in_memory = 304)
+
   let get_tests () =
     let txt = "Memory" in
     let open Alcotest in
-    (txt, [test_case "copy" `Quick (Test_ec_make.repeat 100 test_copy)])
+    ( txt,
+      [ test_case "copy" `Quick (Test_ec_make.repeat 100 test_copy);
+        test_case "size in memory" `Quick test_size_in_memory ] )
 end
 
 module Constructors = struct

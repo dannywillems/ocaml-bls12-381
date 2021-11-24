@@ -1018,3 +1018,18 @@ CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
 
   CAMLreturn(Val_unit);
 }
+
+CAMLprim value caml_blst_sizeof_fr_stubs(value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_int(sizeof(blst_fr)));
+}
+
+CAMLprim value caml_blst_sizeof_g1_stubs(value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_int(sizeof(blst_p1)));
+}
+
+CAMLprim value caml_blst_sizeof_g2_stubs(value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_int(sizeof(blst_p2)));
+}

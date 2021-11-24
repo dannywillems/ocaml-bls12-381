@@ -30,6 +30,8 @@ module Stubs = struct
 
   external allocate_g1 : unit -> jacobian = "allocate_p1_stubs"
 
+  external sizeof_g1 : unit -> int = "caml_blst_sizeof_g1_stubs"
+
   external allocate_g1_affine : unit -> affine = "allocate_p1_affine_stubs"
 
   external from_affine : jacobian -> affine -> unit
@@ -99,6 +101,13 @@ module G1 = struct
   type t = Stubs.jacobian
 
   let global_buffer = Stubs.allocate_g1 ()
+
+  let size_in_memory =
+    (* 1 word for the OCaml block header + 1 word for the C pointer + the number
+       of bytes for the actual size of a C value of type blst_g1.
+    *)
+    let sizeof = Stubs.sizeof_g1 () in
+    sizeof + (2 * Sys.word_size / 8)
 
   let size_in_bytes = 96
 

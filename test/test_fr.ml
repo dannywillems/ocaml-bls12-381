@@ -64,10 +64,14 @@ module Memory = struct
     let y = Bls12_381.Fr.copy x in
     assert (Bls12_381.Fr.eq x y)
 
+  let test_size_in_memory () = assert (Bls12_381.Fr.size_in_memory = 48)
+
   let get_tests () =
     let txt = "Memory" in
     let open Alcotest in
-    (txt, [test_case "copy" `Quick (repeat 100 test_copy)])
+    ( txt,
+      [ test_case "copy" `Quick (repeat 100 test_copy);
+        test_case "size in memory" `Quick test_size_in_memory ] )
 end
 
 module InplaceOperations = struct

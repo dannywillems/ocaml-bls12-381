@@ -31,6 +31,8 @@ module Stubs = struct
 
   external allocate_fr : unit -> fr = "allocate_fr_stubs"
 
+  external sizeof_fr : unit -> int = "caml_blst_sizeof_fr_stubs"
+
   external scalar_of_fr : scalar -> fr -> unit
     = "caml_blst_scalar_from_fr_stubs"
 
@@ -83,6 +85,13 @@ module Fr = struct
     let dst = Stubs.allocate_fr () in
     Stubs.memcpy dst src ;
     dst
+
+  let size_in_memory =
+    (* 1 word for the OCaml block header + 1 word for the C pointer + the number
+       of bytes for the actual size of a C value of type blst_fr.
+    *)
+    let sizeof = Stubs.sizeof_fr () in
+    sizeof + (2 * Sys.word_size / 8)
 
   let size_in_bytes = 32
 
