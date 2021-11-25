@@ -39,6 +39,12 @@ module Stubs = struct
   external fr_of_scalar : fr -> scalar -> unit
     = "caml_blst_fr_from_scalar_stubs"
 
+  external fr_of_bytes_le : fr -> Bytes.t -> bool
+    = "caml_blst_fr_from_lendian_stubs"
+
+  external fr_to_bytes_le : Bytes.t -> fr -> unit
+    = "caml_blst_lendian_from_fr_stubs"
+
   external scalar_of_bytes_le : scalar -> Bytes.t -> unit
     = "caml_blst_scalar_of_bytes_stubs"
 
@@ -111,13 +117,9 @@ module Fr = struct
     if Bytes.length bs > size_in_bytes then None
     else
       let bs = pad_if_require bs in
-      let buffer_scalar = Stubs.allocate_scalar () in
-      let () = Stubs.scalar_of_bytes_le buffer_scalar bs in
-      if Stubs.check_scalar buffer_scalar then (
-        let buffer_fr = Stubs.allocate_fr () in
-        Stubs.fr_of_scalar buffer_fr buffer_scalar ;
-        Some buffer_fr )
-      else None
+      let buffer = Stubs.allocate_fr () in
+      let is_ok = Stubs.fr_of_bytes_le buffer bs in
+      if is_ok then Some buffer else None
 
   let of_bytes_exn bs =
     let buffer_opt = of_bytes_opt bs in
@@ -141,9 +143,7 @@ module Fr = struct
 
   let to_bytes x =
     let buffer_bytes = Bytes.make size_in_bytes '\000' in
-    let buffer_scalar = Stubs.allocate_scalar () in
-    Stubs.scalar_of_fr buffer_scalar x ;
-    Stubs.scalar_to_bytes_le buffer_bytes buffer_scalar ;
+    Stubs.fr_to_bytes_le buffer_bytes x ;
     buffer_bytes
 
   let eq x y = Stubs.eq x y

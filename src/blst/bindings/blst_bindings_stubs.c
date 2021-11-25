@@ -95,6 +95,40 @@ bool blst_fr_is_one(blst_fr *x) {
   return (is_one);
 }
 
+bool blst_fr_from_lendian(blst_fr *x, byte b[32]) {
+  blst_scalar *s = (blst_scalar *)calloc(1, sizeof(blst_scalar));
+  blst_scalar_from_lendian(s, b);
+  bool is_ok = blst_scalar_fr_check(s);
+  if (is_ok) {
+    blst_fr_from_scalar(x, s);
+  }
+  free(s);
+  return (is_ok);
+}
+
+void blst_lendian_from_fr(byte b[32], blst_fr *x) {
+  blst_scalar *s = (blst_scalar *)calloc(1, sizeof(blst_scalar));
+  blst_scalar_from_fr(s, x);
+  blst_lendian_from_scalar(b, s);
+  free(s);
+}
+
+CAMLprim value caml_blst_fr_from_lendian_stubs(value x, value b) {
+  CAMLparam2(x, b);
+  blst_fr *x_c = Blst_fr_val(x);
+  byte *b_c = Bytes_val(b);
+  bool res = blst_fr_from_lendian(x_c, b_c);
+  CAMLreturn(Val_bool(res));
+}
+
+CAMLprim value caml_blst_lendian_from_fr_stubs(value b, value x) {
+  CAMLparam2(b, x);
+  blst_fr *x_c = Blst_fr_val(x);
+  byte *b_c = Bytes_val(b);
+  blst_lendian_from_fr(b_c, x_c);
+  CAMLreturn(Val_unit);
+}
+
 CAMLprim value caml_blst_fr_is_equal_stubs(value x, value y) {
   CAMLparam2(x, y);
   blst_fr *x_c = Blst_fr_val(x);
