@@ -28,9 +28,7 @@
 #define Is_some(v) Is_block(v)
 
 // Fr
-#define Blst_fr_val(v) (*((blst_fr **)Data_custom_val(v)))
-
-static void finalize_free_fr(value v) { free(Blst_fr_val(v)); }
+#define Blst_fr_val(v) ((blst_fr *)Data_custom_val(v))
 
 static int blst_fr_compare(value s, value t) {
   u_int64_t s_uint64[4];
@@ -66,20 +64,18 @@ static int blst_fr_compare(value s, value t) {
 }
 
 static struct custom_operations blst_fr_ops = {"blst_fr",
-                                               finalize_free_fr,
-                                               blst_fr_compare,
+                                               custom_finalize_default,
+                                               custom_compare_default,
                                                custom_hash_default,
                                                custom_serialize_default,
                                                custom_deserialize_default,
                                                custom_compare_ext_default,
                                                custom_fixed_length_default};
 
-#define Blst_scalar_val(v) (*((blst_scalar **)Data_custom_val(v)))
-
-static void finalize_free_scalar(value v) { free(Blst_scalar_val(v)); }
+#define Blst_scalar_val(v) ((blst_scalar *)Data_custom_val(v))
 
 static struct custom_operations blst_scalar_ops = {"blst_scalar",
-                                                   finalize_free_scalar,
+                                                   custom_finalize_default,
                                                    custom_compare_default,
                                                    custom_hash_default,
                                                    custom_serialize_default,
@@ -90,12 +86,9 @@ static struct custom_operations blst_scalar_ops = {"blst_scalar",
 CAMLprim value allocate_scalar_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_scalar_ops, sizeof(blst_scalar *), 0, 1);
-  void *p = calloc(1, sizeof(blst_scalar));
-  if (p == NULL)
-    caml_raise_out_of_memory();
-  blst_scalar **d = (blst_scalar **)Data_custom_val(block);
-  *d = p;
+  block = caml_alloc_custom(&blst_scalar_ops, sizeof(blst_scalar), 0, 1);
+  blst_scalar *c = Blst_scalar_val(block);
+  memset(c, 0, sizeof(blst_scalar));
   CAMLreturn(block);
 }
 
@@ -184,12 +177,9 @@ CAMLprim value caml_blst_fr_is_one_stubs(value x) {
 CAMLprim value allocate_fr_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_fr_ops, sizeof(blst_fr *), 0, 1);
-  void *p = calloc(1, sizeof(blst_fr));
-  if (p == NULL)
-    caml_raise_out_of_memory();
-  blst_fr **d = (blst_fr **)Data_custom_val(block);
-  *d = p;
+  block = caml_alloc_custom(&blst_fr_ops, sizeof(blst_fr), 0, 1);
+  blst_fr *c = Blst_fr_val(block);
+  memset(c, 0, sizeof(blst_fr));
   CAMLreturn(block);
 }
 
@@ -260,12 +250,10 @@ CAMLprim value caml_blst_fr_memcpy_stubs(value dst, value src) {
 }
 
 // Fq
-#define Blst_fp_val(v) (*((blst_fp **)Data_custom_val(v)))
-
-static void finalize_free_fp(value v) { free(Blst_fp_val(v)); }
+#define Blst_fp_val(v) ((blst_fp *)Data_custom_val(v))
 
 static struct custom_operations blst_fp_ops = {"blst_fp",
-                                               finalize_free_fp,
+                                               custom_finalize_default,
                                                custom_compare_default,
                                                custom_hash_default,
                                                custom_serialize_default,
@@ -276,12 +264,9 @@ static struct custom_operations blst_fp_ops = {"blst_fp",
 CAMLprim value allocate_fp_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_fp_ops, sizeof(blst_fp *), 0, 1);
-  void *p = calloc(1, sizeof(blst_fp));
-  if (p == NULL)
-    caml_raise_out_of_memory();
-  blst_fp **d = (blst_fp **)Data_custom_val(block);
-  *d = p;
+  block = caml_alloc_custom(&blst_fp_ops, sizeof(blst_fp), 0, 1);
+  blst_fp *c = Blst_fp_val(block);
+  memset(c, 0, sizeof(blst_fp));
   CAMLreturn(block);
 }
 
@@ -322,12 +307,10 @@ CAMLprim value caml_blst_fp_cneg_stubs(value buffer, value p, value b) {
 }
 
 // Fq2
-#define Blst_fp2_val(v) (*((blst_fp2 **)Data_custom_val(v)))
-
-static void finalize_free_fp2(value v) { free(Blst_fp2_val(v)); }
+#define Blst_fp2_val(v) ((blst_fp2 *)Data_custom_val(v))
 
 static struct custom_operations blst_fp2_ops = {"blst_fp2",
-                                                finalize_free_fp2,
+                                                custom_finalize_default,
                                                 custom_compare_default,
                                                 custom_hash_default,
                                                 custom_serialize_default,
@@ -338,12 +321,9 @@ static struct custom_operations blst_fp2_ops = {"blst_fp2",
 CAMLprim value allocate_fp2_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_fp2_ops, sizeof(blst_fp2 *), 0, 1);
-  void *p = calloc(1, sizeof(blst_fp2));
-  if (p == NULL)
-    caml_raise_out_of_memory();
-  blst_fp2 **d = (blst_fp2 **)Data_custom_val(block);
-  *d = p;
+  block = caml_alloc_custom(&blst_fp2_ops, sizeof(blst_fp2), 0, 1);
+  blst_fp2 *tmp = Blst_fp2_val(block);
+  memset(tmp, 0, sizeof(blst_fp2));
   CAMLreturn(block);
 }
 
@@ -428,12 +408,10 @@ CAMLprim value caml_blst_fp2_to_bytes_stubs(value buffer, value p) {
 
 // Fq12
 
-#define Blst_fp12_val(v) (*((blst_fp12 **)Data_custom_val(v)))
-
-static void finalize_free_fp12(value v) { free(Blst_fp12_val(v)); }
+#define Blst_fp12_val(v) ((blst_fp12 *)Data_custom_val(v))
 
 static struct custom_operations blst_fp12_ops = {"blst_fp12",
-                                                 finalize_free_fp12,
+                                                 custom_finalize_default,
                                                  custom_compare_default,
                                                  custom_hash_default,
                                                  custom_serialize_default,
@@ -444,12 +422,9 @@ static struct custom_operations blst_fp12_ops = {"blst_fp12",
 CAMLprim value allocate_fp12_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_fp12_ops, sizeof(blst_fp12 *), 0, 1);
-  void *p = calloc(1, sizeof(blst_fp12));
-  if (p == NULL)
-    caml_raise_out_of_memory();
-  blst_fp12 **d = (blst_fp12 **)Data_custom_val(block);
-  *d = p;
+  block = caml_alloc_custom(&blst_fp12_ops, sizeof(blst_fp12), 0, 1);
+  blst_fp12 *tmp = Blst_fp12_val(block);
+  memset(tmp, 0, sizeof(blst_fp12));
   CAMLreturn(block);
 }
 
@@ -538,16 +513,12 @@ CAMLprim value caml_blst_fp12_of_bytes_stubs(value buffer, value p) {
 
 // P1
 
-#define Blst_p1_val(v) (*((blst_p1 **)Data_custom_val(v)))
+#define Blst_p1_val(v) ((blst_p1 *)Data_custom_val(v))
 
-#define Blst_p1_affine_val(v) (*((blst_p1_affine **)Data_custom_val(v)))
-
-static void finalize_free_p1(value v) { free(Blst_p1_val(v)); }
-
-static void finalize_free_p1_affine(value v) { free(Blst_p1_affine_val(v)); }
+#define Blst_p1_affine_val(v) ((blst_p1_affine *)Data_custom_val(v))
 
 static struct custom_operations blst_p1_ops = {"blst_p1",
-                                               finalize_free_p1,
+                                               custom_finalize_default,
                                                custom_compare_default,
                                                custom_hash_default,
                                                custom_serialize_default,
@@ -556,7 +527,7 @@ static struct custom_operations blst_p1_ops = {"blst_p1",
                                                custom_fixed_length_default};
 
 static struct custom_operations blst_p1_affine_ops = {
-    "blst_p1_affine",           finalize_free_p1_affine,
+    "blst_p1_affine",           custom_finalize_default,
     custom_compare_default,     custom_hash_default,
     custom_serialize_default,   custom_deserialize_default,
     custom_compare_ext_default, custom_fixed_length_default};
@@ -564,25 +535,18 @@ static struct custom_operations blst_p1_affine_ops = {
 CAMLprim value allocate_p1_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_p1_ops, sizeof(blst_p1 *), 0, 1);
-  void *p = calloc(1, sizeof(blst_p1));
-  if (p == NULL)
-    caml_raise_out_of_memory();
-  blst_p1 **d = (blst_p1 **)Data_custom_val(block);
-  *d = p;
+  block = caml_alloc_custom(&blst_p1_ops, sizeof(blst_p1), 0, 1);
+  blst_p1 *tmp = Blst_p1_val(block);
+  memset(tmp, 0, sizeof(blst_p1));
   CAMLreturn(block);
 }
 
 CAMLprim value allocate_p1_affine_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
-  block =
-      caml_alloc_custom(&blst_p1_affine_ops, sizeof(blst_p1_affine *), 0, 1);
-  void *p = calloc(1, sizeof(blst_p1_affine));
-  if (p == NULL)
-    caml_raise_out_of_memory();
-  blst_p1_affine **d = (blst_p1_affine **)Data_custom_val(block);
-  *d = p;
+  block = caml_alloc_custom(&blst_p1_affine_ops, sizeof(blst_p1_affine), 0, 1);
+  blst_p1_affine *tmp = Blst_p1_affine_val(block);
+  memset(tmp, 0, sizeof(blst_p1_affine));
   CAMLreturn(block);
 }
 
@@ -705,16 +669,12 @@ CAMLprim value caml_blst_p1_set_coordinates_stubs(value buffer, value x,
 
 // P2
 
-#define Blst_p2_val(v) (*((blst_p2 **)Data_custom_val(v)))
+#define Blst_p2_val(v) ((blst_p2 *)Data_custom_val(v))
 
-#define Blst_p2_affine_val(v) (*((blst_p2_affine **)Data_custom_val(v)))
-
-static void finalize_free_p2(value v) { free(Blst_p2_val(v)); }
-
-static void finalize_free_p2_affine(value v) { free(Blst_p2_affine_val(v)); }
+#define Blst_p2_affine_val(v) ((blst_p2_affine *)Data_custom_val(v))
 
 static struct custom_operations blst_p2_ops = {"blst_p2",
-                                               finalize_free_p2,
+                                               custom_finalize_default,
                                                custom_compare_default,
                                                custom_hash_default,
                                                custom_serialize_default,
@@ -723,7 +683,7 @@ static struct custom_operations blst_p2_ops = {"blst_p2",
                                                custom_fixed_length_default};
 
 static struct custom_operations blst_p2_affine_ops = {
-    "blst_p2_affine",           finalize_free_p2_affine,
+    "blst_p2_affine",           custom_finalize_default,
     custom_compare_default,     custom_hash_default,
     custom_serialize_default,   custom_deserialize_default,
     custom_compare_ext_default, custom_fixed_length_default};
@@ -731,25 +691,18 @@ static struct custom_operations blst_p2_affine_ops = {
 CAMLprim value allocate_p2_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_p2_ops, sizeof(blst_p2 *), 0, 1);
-  void *p = calloc(1, sizeof(blst_p2));
-  if (p == NULL)
-    caml_raise_out_of_memory();
-  blst_p2 **d = (blst_p2 **)Data_custom_val(block);
-  *d = p;
+  block = caml_alloc_custom(&blst_p2_ops, sizeof(blst_p2), 0, 1);
+  blst_p2 *tmp = Blst_p2_val(block);
+  memset(tmp, 0, sizeof(blst_p2));
   CAMLreturn(block);
 }
 
 CAMLprim value allocate_p2_affine_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
-  block =
-      caml_alloc_custom(&blst_p2_affine_ops, sizeof(blst_p2_affine *), 0, 1);
-  void *p = calloc(1, sizeof(blst_p2_affine));
-  if (p == NULL)
-    caml_raise_out_of_memory();
-  blst_p2_affine **d = (blst_p2_affine **)Data_custom_val(block);
-  *d = p;
+  block = caml_alloc_custom(&blst_p2_affine_ops, sizeof(blst_p2_affine), 0, 1);
+  blst_p2_affine *tmp = Blst_p2_affine_val(block);
+  memset(tmp, 0, sizeof(blst_p2_affine));
   CAMLreturn(block);
 }
 
@@ -897,36 +850,17 @@ CAMLprim value caml_blst_final_exponentiation_stubs(value buffer, value p) {
 // Signature
 
 // Fr
-#define Blst_pairing_val(v) (*((blst_pairing **)Data_custom_val(v)))
-
-static void finalize_free_pairing(value v) { free(Blst_pairing_val(v)); }
+#define Blst_pairing_val(v) ((blst_pairing *)Data_custom_val(v))
 
 static struct custom_operations blst_pairing_ops = {
     "blst_pairing",
-    finalize_free_pairing,
+    custom_finalize_default,
     custom_compare_default,
     custom_hash_default,
     custom_serialize_default,
     custom_deserialize_default,
     custom_compare_ext_default,
     custom_fixed_length_default};
-
-CAMLprim value allocate_pairing_stubs(value unit) {
-  CAMLparam1(unit);
-  CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_fp12_ops, sizeof(blst_pairing *), 0, 1);
-  void *p = calloc(1, blst_pairing_sizeof());
-  if (p == NULL)
-    caml_raise_out_of_memory();
-  blst_pairing **d = (blst_pairing **)Data_custom_val(block);
-  *d = p;
-  CAMLreturn(block);
-}
-
-/* CAMLprim value caml_return_null_g2_affine(value unit) { */
-/*   CAMLparam1(unit); */
-/*   CAMLreturn(Blst_p2_affine_val(NULL)); */
-/* }; */
 
 CAMLprim value caml_blst_sk_to_pk_in_g1_stubs(value buffer, value scalar) {
   CAMLparam2(buffer, scalar);
@@ -940,12 +874,14 @@ CAMLprim value caml_blst_sign_pk_in_g1_stubs(value buffer, value p, value s) {
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value caml_blst_pairing_init_stubs(value buffer, value check,
-                                            value dst, value dst_length) {
-  CAMLparam4(buffer, check, dst, dst_length);
-  blst_pairing_init(Blst_pairing_val(buffer), Bool_val(check), Bytes_val(dst),
+CAMLprim value caml_blst_pairing_init_stubs(value check, value dst,
+                                            value dst_length) {
+  CAMLparam3(check, dst, dst_length);
+  CAMLlocal1(block);
+  block = caml_alloc_custom(&blst_pairing_ops, blst_pairing_sizeof(), 0, 1);
+  blst_pairing_init(Blst_pairing_val(block), Bool_val(check), Bytes_val(dst),
                     ctypes_size_t_val(dst_length));
-  CAMLreturn(Val_unit);
+  CAMLreturn(block);
 }
 
 CAMLprim value caml_blst_aggregate_signature_stubs(value buffer, value g1,

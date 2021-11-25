@@ -15,9 +15,7 @@ module Stubs = struct
   external sign : G2.t -> G2.t -> Fr.Stubs.scalar -> unit
     = "caml_blst_sign_pk_in_g1_stubs"
 
-  external allocate_ctxt : unit -> ctxt = "allocate_pairing_stubs"
-
-  external pairing_init : ctxt -> bool -> Bytes.t -> Unsigned.Size_t.t -> unit
+  external pairing_init : bool -> Bytes.t -> Unsigned.Size_t.t -> ctxt
     = "caml_blst_pairing_init_stubs"
 
   external aggregate_signature :
@@ -64,13 +62,13 @@ let check_unicity_lst list =
     list
 
 let with_aggregation_ctxt ciphersuite f =
-  let ctxt = Stubs.allocate_ctxt () in
   let ciphersuite_length = Bytes.length ciphersuite in
-  Stubs.pairing_init
-    ctxt
-    true
-    ciphersuite
-    (Unsigned.Size_t.of_int ciphersuite_length) ;
+  let ctxt =
+    Stubs.pairing_init
+      true
+      ciphersuite
+      (Unsigned.Size_t.of_int ciphersuite_length)
+  in
   f ctxt
 
 type sk = Fr.Stubs.scalar

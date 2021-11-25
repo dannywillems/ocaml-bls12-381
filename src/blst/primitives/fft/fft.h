@@ -8,11 +8,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define Blst_fr_val(v) (*((blst_fr **)Data_custom_val(v)))
+#define Blst_fr_val(v) (blst_fr *)Data_custom_val(v)
 
-#define Blst_g1_val(v) (*((blst_p1 **)Data_custom_val(v)))
+#define Blst_g1_val(v) ((blst_p1 *)Data_custom_val(v))
 
-#define Blst_g2_val(v) (*((blst_p2 **)Data_custom_val(v)))
+#define Blst_g2_val(v) ((blst_p2 *)Data_custom_val(v))
 
 #define Fr_val_k(v, k) Blst_fr_val(Field(v, k))
 
