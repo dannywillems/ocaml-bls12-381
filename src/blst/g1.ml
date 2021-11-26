@@ -30,8 +30,6 @@ module Stubs = struct
 
   external allocate_g1 : unit -> jacobian = "allocate_p1_stubs"
 
-  external sizeof_g1 : unit -> int = "caml_blst_sizeof_g1_stubs"
-
   external allocate_g1_affine : unit -> affine = "allocate_p1_affine_stubs"
 
   external from_affine : jacobian -> affine -> unit
@@ -102,13 +100,6 @@ module G1 = struct
 
   let global_buffer = Stubs.allocate_g1 ()
 
-  let size_in_memory =
-    (* 1 word for the OCaml block header + 1 word for the C pointer + the number
-       of bytes for the actual size of a C value of type blst_g1.
-    *)
-    let sizeof = Stubs.sizeof_g1 () in
-    sizeof + (2 * Sys.word_size / 8)
-
   let size_in_bytes = 96
 
   let memcpy dst src = Stubs.memcpy dst src
@@ -158,6 +149,8 @@ module G1 = struct
          \246\000\219\024\203,\004\179\237\208<\199D\162\136\138\228\012\170#)F\197\231\225"
     in
     of_bytes_exn bytes
+
+  let size_in_memory = Obj.reachable_words (Obj.magic one) * 8
 
   let of_compressed_bytes_opt bs =
     let buffer_affine = Stubs.allocate_g1_affine () in

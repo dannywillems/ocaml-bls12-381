@@ -31,8 +31,6 @@ module Stubs = struct
 
   external allocate_fr : unit -> fr = "allocate_fr_stubs"
 
-  external sizeof_fr : unit -> int = "caml_blst_sizeof_fr_stubs"
-
   external scalar_of_fr : scalar -> fr -> unit
     = "caml_blst_scalar_from_fr_stubs"
 
@@ -95,13 +93,6 @@ module Fr = struct
     Stubs.memcpy dst src ;
     dst
 
-  let size_in_memory =
-    (* 1 word for the OCaml block header + 1 word for the C pointer + the number
-       of bytes for the actual size of a C value of type blst_fr.
-    *)
-    let sizeof = Stubs.sizeof_fr () in
-    sizeof + (2 * Sys.word_size / 8)
-
   let size_in_bytes = 32
 
   let order =
@@ -148,6 +139,8 @@ module Fr = struct
     let buffer_bytes = Bytes.make size_in_bytes '\000' in
     Stubs.fr_to_bytes_le buffer_bytes x ;
     buffer_bytes
+
+  let size_in_memory = Obj.reachable_words (Obj.magic one) * 8
 
   let eq x y = Stubs.eq x y
 
