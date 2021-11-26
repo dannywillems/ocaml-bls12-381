@@ -65,7 +65,7 @@ static int blst_fr_compare(value s, value t) {
 
 static struct custom_operations blst_fr_ops = {"blst_fr",
                                                custom_finalize_default,
-                                               custom_compare_default,
+                                               blst_fr_compare,
                                                custom_hash_default,
                                                custom_serialize_default,
                                                custom_deserialize_default,
