@@ -49,6 +49,16 @@
  (libraries bls12-381-unix core core_bench))
 
 (executable
+ (name bench_fft_g1)
+ (modules bench_fft_g1)
+ (libraries bls12-381-unix core core_bench))
+
+(executable
+ (name bench_fft_g2)
+ (modules bench_fft_g2)
+ (libraries bls12-381-unix core core_bench))
+
+(executable
  (name bench_fft_great_domain)
  (modules bench_fft_great_domain)
  (libraries bls12-381-unix))
