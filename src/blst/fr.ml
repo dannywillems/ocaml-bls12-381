@@ -76,6 +76,9 @@ module Stubs = struct
 
   external mul_map_inplace : fr array -> fr -> int -> unit
     = "caml_mul_map_fr_inplace_stubs"
+
+  external inner_product : fr -> fr array -> fr array -> int -> unit
+    = "caml_blst_fr_inner_product_stubs"
 end
 
 (* module = Blst_bindings.r (Blst_stubs) *)
@@ -374,6 +377,21 @@ module Fr = struct
     Stubs.mul_map_inplace points n_inv n
 
   let compare x y = Stdlib.compare (to_bytes x) (to_bytes y)
+
+  let inner_product_exn a b =
+    if Array.length a <> Array.length b then
+      raise (Invalid_argument "Both parameters must be of the same length")
+    else
+      let res = Stubs.allocate_fr () in
+      Stubs.inner_product res a b (Array.length a) ;
+      res
+
+  let inner_product_opt a b =
+    if Array.length a <> Array.length b then None
+    else
+      let res = Stubs.allocate_fr () in
+      Stubs.inner_product res a b (Array.length a) ;
+      Some res
 end
 
 include Fr

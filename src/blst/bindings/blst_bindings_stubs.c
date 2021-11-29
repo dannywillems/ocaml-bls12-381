@@ -1100,3 +1100,21 @@ CAMLprim value caml_blst_sizeof_g2_stubs(value unit) {
   CAMLparam1(unit);
   CAMLreturn(Val_int(sizeof(blst_p2)));
 }
+
+// Hypothesis: fr_array_left and fr_array_right are of the same length
+CAMLprim value caml_blst_fr_inner_product_stubs(value buffer,
+                                                value fr_array_left,
+                                                value fr_array_right,
+                                                value length) {
+  CAMLparam4(buffer, fr_array_left, fr_array_right, length);
+  blst_fr *tmp = (blst_fr *)(calloc(1, sizeof(blst_fr)));
+  blst_fr *buffer_c = Blst_fr_val(buffer);
+  int length_c = Int_val(length);
+  for (int i = 0; i < length_c; i++) {
+    blst_fr_mul(tmp, Blst_fr_val(Field(fr_array_left, i)),
+                Blst_fr_val(Field(fr_array_right, i)));
+    blst_fr_add(buffer_c, tmp, buffer_c);
+  }
+  free(tmp);
+  CAMLreturn(Val_unit);
+}

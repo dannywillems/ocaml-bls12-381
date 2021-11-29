@@ -200,6 +200,14 @@ module Fr : sig
   (** [compare a b] compares the elements [a] and [b] based on their bytes
       representation *)
   val compare : t -> t -> int
+
+  (** [inner_product_exn a b] returns the inner product of [a] and [b], i.e.
+      sum(a_i * b_i). Raise [Invalid_argument] if the arguments are not of the same
+      length *)
+  val inner_product_exn : t array -> t array -> t
+
+  (** Same than [inner_product_exn] but returns an option instead of raising an exception *)
+  val inner_product_opt : t array -> t array -> t option
 end
 
 module G1 : sig

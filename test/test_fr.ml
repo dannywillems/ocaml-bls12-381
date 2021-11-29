@@ -961,6 +961,30 @@ module OCamlComparisonOperators = struct
         test_case "(=) operator on one" `Quick test_fr_equal_with_one ] )
 end
 
+module InnerProduct = struct
+  let test_random_elements () =
+    let n = 1 + Random.int 1000 in
+    let a = Array.init n (fun _ -> Bls12_381.Fr.random ()) in
+    let b = Array.init n (fun _ -> Bls12_381.Fr.random ()) in
+    let exp_res =
+      Array.fold_left
+        Bls12_381.Fr.add
+        Bls12_381.Fr.zero
+        (Array.map2 Bls12_381.Fr.mul a b)
+    in
+    let res_exn = Bls12_381.Fr.inner_product_exn a b in
+    let res_opt = Bls12_381.Fr.inner_product_opt a b in
+    assert (Option.is_some res_opt) ;
+    assert (Bls12_381.Fr.eq exp_res res_exn) ;
+    assert (Bls12_381.Fr.eq exp_res (Option.get res_opt))
+
+  let get_tests () =
+    let open Alcotest in
+    ( "Inner product",
+      [test_case "with random elements" `Quick (repeat 100 test_random_elements)]
+    )
+end
+
 let () =
   let open Alcotest in
   run
@@ -971,5 +995,6 @@ let () =
     :: InplaceOperations.get_tests ()
     :: BytesRepresentation.get_tests ()
     :: OCamlComparisonOperators.get_tests ()
+    :: InnerProduct.get_tests ()
     :: StringRepresentation.get_tests ()
     :: FFT.get_tests () :: Tests.get_tests () )
