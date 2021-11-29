@@ -392,6 +392,8 @@ module Fr = struct
       let res = Stubs.allocate_fr () in
       Stubs.inner_product res a b (Array.length a) ;
       Some res
+
+  let of_int x = of_z (Z.of_int x)
 end
 
 include Fr

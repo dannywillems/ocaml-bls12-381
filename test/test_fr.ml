@@ -985,6 +985,51 @@ module InnerProduct = struct
     )
 end
 
+module AdditionalConstructors = struct
+  let test_positive_values_as_documented () =
+    let n = Random.int 1_000_000 in
+    let n_fr = Bls12_381.Fr.of_int n in
+    assert (Bls12_381.Fr.(eq (of_z (Z.of_int n)) n_fr))
+
+  let test_positive_values_use_decimal_representation () =
+    let n = Random.int 1_000_000 in
+    let n_fr = Bls12_381.Fr.of_int n in
+    assert (String.equal (Bls12_381.Fr.to_string n_fr) (string_of_int n))
+
+  let test_negative_values_as_documented () =
+    let n = -Random.int 1_000_000 in
+    let n_fr = Bls12_381.Fr.of_int n in
+    assert (Bls12_381.Fr.(eq (of_z (Z.of_int n)) n_fr))
+
+  let test_negative_values_use_decimal_representation () =
+    let n = -Random.int 1_000_000 in
+    let n_fr = Bls12_381.Fr.of_int n in
+    let res = Bls12_381.Fr.to_string n_fr in
+    let exp_res_z = Z.(add Bls12_381.Fr.order (of_int n)) in
+    let exp_res = Bls12_381.Fr.(to_string (of_z exp_res_z)) in
+    assert (String.equal res exp_res)
+
+  let get_tests () =
+    let open Alcotest in
+    ( "Additional Constructors",
+      [ test_case
+          "with positive values as documented"
+          `Quick
+          (repeat 100 test_positive_values_as_documented);
+        test_case
+          "with positive values use decimal represntation"
+          `Quick
+          (repeat 100 test_positive_values_use_decimal_representation);
+        test_case
+          "with negative values as documented"
+          `Quick
+          (repeat 100 test_negative_values_as_documented);
+        test_case
+          "with negeative values use decimal represntation"
+          `Quick
+          (repeat 100 test_negative_values_use_decimal_representation) ] )
+end
+
 let () =
   let open Alcotest in
   run
@@ -992,6 +1037,7 @@ let () =
     ( TestVector.get_tests ()
     :: ZRepresentation.get_tests ()
     :: Memory.get_tests ()
+    :: AdditionalConstructors.get_tests ()
     :: InplaceOperations.get_tests ()
     :: BytesRepresentation.get_tests ()
     :: OCamlComparisonOperators.get_tests ()

@@ -208,6 +208,11 @@ module Fr : sig
 
   (** Same than [inner_product_exn] but returns an option instead of raising an exception *)
   val inner_product_opt : t array -> t array -> t option
+
+  (** [of_int x] is equivalent to [of_z (Z.of_int x)]. If [x] is is negative,
+      returns the element [order - |x|].
+  *)
+  val of_int : int -> t
 end
 
 module G1 : sig
