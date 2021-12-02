@@ -6,7 +6,7 @@
  (modules bls12_381 fr g1 g2 pairing fq12 rustc_bls12_381_stubs rustc_bls12_381_bindings)
  (instrumentation (backend bisect_ppx))
  (private_modules Rustc_bls12_381_stubs Rustc_bls12_381_bindings)
- (libraries zarith ctypes ctypes.foreign bls12-381-gen)
+ (libraries zarith ctypes bls12-381-gen)
  (library_flags :standard -linkall -ccopt -pthread)
  (foreign_stubs
   (language c)
