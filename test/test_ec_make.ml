@@ -393,7 +393,7 @@ module MakeECProperties (G : G_SIG) = struct
   (** Returns the tests to be used with Alcotest *)
   let get_tests () =
     let open Alcotest in
-    ( "Field properties",
+    ( "Curve properties",
       [ test_case "check_bytes_random" `Quick (repeat 100 check_bytes_random);
         test_case "check_bytes_zero" `Quick (repeat 1 check_bytes_zero);
         test_case "check_bytes_one" `Quick (repeat 1 check_bytes_one);
