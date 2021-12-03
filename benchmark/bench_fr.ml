@@ -55,6 +55,11 @@ module MakeBenchBlst = struct
     Bench.Test.create ~name:"square root when exists" (fun () ->
         ignore (F.sqrt_opt ee))
 
+  let test_copy =
+    Bench.Test.create
+      ~name:"Copy zero, equivalent to a new allocation"
+      (fun () -> ignore F.(copy zero))
+
   let get_benches () =
     [ test_addition;
       test_multiplication;
@@ -66,7 +71,8 @@ module MakeBenchBlst = struct
       test_double;
       test_of_bytes_exn;
       test_to_bytes;
-      test_sqrt_opt ]
+      test_sqrt_opt;
+      test_copy ]
 end
 
 let () =
