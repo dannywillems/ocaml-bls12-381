@@ -29,9 +29,9 @@ let init s =
 let apply_perm ctxt = Stubs.apply_perm ctxt
 
 let get ctxt =
-  let a = Fr.Stubs.allocate_fr () in
-  let b = Fr.Stubs.allocate_fr () in
-  let c = Fr.Stubs.allocate_fr () in
+  let a = Fr.Stubs.mallocate_fr () in
+  let b = Fr.Stubs.mallocate_fr () in
+  let c = Fr.Stubs.mallocate_fr () in
   Stubs.get_state a b c ctxt ;
   [| a; b; c |]
 

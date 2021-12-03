@@ -29,7 +29,9 @@ module Stubs = struct
 
   external allocate_scalar : unit -> scalar = "allocate_scalar_stubs"
 
-  external allocate_fr : unit -> fr = "allocate_fr_stubs"
+  external callocate_fr : unit -> fr = "callocate_fr_stubs"
+
+  external mallocate_fr : unit -> fr = "mallocate_fr_stubs"
 
   external scalar_of_fr : scalar -> fr -> unit
     = "caml_blst_scalar_from_fr_stubs"
@@ -86,10 +88,10 @@ module Fr = struct
 
   type t = Stubs.fr
 
-  let global_buffer = Stubs.allocate_fr ()
+  let global_buffer = Stubs.callocate_fr ()
 
   let copy src =
-    let dst = Stubs.allocate_fr () in
+    let dst = Stubs.mallocate_fr () in
     Stubs.memcpy dst src ;
     dst
 
@@ -111,7 +113,7 @@ module Fr = struct
     if Bytes.length bs > size_in_bytes then None
     else
       let bs = pad_if_require bs in
-      let buffer = Stubs.allocate_fr () in
+      let buffer = Stubs.mallocate_fr () in
       let is_ok = Stubs.fr_of_bytes_le buffer bs in
       if is_ok then Some buffer else None
 
@@ -163,7 +165,7 @@ module Fr = struct
     if is_zero r then non_null_random ?state () else r
 
   let add x y =
-    let buffer = Stubs.allocate_fr () in
+    let buffer = Stubs.mallocate_fr () in
     Stubs.add buffer x y ;
     buffer
 
@@ -172,14 +174,14 @@ module Fr = struct
     Stubs.memcpy x global_buffer
 
   let add_bulk xs =
-    let buffer = Stubs.allocate_fr () in
+    let buffer = Stubs.callocate_fr () in
     List.iter (fun x -> Stubs.add buffer buffer x) xs ;
     buffer
 
   let ( + ) = add
 
   let mul x y =
-    let buffer = Stubs.allocate_fr () in
+    let buffer = Stubs.mallocate_fr () in
     Stubs.mul buffer x y ;
     buffer
 
@@ -188,7 +190,7 @@ module Fr = struct
     Stubs.memcpy x global_buffer
 
   let mul_bulk xs =
-    let buffer = Stubs.allocate_fr () in
+    let buffer = Stubs.callocate_fr () in
     Stubs.add buffer buffer one ;
     List.iter (fun x -> Stubs.mul buffer buffer x) xs ;
     buffer
@@ -198,7 +200,7 @@ module Fr = struct
   let inverse_opt x =
     if is_zero x then None
     else
-      let buffer = Stubs.allocate_fr () in
+      let buffer = Stubs.mallocate_fr () in
       Stubs.eucl_inverse buffer x ;
       Some buffer
 
@@ -211,7 +213,7 @@ module Fr = struct
     Stubs.memcpy x global_buffer
 
   let sub a b =
-    let buffer = Stubs.allocate_fr () in
+    let buffer = Stubs.mallocate_fr () in
     Stubs.sub buffer a b ;
     buffer
 
@@ -220,7 +222,7 @@ module Fr = struct
     Stubs.memcpy x global_buffer
 
   let square x =
-    let buffer = Stubs.allocate_fr () in
+    let buffer = Stubs.mallocate_fr () in
     Stubs.sqr buffer x ;
     buffer
 
@@ -375,14 +377,14 @@ module Fr = struct
     if Array.length a <> Array.length b then
       raise (Invalid_argument "Both parameters must be of the same length")
     else
-      let res = Stubs.allocate_fr () in
+      let res = Stubs.callocate_fr () in
       Stubs.inner_product res a b (Array.length a) ;
       res
 
   let inner_product_opt a b =
     if Array.length a <> Array.length b then None
     else
-      let res = Stubs.allocate_fr () in
+      let res = Stubs.callocate_fr () in
       Stubs.inner_product res a b (Array.length a) ;
       Some res
 
