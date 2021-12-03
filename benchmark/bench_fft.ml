@@ -35,21 +35,24 @@ let t1 =
   let points = Array.init n (fun _ -> Bls12_381.Fr.random ()) in
   let root = get_nth_root_of_unity logn in
   let domain = Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int i)) in
-  Core_bench.Bench.Test.create ~name:"FFT inplace on Fr elements" (fun () ->
+  let name = Printf.sprintf "FFT inplace on Fr elements, degree %d" n in
+  Core_bench.Bench.Test.create ~name (fun () ->
       ignore @@ Bls12_381.Fr.fft_inplace ~domain ~points)
 
 let t3 =
   let points = Array.init n (fun _ -> Bls12_381.Fr.random ()) in
   let root = get_nth_root_of_unity logn in
   let domain = Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int i)) in
-  Core_bench.Bench.Test.create ~name:"FFT with copy on Fr elements" (fun () ->
+  let name = Printf.sprintf "FFT with copy on Fr elements, degree %d" n in
+  Core_bench.Bench.Test.create ~name (fun () ->
       ignore @@ Bls12_381.Fr.fft ~domain ~points)
 
 let t2 =
   let points = Array.init n (fun _ -> Bls12_381.Fr.random ()) in
   let root = get_nth_root_of_unity logn in
   let domain = Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int i)) in
-  Core_bench.Bench.Test.create ~name:"IFFT with copy on Fr elements" (fun () ->
+  let name = Printf.sprintf "iFFT with copy on Fr elements, degree %d" n in
+  Core_bench.Bench.Test.create ~name (fun () ->
       ignore @@ Bls12_381.Fr.ifft ~domain ~points)
 
-let () = Core.Command.run (Core_bench.Bench.make_command [t1; t2; t3])
+let () = Core.Command.run (Core_bench.Bench.make_command [t1])
