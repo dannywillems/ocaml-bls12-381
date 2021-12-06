@@ -7,7 +7,7 @@
 
 (copy_files bindings/blst_bindings_stubs.c)
 
-(copy_files bindings/blst_fr_misc.h)
+(copy_files bindings/*.h)
 
 (copy_files libblst/bindings/blst.h)
 
@@ -63,6 +63,7 @@
     caml_fft_stubs)))
 
 (install
- (files libblst/bindings/blst.h libblst/bindings/blst_aux.h blst_fr_misc.h)
+ (files libblst/bindings/blst.h libblst/bindings/blst_aux.h blst_fr_misc.h
+   caml_bls12_381_stubs.h)
  (section lib)
  (package bls12-381-unix))

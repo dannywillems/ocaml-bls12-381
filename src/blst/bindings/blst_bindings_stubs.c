@@ -1,5 +1,6 @@
 #include "blst.h"
 #define CAML_NAME_SPACE
+#include "caml_bls12_381_stubs.h"
 #include "ocaml_integers.h"
 #include <caml/alloc.h>
 #include <caml/custom.h>
@@ -26,9 +27,6 @@
 #define Tag_some 0
 #define Is_none(v) ((v) == Val_none)
 #define Is_some(v) Is_block(v)
-
-// Fr
-#define Blst_fr_val(v) ((blst_fr *)Data_custom_val(v))
 
 static int blst_fr_compare(value s, value t) {
   u_int64_t s_uint64[4];
@@ -71,8 +69,6 @@ static struct custom_operations blst_fr_ops = {"blst_fr",
                                                custom_deserialize_default,
                                                custom_compare_ext_default,
                                                custom_fixed_length_default};
-
-#define Blst_scalar_val(v) ((blst_scalar *)Data_custom_val(v))
 
 static struct custom_operations blst_scalar_ops = {"blst_scalar",
                                                    custom_finalize_default,
@@ -257,9 +253,6 @@ CAMLprim value caml_blst_fr_memcpy_stubs(value dst, value src) {
   CAMLreturn(Val_unit);
 }
 
-// Fq
-#define Blst_fp_val(v) ((blst_fp *)Data_custom_val(v))
-
 static struct custom_operations blst_fp_ops = {"blst_fp",
                                                custom_finalize_default,
                                                custom_compare_default,
@@ -313,9 +306,6 @@ CAMLprim value caml_blst_fp_cneg_stubs(value buffer, value p, value b) {
   blst_fp_cneg(Blst_fp_val(buffer), Blst_fp_val(p), Bool_val(b));
   CAMLreturn(Val_unit);
 }
-
-// Fq2
-#define Blst_fp2_val(v) ((blst_fp2 *)Data_custom_val(v))
 
 static struct custom_operations blst_fp2_ops = {"blst_fp2",
                                                 custom_finalize_default,
@@ -413,10 +403,6 @@ CAMLprim value caml_blst_fp2_to_bytes_stubs(value buffer, value p) {
   blst_lendian_from_fp(out + 48, &p_c->fp[1]);
   CAMLreturn(Val_unit);
 }
-
-// Fq12
-
-#define Blst_fp12_val(v) ((blst_fp12 *)Data_custom_val(v))
 
 static struct custom_operations blst_fp12_ops = {"blst_fp12",
                                                  custom_finalize_default,
@@ -518,12 +504,6 @@ CAMLprim value caml_blst_fp12_of_bytes_stubs(value buffer, value p) {
 
   CAMLreturn(Val_unit);
 }
-
-// P1
-
-#define Blst_p1_val(v) ((blst_p1 *)Data_custom_val(v))
-
-#define Blst_p1_affine_val(v) ((blst_p1_affine *)Data_custom_val(v))
 
 static struct custom_operations blst_p1_ops = {"blst_p1",
                                                custom_finalize_default,
@@ -674,12 +654,6 @@ CAMLprim value caml_blst_p1_set_coordinates_stubs(value buffer, value x,
   buffer_c->y = *y_c;
   CAMLreturn(Val_unit);
 }
-
-// P2
-
-#define Blst_p2_val(v) ((blst_p2 *)Data_custom_val(v))
-
-#define Blst_p2_affine_val(v) ((blst_p2_affine *)Data_custom_val(v))
 
 static struct custom_operations blst_p2_ops = {"blst_p2",
                                                custom_finalize_default,
@@ -854,11 +828,6 @@ CAMLprim value caml_blst_final_exponentiation_stubs(value buffer, value p) {
   blst_final_exp(Blst_fp12_val(buffer), Blst_fp12_val(p));
   CAMLreturn(Val_unit);
 }
-
-// Signature
-
-// Fr
-#define Blst_pairing_val(v) ((blst_pairing *)Data_custom_val(v))
 
 static struct custom_operations blst_pairing_ops = {
     "blst_pairing",

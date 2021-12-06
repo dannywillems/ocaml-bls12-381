@@ -8,9 +8,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define Poseidon128_ctxt_val(v) (*((poseidon128_ctxt_t **)Data_custom_val(v)))
+#include "caml_bls12_381_stubs.h"
 
-#define Blst_fr_val(v) (*((blst_fr **)Data_custom_val(v)))
+#define Poseidon128_ctxt_val(v) (*((poseidon128_ctxt_t **)Data_custom_val(v)))
 
 static void finalize_free_poseidon128_ctxt(value v) {
   free(Poseidon128_ctxt_val(v));
