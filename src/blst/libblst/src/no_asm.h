@@ -309,6 +309,29 @@ inline limb_t add_n_check_mod_##bits(pow##bits ret, const pow##bits a, \
 
 ADD_N_CHECK_MOD_IMPL(256)
 
+static limb_t sub_n_check_mod_n(byte ret[], const byte a[], const byte b[],
+                                            const limb_t p[], size_t n)
+{
+    limb_t ret_[n], a_[n], b_[n], zero;
+
+    limbs_from_le_bytes(a_, a, sizeof(a_));
+    limbs_from_le_bytes(b_, b, sizeof(b_));
+
+    sub_mod_n(ret_, a_, b_, p, n);
+    zero = vec_is_zero(ret_, sizeof(ret_));
+
+    le_bytes_from_limbs(ret, ret_, sizeof(ret_));
+
+    return zero^1;
+}
+
+#define SUB_N_CHECK_MOD_IMPL(bits) \
+inline limb_t sub_n_check_mod_##bits(pow##bits ret, const pow##bits a, \
+                                     const pow##bits b, const vec##bits p) \
+{   return sub_n_check_mod_n(ret, a, b, p, NLIMBS(bits));   }
+
+SUB_N_CHECK_MOD_IMPL(256)
+
 static void from_mont_n(limb_t ret[], const limb_t a[],
                         const limb_t p[], limb_t n0, size_t n)
 {
@@ -800,8 +823,9 @@ static limb_t umul_n(limb_t ret[], const limb_t a[], limb_t b, size_t n)
     return hi;
 }
 
-static void smul_n_shift_n(limb_t ret[], const limb_t a[], limb_t *f_,
-                                         const limb_t b[], limb_t *g_, size_t n)
+static limb_t smul_n_shift_n(limb_t ret[], const limb_t a[], limb_t *f_,
+                                           const limb_t b[], limb_t *g_,
+                                           size_t n)
 {
     limb_t a_[n+1], b_[n+1], f, g, neg, carry, hi;
     size_t i;
@@ -837,6 +861,8 @@ static void smul_n_shift_n(limb_t ret[], const limb_t a[], limb_t *f_,
     *f_ = (*f_ ^ neg) - neg;
     *g_ = (*g_ ^ neg) - neg;
     (void)cneg_n(ret, ret, neg, n);
+
+    return neg;
 }
 
 static limb_t smul_2n(limb_t ret[], const limb_t u[], limb_t f,
@@ -879,8 +905,8 @@ static void ct_inverse_mod_n(limb_t ret[], const limb_t inp[],
     for (i=0; i<(2*n*LIMB_T_BITS)/(LIMB_T_BITS-2); i++) {
         ab_approximation_n(a_, a, b_, b, n);
         inner_loop_n(&fg, a_, b_, LIMB_T_BITS-2);
-        smul_n_shift_n(t, a, &fg.f0, b, &fg.g0, n);
-        smul_n_shift_n(b, a, &fg.f1, b, &fg.g1, n);
+        (void)smul_n_shift_n(t, a, &fg.f0, b, &fg.g0, n);
+        (void)smul_n_shift_n(b, a, &fg.f1, b, &fg.g1, n);
         vec_copy(a, t, sizeof(a));
         smul_2n(t, u, fg.f0, v, fg.g0, 2*n);
         smul_2n(v, u, fg.f1, v, fg.g1, 2*n);
@@ -912,6 +938,102 @@ inline void ct_inverse_mod_##bits(vec##bits ret, const vec##bits inp, \
 
 CT_INVERSE_MOD_IMPL(256)
 CT_INVERSE_MOD_IMPL(384)
+
+/*
+ * Copy of inner_loop_n above, but with |L| updates.
+ */
+static limb_t legendre_loop_n(limb_t L, factors *fg, const limb_t a_[2],
+                              const limb_t b_[2], size_t n)
+{
+    llimb_t limbx;
+    limb_t f0 = 1, g0 = 0, f1 = 0, g1 = 1;
+    limb_t a_lo, a_hi, b_lo, b_hi, t_lo, t_hi, odd, borrow, xorm;
+
+    a_lo = a_[0], a_hi = a_[1];
+    b_lo = b_[0], b_hi = b_[1];
+
+    while(n--) {
+        odd = 0 - (a_lo&1);
+
+        /* a_ -= b_ if a_ is odd */
+        t_lo = a_lo, t_hi = a_hi;
+        limbx = a_lo - (llimb_t)(b_lo & odd);
+        a_lo = (limb_t)limbx;
+        borrow = (limb_t)(limbx >> LIMB_T_BITS) & 1;
+        limbx = a_hi - ((llimb_t)(b_hi & odd) + borrow);
+        a_hi = (limb_t)limbx;
+        borrow = (limb_t)(limbx >> LIMB_T_BITS);
+
+        L += ((t_lo & b_lo) >> 1) & borrow;
+
+        /* negate a_-b_ if it borrowed */
+        a_lo ^= borrow;
+        a_hi ^= borrow;
+        limbx = a_lo + (llimb_t)(borrow & 1);
+        a_lo = (limb_t)limbx;
+        a_hi += (limb_t)(limbx >> LIMB_T_BITS) & 1;
+
+        /* b_=a_ if a_-b_ borrowed */
+        b_lo = ((t_lo ^ b_lo) & borrow) ^ b_lo;
+        b_hi = ((t_hi ^ b_hi) & borrow) ^ b_hi;
+
+        /* exchange f0 and f1 if a_-b_ borrowed */
+        xorm = (f0 ^ f1) & borrow;
+        f0 ^= xorm;
+        f1 ^= xorm;
+
+        /* exchange g0 and g1 if a_-b_ borrowed */
+        xorm = (g0 ^ g1) & borrow;
+        g0 ^= xorm;
+        g1 ^= xorm;
+
+        /* subtract if a_ was odd */
+        f0 -= f1 & odd;
+        g0 -= g1 & odd;
+
+        f1 <<= 1;
+        g1 <<= 1;
+        a_lo >>= 1; a_lo |= a_hi << (LIMB_T_BITS-1);
+        a_hi >>= 1;
+
+        L += (b_lo + 2) >> 2;
+    }
+
+    fg->f0 = f0, fg->g0 = g0, fg->f1 = f1, fg->g1 = g1;
+
+    return L;
+}
+
+static bool_t ct_is_sqr_mod_n(const limb_t inp[], const limb_t mod[], size_t n)
+{
+    limb_t a[n], b[n], t[n];
+    limb_t a_[2], b_[2], neg, L = 0;
+    factors fg;
+    size_t i;
+
+    vec_copy(a, inp, sizeof(a));
+    vec_copy(b, mod, sizeof(b));
+
+    for (i=0; i<(2*n*LIMB_T_BITS)/(LIMB_T_BITS-2); i++) {
+        ab_approximation_n(a_, a, b_, b, n);
+        L = legendre_loop_n(L, &fg, a_, b_, LIMB_T_BITS-2);
+        neg = smul_n_shift_n(t, a, &fg.f0, b, &fg.g0, n);
+        (void)smul_n_shift_n(b, a, &fg.f1, b, &fg.g1, n);
+        vec_copy(a, t, sizeof(a));
+        L += (b[0] >> 1) & neg;
+    }
+
+    L = legendre_loop_n(L, &fg, a, b, (2*n*LIMB_T_BITS)%(LIMB_T_BITS-2));
+
+    return (L & 1) ^ 1;
+}
+
+#define CT_IS_SQR_MOD_IMPL(bits) \
+inline bool_t ct_is_square_mod_##bits(const vec##bits inp, \
+                                      const vec##bits mod) \
+{   return ct_is_sqr_mod_n(inp, mod, NLIMBS(bits));   }
+
+CT_IS_SQR_MOD_IMPL(384)
 
 /*
  * |div_top| points at two most significant limbs of the dividend, |d_hi|

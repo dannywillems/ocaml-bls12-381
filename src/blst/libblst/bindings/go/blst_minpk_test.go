@@ -127,7 +127,7 @@ func TestSignVerifyMinPk(t *testing.T) {
     }
 
     // Verify serialized inputs
-    if !new(SignatureMinPk).AggregateVerifyCompressed(sig0.Serialize(), true,
+    if !new(SignatureMinPk).AggregateVerifyCompressed(sig0.Compress(), true,
                                                       [][]byte{pk0.Serialize()},
                                                       false,
                                                       []Message{msg0}, dstMinPk) {
@@ -220,14 +220,10 @@ func TestSignVerifyAggregateMinPk(t *testing.T) {
             t.Errorf("failed to not verify size %d", size)
         }
 
-        // Test compressed/serialized signature aggregation
+        // Test compressed signature aggregation
         compSigs := make([][]byte, size)
         for i := 0; i < size; i++ {
-            if (i % 2) == 0 {
-                compSigs[i] = sigs[i].Compress()
-            } else {
-                compSigs[i] = sigs[i].Serialize()
-            }
+            compSigs[i] = sigs[i].Compress()
         }
         agProj = new(AggregateSignatureMinPk)
         if !agProj.AggregateCompressed(compSigs, false) {
@@ -621,4 +617,81 @@ func TestEmptySignatureMinPk(t *testing.T) {
     if new(SignatureMinPk).VerifyCompressed(emptySig, true, pk.Compress(), false, msg, dstMinPk) {
         t.Errorf("failed to NOT verify empty signature")
     }
+}
+
+func TestMultiScalarP1(t *testing.T) {
+    const npoints = 1027
+    scalars := make([]byte, npoints*16)
+    _, err := rand.Read(scalars[:])
+    if err != nil {
+        t.Errorf(err.Error())
+	return
+    }
+    points := make([]P1, npoints)
+    refs   := make([]P1, npoints)
+    generator := P1Generator()
+    for i := range points {
+        points[i] = *generator.Mult(scalars[i*4:(i+1)*4])
+        refs[i]   = *points[i].Mult(scalars[i*16:(i+1)*16], 128)
+    }
+    ref := P1s(refs).Add()
+    ret := P1s(points).Mult(scalars, 128)
+    if !ref.Equals(ret) {
+        t.Errorf("failed self-consistency multi-scalar test")
+    }
+}
+
+func BenchmarkMultiScalarP1(b *testing.B) {
+    const npoints = 200000
+    scalars := make([]byte, npoints*32)
+    _, err := rand.Read(scalars[:])
+    if err != nil {
+        b.Fatal(err.Error())
+    }
+    temp := make([]P1, npoints)
+    generator := P1Generator()
+    for i := range temp {
+        temp[i] = *generator.Mult(scalars[i*4:(i+1)*4])
+    }
+    points := P1s(temp).ToAffine()
+    run := func(size int) func(b *testing.B) {
+        return func(b *testing.B) {
+            for i:=0; i<b.N; i++ {
+                P1Affines(points[:size]).Mult(scalars, 255)
+            }
+        }
+    }
+    b.Run(fmt.Sprintf("%d",npoints/8), run(npoints/8))
+    b.Run(fmt.Sprintf("%d",npoints/4), run(npoints/4))
+    b.Run(fmt.Sprintf("%d",npoints/2), run(npoints/2))
+    b.Run(fmt.Sprintf("%d",npoints), run(npoints))
+}
+
+func BenchmarkToP1Affines(b *testing.B) {
+    const npoints = 32000
+    scalars := make([]byte, npoints*32)
+    _, err := rand.Read(scalars[:])
+    if err != nil {
+        b.Fatal(err.Error())
+    }
+    temp := make([]P1, npoints)
+    generator := P1Generator()
+    for i := range temp {
+        temp[i] = *generator.Mult(scalars[i*4:(i+1)*4])
+    }
+    scratch := make([]P1Affine, npoints)
+    run := func(size int) func(b *testing.B) {
+        return func(b *testing.B) {
+            b.ResetTimer()
+            for i:=0; i<b.N; i++ {
+                P1s(temp[:size]).ToAffine(scratch)
+            }
+        }
+    }
+    b.Run(fmt.Sprintf("%d",npoints/128), run(npoints/128))
+    b.Run(fmt.Sprintf("%d",npoints/64), run(npoints/64))
+    b.Run(fmt.Sprintf("%d",npoints/32), run(npoints/32))
+    b.Run(fmt.Sprintf("%d",npoints/16), run(npoints/16))
+    b.Run(fmt.Sprintf("%d",npoints/4), run(npoints/4))
+    b.Run(fmt.Sprintf("%d",npoints), run(npoints))
 }

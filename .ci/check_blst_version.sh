@@ -1,4 +1,4 @@
-COMMIT="095a8c53787d6c91b725152ebfbbf33acf05a931"
+COMMIT="bf24f2bce2a137afa2bbc52f0bbb44cc8ce5680b"
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd -P)"
 TMP_DIRECTORY=$(mktemp -d)

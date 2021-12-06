@@ -145,11 +145,11 @@ static bool_t POINTonE2_affine_on_curve(const POINTonE2_affine *p)
 
     sqr_fp2(YY, p->Y);                                  /* Y^2 */
 
-    return vec_is_equal(XXX, YY, sizeof(XXX)) | vec_is_zero(p, sizeof(*p));
+    return vec_is_equal(XXX, YY, sizeof(XXX));
 }
 
 int blst_p2_affine_on_curve(const POINTonE2_affine *p)
-{   return (int)POINTonE2_affine_on_curve(p);   }
+{   return (int)(POINTonE2_affine_on_curve(p) | vec_is_zero(p, sizeof(*p)));   }
 
 static bool_t POINTonE2_on_curve(const POINTonE2 *p)
 {
@@ -309,8 +309,8 @@ static limb_t POINTonE2_Uncompress_BE(POINTonE2_affine *out,
     return sgn0_pty_mont_384x(out->Y, BLS12_381_P, p0);
 }
 
-static BLST_ERROR POINTonE2_Uncompress(POINTonE2_affine *out,
-                                       const unsigned char in[96])
+static BLST_ERROR POINTonE2_Uncompress_Z(POINTonE2_affine *out,
+                                         const unsigned char in[96])
 {
     unsigned char in0 = in[0];
     limb_t sgn0_pty;
@@ -340,7 +340,7 @@ static BLST_ERROR POINTonE2_Uncompress(POINTonE2_affine *out,
 }
 
 BLST_ERROR blst_p2_uncompress(POINTonE2_affine *out, const unsigned char in[96])
-{   return POINTonE2_Uncompress(out, in);   }
+{   return POINTonE2_Uncompress_Z(out, in);   }
 
 static BLST_ERROR POINTonE2_Deserialize_BE(POINTonE2_affine *out,
                                            const unsigned char in[192])
@@ -384,7 +384,8 @@ static BLST_ERROR POINTonE2_Deserialize_BE(POINTonE2_affine *out,
     return BLST_SUCCESS;
 }
 
-int blst_p2_deserialize(POINTonE2_affine *out, const unsigned char in[192])
+static BLST_ERROR POINTonE2_Deserialize_Z(POINTonE2_affine *out,
+                                          const unsigned char in[192])
 {
     unsigned char in0 = in[0];
 
@@ -392,7 +393,7 @@ int blst_p2_deserialize(POINTonE2_affine *out, const unsigned char in[192])
         return POINTonE2_Deserialize_BE(out, in);
 
     if (in0 & 0x80)             /* compressed bit */
-        return POINTonE2_Uncompress(out, in);
+        return POINTonE2_Uncompress_Z(out, in);
 
     if (in0 & 0x40) {           /* infinity bit */
         if (byte_is_zero(in0 & 0x3f) & bytes_are_zero(in+1, 191)) {
@@ -403,6 +404,10 @@ int blst_p2_deserialize(POINTonE2_affine *out, const unsigned char in[192])
 
     return BLST_BAD_ENCODING;
 }
+
+BLST_ERROR blst_p2_deserialize(POINTonE2_affine *out,
+                               const unsigned char in[192])
+{   return POINTonE2_Deserialize_Z(out, in);   }
 
 #include "ec_ops.h"
 POINT_DADD_IMPL(POINTonE2, 384x, fp2)
@@ -599,6 +604,15 @@ void blst_p2_mult(POINTonE2 *out, const POINTonE2 *a,
     } else {    /* should never be the case, added for formal completeness */
         POINTonE2_mult_w5(out, a, scalar, nbits);
     }
+}
+
+void blst_p2_unchecked_mult(POINTonE2 *out, const POINTonE2 *a,
+                                            const byte *scalar, size_t nbits)
+{
+    if (nbits)
+        POINTonE2_mult_w4(out, a, scalar, nbits);
+    else
+        vec_zero(out, sizeof(*out));
 }
 
 int blst_p2_affine_is_equal(const POINTonE2_affine *a,

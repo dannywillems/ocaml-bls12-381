@@ -6,22 +6,73 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 
-use std::any::Any;
-use std::mem::transmute;
-use std::sync::{atomic::*, mpsc::channel, Arc, Mutex, Once};
-use std::{ptr, slice};
-use threadpool::ThreadPool;
+use core::any::Any;
+use core::mem::MaybeUninit;
+use core::ptr;
+use core::sync::atomic::*;
+use std::sync::{mpsc::channel, Arc, Barrier};
 use zeroize::Zeroize;
 
-fn da_pool() -> ThreadPool {
-    static INIT: Once = Once::new();
-    static mut POOL: *const Mutex<ThreadPool> = 0 as *const Mutex<ThreadPool>;
+#[cfg(not(feature = "no-threads"))]
+trait ThreadPoolExt {
+    fn joined_execute<'any, F>(&self, job: F)
+    where
+        F: FnOnce() + Send + 'any;
+}
+#[cfg(not(feature = "no-threads"))]
+mod mt {
+    use super::*;
+    use core::mem::transmute;
+    use std::sync::{Mutex, Once};
+    use threadpool::ThreadPool;
 
-    INIT.call_once(|| {
-        let pool = Mutex::new(ThreadPool::default());
-        unsafe { POOL = transmute(Box::new(pool)) };
-    });
-    unsafe { (*POOL).lock().unwrap().clone() }
+    pub fn da_pool() -> ThreadPool {
+        static INIT: Once = Once::new();
+        static mut POOL: *const Mutex<ThreadPool> =
+            0 as *const Mutex<ThreadPool>;
+
+        INIT.call_once(|| {
+            let pool = Mutex::new(ThreadPool::default());
+            unsafe { POOL = transmute(Box::new(pool)) };
+        });
+        unsafe { (*POOL).lock().unwrap().clone() }
+    }
+
+    type Thunk<'any> = Box<dyn FnOnce() + Send + 'any>;
+
+    impl ThreadPoolExt for ThreadPool {
+        fn joined_execute<'scope, F>(&self, job: F)
+        where
+            F: FnOnce() + Send + 'scope,
+        {
+            // Bypass 'lifetime limitations by brute force. It works,
+            // because we explicitly join the threads...
+            self.execute(unsafe {
+                transmute::<Thunk<'scope>, Thunk<'static>>(Box::new(job))
+            })
+        }
+    }
+}
+
+#[cfg(feature = "no-threads")]
+mod mt {
+    pub struct EmptyPool {}
+
+    pub fn da_pool() -> EmptyPool {
+        EmptyPool {}
+    }
+
+    impl EmptyPool {
+        pub fn max_count(&self) -> usize {
+            1
+        }
+        pub fn joined_execute<'scope, F>(&self, job: F)
+        where
+            F: FnOnce() + Send + 'scope,
+        {
+            job()
+        }
+    }
 }
 
 include!("bindings.rs");
@@ -59,6 +110,72 @@ impl Default for blst_fp12 {
 impl PartialEq for blst_fp12 {
     fn eq(&self, other: &Self) -> bool {
         unsafe { blst_fp12_is_equal(self, other) }
+    }
+}
+
+impl core::ops::Mul for blst_fp12 {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        let mut out = MaybeUninit::<blst_fp12>::uninit();
+        unsafe {
+            blst_fp12_mul(out.as_mut_ptr(), &self, &other);
+            out.assume_init()
+        }
+    }
+}
+
+impl core::ops::MulAssign for blst_fp12 {
+    fn mul_assign(&mut self, other: Self) {
+        unsafe { blst_fp12_mul(self, self, &other) }
+    }
+}
+
+impl blst_fp12 {
+    pub fn miller_loop(q: &blst_p2_affine, p: &blst_p1_affine) -> Self {
+        let mut out = MaybeUninit::<blst_fp12>::uninit();
+        unsafe {
+            blst_miller_loop(out.as_mut_ptr(), q, p);
+            out.assume_init()
+        }
+    }
+
+    pub fn final_exp(&self) -> Self {
+        let mut out = MaybeUninit::<blst_fp12>::uninit();
+        unsafe {
+            blst_final_exp(out.as_mut_ptr(), self);
+            out.assume_init()
+        }
+    }
+
+    pub fn in_group(&self) -> bool {
+        unsafe { blst_fp12_in_group(self) }
+    }
+
+    pub fn finalverify(a: &Self, b: &Self) -> bool {
+        unsafe { blst_fp12_finalverify(a, b) }
+    }
+}
+
+impl blst_scalar {
+    pub fn hash_to(msg: &[u8], dst: &[u8]) -> Option<Self> {
+        unsafe {
+            let mut out = <Self>::default();
+            let mut elem: [u8; 48] = MaybeUninit::uninit().assume_init();
+            blst_expand_message_xmd(
+                elem.as_mut_ptr(),
+                elem.len(),
+                msg.as_ptr(),
+                msg.len(),
+                dst.as_ptr(),
+                dst.len(),
+            );
+            if blst_scalar_from_be_bytes(&mut out, elem.as_ptr(), elem.len()) {
+                Some(out)
+            } else {
+                None
+            }
+        }
     }
 }
 
@@ -246,6 +363,14 @@ impl Pairing {
                 },
             )
         }
+    }
+
+    pub fn raw_aggregate(&mut self, q: &blst_p2_affine, p: &blst_p1_affine) {
+        unsafe { blst_pairing_raw_aggregate(self.ctx(), q, p) }
+    }
+
+    pub fn as_fp12(&mut self) -> blst_fp12 {
+        unsafe { *blst_pairing_as_fp12(self.ctx()) }
     }
 }
 
@@ -702,42 +827,19 @@ macro_rules! sig_variant_impl {
 
                 // TODO - check msg uniqueness?
 
-                let pool = da_pool();
+                let pool = mt::da_pool();
                 let (tx, rx) = channel();
                 let counter = Arc::new(AtomicUsize::new(0));
                 let valid = Arc::new(AtomicBool::new(true));
 
-                // Bypass 'lifetime limitations by brute force. It works,
-                // because we explicitly join the threads...
-                let raw_pks = unsafe {
-                    transmute::<*const &PublicKey, usize>(pks.as_ptr())
-                };
-                let raw_msgs =
-                    unsafe { transmute::<*const &[u8], usize>(msgs.as_ptr()) };
-                let dst =
-                    unsafe { slice::from_raw_parts(dst.as_ptr(), dst.len()) };
-
-                let n_workers = std::cmp::min(pool.max_count(), n_elems);
+                let n_workers = core::cmp::min(pool.max_count(), n_elems);
                 for _ in 0..n_workers {
                     let tx = tx.clone();
                     let counter = counter.clone();
                     let valid = valid.clone();
 
-                    pool.execute(move || {
+                    pool.joined_execute(move || {
                         let mut pairing = Pairing::new($hash_or_encode, dst);
-                        // reconstruct input slices...
-                        let msgs = unsafe {
-                            slice::from_raw_parts(
-                                transmute::<usize, *const &[u8]>(raw_msgs),
-                                n_elems,
-                            )
-                        };
-                        let pks = unsafe {
-                            slice::from_raw_parts(
-                                transmute::<usize, *const &PublicKey>(raw_pks),
-                                n_elems,
-                            )
-                        };
 
                         while valid.load(Ordering::Relaxed) {
                             let work = counter.fetch_add(1, Ordering::Relaxed);
@@ -845,62 +947,19 @@ macro_rules! sig_variant_impl {
 
                 // TODO - check msg uniqueness?
 
-                let pool = da_pool();
+                let pool = mt::da_pool();
                 let (tx, rx) = channel();
                 let counter = Arc::new(AtomicUsize::new(0));
                 let valid = Arc::new(AtomicBool::new(true));
 
-                // Bypass 'lifetime limitations by brute force. It works,
-                // because we explicitly join the threads...
-                let raw_pks = unsafe {
-                    transmute::<*const &PublicKey, usize>(pks.as_ptr())
-                };
-                let raw_sigs = unsafe {
-                    transmute::<*const &Signature, usize>(sigs.as_ptr())
-                };
-                let raw_rands = unsafe {
-                    transmute::<*const blst_scalar, usize>(rands.as_ptr())
-                };
-                let raw_msgs =
-                    unsafe { transmute::<*const &[u8], usize>(msgs.as_ptr()) };
-                let dst =
-                    unsafe { slice::from_raw_parts(dst.as_ptr(), dst.len()) };
-
-                let n_workers = std::cmp::min(pool.max_count(), n_elems);
+                let n_workers = core::cmp::min(pool.max_count(), n_elems);
                 for _ in 0..n_workers {
                     let tx = tx.clone();
                     let counter = counter.clone();
                     let valid = valid.clone();
 
-                    pool.execute(move || {
+                    pool.joined_execute(move || {
                         let mut pairing = Pairing::new($hash_or_encode, dst);
-                        // reconstruct input slices...
-                        let rands = unsafe {
-                            slice::from_raw_parts(
-                                transmute::<usize, *const blst_scalar>(
-                                    raw_rands,
-                                ),
-                                n_elems,
-                            )
-                        };
-                        let msgs = unsafe {
-                            slice::from_raw_parts(
-                                transmute::<usize, *const &[u8]>(raw_msgs),
-                                n_elems,
-                            )
-                        };
-                        let sigs = unsafe {
-                            slice::from_raw_parts(
-                                transmute::<usize, *const &Signature>(raw_sigs),
-                                n_elems,
-                            )
-                        };
-                        let pks = unsafe {
-                            slice::from_raw_parts(
-                                transmute::<usize, *const &PublicKey>(raw_pks),
-                                n_elems,
-                            )
-                        };
 
                         // TODO - engage multi-point mul-n-add for larger
                         // amount of inputs...
@@ -1372,8 +1431,7 @@ macro_rules! sig_variant_impl {
                         // Reject zero as it is used for multiplication.
                         vals[0] = rng.next_u64();
                     }
-                    let mut rand_i =
-                        std::mem::MaybeUninit::<blst_scalar>::uninit();
+                    let mut rand_i = MaybeUninit::<blst_scalar>::uninit();
                     unsafe {
                         blst_scalar_from_uint64(
                             rand_i.as_mut_ptr(),
@@ -1552,4 +1610,350 @@ pub mod min_sig {
         blst_p1_affine_is_inf,
         blst_p1_in_g1,
     );
+}
+
+struct tile {
+    x: usize,
+    dx: usize,
+    y: usize,
+    dy: usize,
+}
+
+// Minimalist core::cell::Cell stand-in, but with Sync marker, which
+// makes it possible to pass it to multiple threads. It works, because
+// *here* each Cell is written only once and by just one thread.
+#[repr(transparent)]
+struct Cell<T: ?Sized> {
+    value: T,
+}
+unsafe impl<T: ?Sized + Sync> Sync for Cell<T> {}
+impl<T> Cell<T> {
+    pub fn as_ptr(&self) -> *mut T {
+        &self.value as *const T as *mut T
+    }
+}
+
+macro_rules! pippenger_mult_impl {
+    (
+        $points:ident,
+        $point:ty,
+        $point_affine:ty,
+        $to_affines:ident,
+        $scratch_sizeof:ident,
+        $multi_scalar_mult:ident,
+        $tile_mult:ident,
+        $add_or_double:ident,
+        $double:ident,
+        $test_mod:ident,
+        $generator:ident,
+        $mult:ident,
+    ) => {
+        pub struct $points {
+            points: Vec<$point_affine>,
+        }
+
+        impl $points {
+            pub fn from(points: &[$point]) -> Self {
+                let npoints = points.len();
+                let mut ret = Self {
+                    points: Vec::with_capacity(npoints),
+                };
+                unsafe { ret.points.set_len(npoints) };
+
+                let pool = mt::da_pool();
+                let ncpus = pool.max_count();
+                if ncpus < 2 || npoints < 768 {
+                    let p: [*const $point; 2] = [&points[0], ptr::null()];
+                    unsafe { $to_affines(&mut ret.points[0], &p[0], npoints) };
+                    return ret;
+                }
+
+                let mut nslices = (npoints + 511) / 512;
+                nslices = core::cmp::min(nslices, ncpus);
+                let wg = Arc::new((Barrier::new(2), AtomicUsize::new(nslices)));
+
+                let (mut delta, mut rem) =
+                    (npoints / nslices + 1, npoints % nslices);
+                let mut x = 0usize;
+                while x < npoints {
+                    let out = &mut ret.points[x];
+                    let inp = &points[x];
+
+                    delta -= (rem == 0) as usize;
+                    rem -= 1;
+                    x += delta;
+
+                    let wg = wg.clone();
+                    pool.joined_execute(move || {
+                        let p: [*const $point; 2] = [inp, ptr::null()];
+                        unsafe { $to_affines(out, &p[0], delta) };
+                        if wg.1.fetch_sub(1, Ordering::AcqRel) == 1 {
+                            wg.0.wait();
+                        }
+                    });
+                }
+                wg.0.wait();
+
+                ret
+            }
+
+            pub fn mult(&self, scalars: &[u8], nbits: usize) -> $point {
+                let npoints = self.points.len();
+                let nbytes = (nbits + 7) / 8;
+
+                if scalars.len() < nbytes * npoints {
+                    panic!("scalars length mismatch");
+                }
+
+                let pool = mt::da_pool();
+                let ncpus = pool.max_count();
+                if ncpus < 2 || npoints < 32 {
+                    let p: [*const $point_affine; 2] =
+                        [&self.points[0], ptr::null()];
+                    let s: [*const u8; 2] = [&scalars[0], ptr::null()];
+
+                    unsafe {
+                        let mut scratch: Vec<u64> =
+                            Vec::with_capacity($scratch_sizeof(npoints) / 8);
+                        scratch.set_len(scratch.capacity());
+                        let mut ret = <$point>::default();
+                        $multi_scalar_mult(
+                            &mut ret,
+                            &p[0],
+                            npoints,
+                            &s[0],
+                            nbits,
+                            &mut scratch[0],
+                        );
+                        return ret;
+                    }
+                }
+
+                let (nx, ny, window) =
+                    breakdown(nbits, pippenger_window_size(npoints), ncpus);
+
+                // |grid[]| holds "coordinates" and place for result
+                let mut grid: Vec<(tile, Cell<$point>)> =
+                    Vec::with_capacity(nx * ny);
+                unsafe { grid.set_len(grid.capacity()) };
+                let dx = npoints / nx;
+                let mut y = window * (ny - 1);
+                let mut total = 0usize;
+
+                while total < nx {
+                    grid[total].0.x = total * dx;
+                    grid[total].0.dx = dx;
+                    grid[total].0.y = y;
+                    grid[total].0.dy = nbits - y;
+                    total += 1;
+                }
+                grid[total - 1].0.dx = npoints - grid[total - 1].0.x;
+                while y != 0 {
+                    y -= window;
+                    for i in 0..nx {
+                        grid[total].0.x = grid[i].0.x;
+                        grid[total].0.dx = grid[i].0.dx;
+                        grid[total].0.y = y;
+                        grid[total].0.dy = window;
+                        total += 1;
+                    }
+                }
+                let grid = &grid[..];
+
+                let points = &self.points[..];
+                let sz = unsafe { $scratch_sizeof(0) / 8 };
+
+                let mut row_sync: Vec<AtomicUsize> = Vec::with_capacity(ny);
+                row_sync.resize_with(ny, Default::default);
+                let row_sync = Arc::new(row_sync);
+                let counter = Arc::new(AtomicUsize::new(0));
+                let (tx, rx) = channel();
+                let n_workers = core::cmp::min(ncpus, total);
+                for _ in 0..n_workers {
+                    let tx = tx.clone();
+                    let counter = counter.clone();
+                    let row_sync = row_sync.clone();
+
+                    pool.joined_execute(move || {
+                        let mut scratch = vec![0u64; sz << (window - 1)];
+                        let mut p: [*const $point_affine; 2] =
+                            [ptr::null(), ptr::null()];
+                        let mut s: [*const u8; 2] = [ptr::null(), ptr::null()];
+
+                        loop {
+                            let work = counter.fetch_add(1, Ordering::Relaxed);
+                            if work >= total {
+                                break;
+                            }
+                            let x = grid[work].0.x;
+                            let y = grid[work].0.y;
+
+                            p[0] = &points[x];
+                            s[0] = &scalars[x * nbytes];
+                            unsafe {
+                                $tile_mult(
+                                    grid[work].1.as_ptr(),
+                                    &p[0],
+                                    grid[work].0.dx,
+                                    &s[0],
+                                    nbits,
+                                    &mut scratch[0],
+                                    y,
+                                    window,
+                                );
+                            }
+                            if row_sync[y / window]
+                                .fetch_add(1, Ordering::AcqRel)
+                                == nx - 1
+                            {
+                                tx.send(y).expect("disaster");
+                            }
+                        }
+                    });
+                }
+
+                let mut ret = <$point>::default();
+                let mut rows = vec![false; ny];
+                let mut row = 0usize;
+                for _ in 0..ny {
+                    let mut y = rx.recv().unwrap();
+                    rows[y / window] = true;
+                    while grid[row].0.y == y {
+                        while row < total && grid[row].0.y == y {
+                            unsafe {
+                                $add_or_double(
+                                    &mut ret,
+                                    &ret,
+                                    grid[row].1.as_ptr(),
+                                );
+                            }
+                            row += 1;
+                        }
+                        if y == 0 {
+                            break;
+                        }
+                        for _ in 0..window {
+                            unsafe { $double(&mut ret, &ret) };
+                        }
+                        y -= window;
+                        if !rows[y / window] {
+                            break;
+                        }
+                    }
+                }
+                ret
+            }
+        }
+
+        #[cfg(test)]
+        mod $test_mod {
+            use super::*;
+            use rand::{RngCore, SeedableRng};
+            use rand_chacha::ChaCha20Rng;
+
+            #[test]
+            fn test_mult() {
+                const npoints: usize = 2000;
+                const nbits: usize = 160;
+                const nbytes: usize = (nbits + 7) / 8;
+
+                let mut scalars = [0u8; nbytes * npoints];
+                ChaCha20Rng::from_seed([0u8; 32]).fill_bytes(&mut scalars);
+
+                let mut points: Vec<$point> = Vec::with_capacity(npoints);
+                unsafe { points.set_len(points.capacity()) };
+
+                let mut naive = <$point>::default();
+                for i in 0..npoints {
+                    unsafe {
+                        let mut t = <$point>::default();
+                        $mult(
+                            &mut points[i],
+                            $generator(),
+                            &scalars[i * nbytes],
+                            core::cmp::min(32, nbits),
+                        );
+                        $mult(&mut t, &points[i], &scalars[i * nbytes], nbits);
+                        $add_or_double(&mut naive, &naive, &t);
+                    }
+                }
+
+                let points = $points::from(&points);
+                assert_eq!(naive, points.mult(&scalars, nbits));
+            }
+        }
+    };
+}
+
+pippenger_mult_impl!(
+    p1_affines,
+    blst_p1,
+    blst_p1_affine,
+    blst_p1s_to_affine,
+    blst_p1s_mult_pippenger_scratch_sizeof,
+    blst_p1s_mult_pippenger,
+    blst_p1s_tile_pippenger,
+    blst_p1_add_or_double,
+    blst_p1_double,
+    p1_multi_scalar,
+    blst_p1_generator,
+    blst_p1_mult,
+);
+
+pippenger_mult_impl!(
+    p2_affines,
+    blst_p2,
+    blst_p2_affine,
+    blst_p2s_to_affine,
+    blst_p2s_mult_pippenger_scratch_sizeof,
+    blst_p2s_mult_pippenger,
+    blst_p2s_tile_pippenger,
+    blst_p2_add_or_double,
+    blst_p2_double,
+    p2_multi_scalar,
+    blst_p2_generator,
+    blst_p2_mult,
+);
+
+fn num_bits(l: usize) -> usize {
+    8 * core::mem::size_of_val(&l) - l.leading_zeros() as usize
+}
+
+fn breakdown(
+    nbits: usize,
+    window: usize,
+    ncpus: usize,
+) -> (usize, usize, usize) {
+    let mut nx: usize;
+    let mut wnd: usize;
+
+    if nbits > window * ncpus {
+        nx = 1;
+        wnd = window - num_bits(ncpus / 4);
+    } else {
+        nx = 2;
+        wnd = window - 2;
+        while (nbits / wnd + 1) * nx < ncpus {
+            nx += 1;
+            wnd = window - num_bits(3 * nx / 2);
+        }
+        nx -= 1;
+        wnd = window - num_bits(3 * nx / 2);
+    }
+    let ny = nbits / wnd + 1;
+    wnd = nbits / ny + 1;
+
+    (nx, ny, wnd)
+}
+
+fn pippenger_window_size(npoints: usize) -> usize {
+    let wbits = num_bits(npoints);
+
+    if wbits > 13 {
+        return wbits - 4;
+    }
+    if wbits > 5 {
+        return wbits - 3;
+    }
+    2
 }

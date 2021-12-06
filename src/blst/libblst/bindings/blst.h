@@ -47,6 +47,7 @@ typedef enum {
     BLST_AGGR_TYPE_MISMATCH,
     BLST_VERIFY_FAIL,
     BLST_PK_IS_INFINITY,
+    BLST_BAD_SCALAR,
 } BLST_ERROR;
 
 typedef uint8_t byte;
@@ -70,10 +71,15 @@ void blst_scalar_from_lendian(blst_scalar *out, const byte a[32]);
 void blst_lendian_from_scalar(byte out[32], const blst_scalar *a);
 bool blst_scalar_fr_check(const blst_scalar *a);
 bool blst_sk_check(const blst_scalar *a);
-bool blst_sk_add_n_check(blst_scalar *ret, const blst_scalar *a,
+bool blst_sk_add_n_check(blst_scalar *out, const blst_scalar *a,
                                            const blst_scalar *b);
-bool blst_scalar_from_le_bytes(blst_scalar *out, const byte *bytes, size_t n);
-bool blst_scalar_from_be_bytes(blst_scalar *out, const byte *bytes, size_t n);
+bool blst_sk_sub_n_check(blst_scalar *out, const blst_scalar *a,
+                                           const blst_scalar *b);
+bool blst_sk_mul_n_check(blst_scalar *out, const blst_scalar *a,
+                                           const blst_scalar *b);
+void blst_sk_inverse(blst_scalar *out, const blst_scalar *a);
+bool blst_scalar_from_le_bytes(blst_scalar *out, const byte *in, size_t len);
+bool blst_scalar_from_be_bytes(blst_scalar *out, const byte *in, size_t len);
 
 #ifndef SWIG
 /*
@@ -148,6 +154,7 @@ void blst_fp12_inverse(blst_fp12 *ret, const blst_fp12 *a);
 void blst_fp12_frobenius_map(blst_fp12 *ret, const blst_fp12 *a, size_t n);
 bool blst_fp12_is_equal(const blst_fp12 *a, const blst_fp12 *b);
 bool blst_fp12_is_one(const blst_fp12 *a);
+bool blst_fp12_in_group(const blst_fp12 *a);
 const blst_fp12 *blst_fp12_one();
 #endif  // SWIG
 
@@ -212,41 +219,53 @@ const blst_p2_affine *blst_p2_affine_generator();
  * Multi-scalar multiplications and other multi-point operations.
  */
 
-void blst_p1s_to_affine(blst_p1_affine dst[], const blst_p1 *points[],
+void blst_p1s_to_affine(blst_p1_affine dst[], const blst_p1 *const points[],
                         size_t npoints);
-void blst_p1s_add(blst_p1 *ret, const blst_p1_affine *points[], size_t npoints);
+void blst_p1s_add(blst_p1 *ret, const blst_p1_affine *const points[],
+                                size_t npoints);
 
 size_t blst_p1s_mult_wbits_precompute_sizeof(size_t wbits, size_t npoints);
 void blst_p1s_mult_wbits_precompute(blst_p1_affine table[], size_t wbits,
-                                    const blst_p1_affine *points[],
+                                    const blst_p1_affine *const points[],
                                     size_t npoints);
 size_t blst_p1s_mult_wbits_scratch_sizeof(size_t npoints);
 void blst_p1s_mult_wbits(blst_p1 *ret, const blst_p1_affine table[],
-                         size_t wbits, size_t npoints, const byte *scalars[],
-                         size_t nbits, void *scratch);
+                         size_t wbits, size_t npoints,
+                         const byte *const scalars[], size_t nbits,
+                         limb_t *scratch);
 
 size_t blst_p1s_mult_pippenger_scratch_sizeof(size_t npoints);
-void blst_p1s_mult_pippenger(blst_p1 *ret, const blst_p1_affine *points[],
-                             size_t npoints, const byte *scalars[],
-                             size_t nbits, void *scratch);
+void blst_p1s_mult_pippenger(blst_p1 *ret, const blst_p1_affine *const points[],
+                             size_t npoints, const byte *const scalars[],
+                             size_t nbits, limb_t *scratch);
+void blst_p1s_tile_pippenger(blst_p1 *ret, const blst_p1_affine *const points[],
+                             size_t npoints, const byte *const scalars[],
+                             size_t nbits, limb_t *scratch,
+                             size_t bit0, size_t window);
 
-void blst_p2s_to_affine(blst_p2_affine dst[], const blst_p2 *points[],
+void blst_p2s_to_affine(blst_p2_affine dst[], const blst_p2 *const points[],
                         size_t npoints);
-void blst_p2s_add(blst_p2 *ret, const blst_p2_affine *points[], size_t npoints);
+void blst_p2s_add(blst_p2 *ret, const blst_p2_affine *const points[],
+                                size_t npoints);
 
 size_t blst_p2s_mult_wbits_precompute_sizeof(size_t wbits, size_t npoints);
 void blst_p2s_mult_wbits_precompute(blst_p2_affine table[], size_t wbits,
-                                    const blst_p2_affine *points[],
+                                    const blst_p2_affine *const points[],
                                     size_t npoints);
 size_t blst_p2s_mult_wbits_scratch_sizeof(size_t npoints);
 void blst_p2s_mult_wbits(blst_p2 *ret, const blst_p2_affine table[],
-                         size_t wbits, size_t npoints, const byte *scalars[],
-                         size_t nbits, void *scratch);
+                         size_t wbits, size_t npoints,
+                         const byte *const scalars[], size_t nbits,
+                         limb_t *scratch);
 
 size_t blst_p2s_mult_pippenger_scratch_sizeof(size_t npoints);
-void blst_p2s_mult_pippenger(blst_p2 *ret, const blst_p2_affine *points[],
-                             size_t npoints, const byte *scalars[],
-                             size_t nbits, void *scratch);
+void blst_p2s_mult_pippenger(blst_p2 *ret, const blst_p2_affine *const points[],
+                             size_t npoints, const byte *const scalars[],
+                             size_t nbits, limb_t *scratch);
+void blst_p2s_tile_pippenger(blst_p2 *ret, const blst_p2_affine *const points[],
+                             size_t npoints, const byte *const scalars[],
+                             size_t nbits, limb_t *scratch,
+                             size_t bit0, size_t window);
 
 /*
  * Hash-to-curve operations.

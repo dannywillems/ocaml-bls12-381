@@ -16,6 +16,9 @@ void blst_fr_from(blst_fr *ret, const blst_fr *a);
 void blst_fp_to(blst_fp *ret, const blst_fp *a);
 void blst_fp_from(blst_fp *ret, const blst_fp *a);
 
+bool blst_fp_is_square(const blst_fp *a);
+bool blst_fp2_is_square(const blst_fp2 *a);
+
 void blst_p1_from_jacobian(blst_p1 *out, const blst_p1 *in);
 void blst_p2_from_jacobian(blst_p2 *out, const blst_p2 *in);
 
@@ -58,6 +61,19 @@ void expand_message_xmd(unsigned char *bytes, size_t len_in_bytes,
                         const unsigned char *aug, size_t aug_len,
                         const unsigned char *msg, size_t msg_len,
                         const unsigned char *DST, size_t DST_len);
+#else
+void blst_expand_message_xmd(byte *out, size_t out_len,
+                             const byte *msg, size_t msg_len,
+                             const byte *DST, size_t DST_len);
 #endif
+
+void blst_p1_unchecked_mult(blst_p1 *out, const blst_p1 *p, const byte *scalar,
+                                                            size_t nbits);
+void blst_p2_unchecked_mult(blst_p2 *out, const blst_p2 *p, const byte *scalar,
+                                                            size_t nbits);
+
+void blst_pairing_raw_aggregate(blst_pairing *ctx, const blst_p2_affine *q,
+                                                   const blst_p1_affine *p);
+blst_fp12 *blst_pairing_as_fp12(blst_pairing *ctx);
 
 #endif

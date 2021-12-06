@@ -419,6 +419,8 @@ BLST_ERROR blst_pairing_merge(PAIRING *ctx, const PAIRING *ctx1)
     if (ctx->nelems || ctx1->nelems)
         return BLST_AGGR_TYPE_MISMATCH;
 
+    ctx->ctrl |= ctx1->ctrl & MIN_SIG_OR_PK;
+
     switch (ctx->ctrl & MIN_SIG_OR_PK) {
         case AGGR_MIN_SIG:
             if (ctx->ctrl & ctx1->ctrl & AGGR_SIGN_SET) {
@@ -441,8 +443,7 @@ BLST_ERROR blst_pairing_merge(PAIRING *ctx, const PAIRING *ctx1)
             }
             break;
         case AGGR_UNDEFINED:
-            vec_copy(ctx, ctx1, sizeof(*ctx));
-            return BLST_SUCCESS;
+            break;
         default:
             return BLST_AGGR_TYPE_MISMATCH;
     }
@@ -517,6 +518,37 @@ int blst_fp12_finalverify(const vec384fp12 GT1, const vec384fp12 GT2)
                  vec_is_zero(GT[0][1], sizeof(GT) - sizeof(GT[0][0])));
 }
 
+void blst_pairing_raw_aggregate(PAIRING *ctx, const POINTonE2_affine *q,
+                                              const POINTonE1_affine *p)
+{
+    unsigned int n;
+
+    if (vec_is_zero(q, sizeof(*q)) & vec_is_zero(p, sizeof(*p)))
+        return;
+
+    n = ctx->nelems;
+    vec_copy(ctx->Q + n, q, sizeof(*q));
+    vec_copy(ctx->P + n, p, sizeof(*p));
+    if (++n == N_MAX) {
+        if (ctx->ctrl & AGGR_GT_SET) {
+            vec384fp12 GT;
+            miller_loop_n(GT, ctx->Q, ctx->P, n);
+            mul_fp12(ctx->GT, ctx->GT, GT);
+        } else {
+            miller_loop_n(ctx->GT, ctx->Q, ctx->P, n);
+            ctx->ctrl |= AGGR_GT_SET;
+        }
+        n = 0;
+    }
+    ctx->nelems = n;
+}
+
+vec384fp12 *blst_pairing_as_fp12(PAIRING *ctx)
+{
+    PAIRING_Commit(ctx);
+    return (vec384fp12 *)ctx->GT;
+}
+
 /*
  * PAIRING context-free entry points.
  *
@@ -529,21 +561,17 @@ BLST_ERROR blst_aggregate_in_g1(POINTonE1 *out, const POINTonE1 *in,
                                                 const unsigned char *zwire)
 {
     POINTonE1 P[1];
+    BLST_ERROR ret;
 
-    if (zwire[0] & 0x40) {      /* infinity? */
+    ret = POINTonE1_Deserialize_Z((POINTonE1_affine *)P, zwire);
+
+    if (ret != BLST_SUCCESS)
+        return ret;
+
+    if (vec_is_zero(P, sizeof(POINTonE1_affine))) {
         if (in == NULL)
             vec_zero(out, sizeof(*out));
         return BLST_SUCCESS;
-    }
-
-    if (zwire[0] & 0x80) {      /* compressed? */
-        BLST_ERROR ret = POINTonE1_Uncompress((POINTonE1_affine *)P, zwire);
-        if (ret != BLST_SUCCESS)
-            return ret;
-    } else {
-        POINTonE1_Deserialize_BE((POINTonE1_affine *)P, zwire);
-        if (!POINTonE1_affine_on_curve((POINTonE1_affine *)P))
-            return BLST_POINT_NOT_ON_CURVE;
     }
 
     vec_copy(P->Z, BLS12_381_Rx.p, sizeof(P->Z));
@@ -563,21 +591,17 @@ BLST_ERROR blst_aggregate_in_g2(POINTonE2 *out, const POINTonE2 *in,
                                                 const unsigned char *zwire)
 {
     POINTonE2 P[1];
+    BLST_ERROR ret;
 
-    if (zwire[0] & 0x40) {      /* infinity? */
+    ret = POINTonE2_Deserialize_Z((POINTonE2_affine *)P, zwire);
+
+    if (ret != BLST_SUCCESS)
+        return ret;
+
+    if (vec_is_zero(P, sizeof(POINTonE2_affine))) {
         if (in == NULL)
             vec_zero(out, sizeof(*out));
         return BLST_SUCCESS;
-    }
-
-    if (zwire[0] & 0x80) {      /* compressed? */
-        BLST_ERROR ret = POINTonE2_Uncompress((POINTonE2_affine *)P, zwire);
-        if (ret != BLST_SUCCESS)
-            return ret;
-    } else {
-        POINTonE2_Deserialize_BE((POINTonE2_affine *)P, zwire);
-        if (!POINTonE2_affine_on_curve((POINTonE2_affine *)P))
-            return BLST_POINT_NOT_ON_CURVE;
     }
 
     vec_copy(P->Z, BLS12_381_Rx.p, sizeof(P->Z));

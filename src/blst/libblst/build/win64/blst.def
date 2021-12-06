@@ -12,6 +12,9 @@ EXPORTS
 	blst_scalar_fr_check
 	blst_sk_check
 	blst_sk_add_n_check
+	blst_sk_sub_n_check
+	blst_sk_mul_n_check
+	blst_sk_inverse
 	blst_scalar_from_le_bytes
 	blst_scalar_from_be_bytes
 	blst_fr_add
@@ -67,6 +70,7 @@ EXPORTS
 	blst_fp12_frobenius_map
 	blst_fp12_is_equal
 	blst_fp12_is_one
+	blst_fp12_in_group
 	blst_fp12_one
 	blst_p1_add
 	blst_p1_add_or_double
@@ -114,6 +118,7 @@ EXPORTS
 	blst_p1s_mult_wbits
 	blst_p1s_mult_pippenger_scratch_sizeof
 	blst_p1s_mult_pippenger
+	blst_p1s_tile_pippenger
 	blst_p2s_to_affine
 	blst_p2s_add
 	blst_p2s_mult_wbits_precompute_sizeof
@@ -122,6 +127,7 @@ EXPORTS
 	blst_p2s_mult_wbits
 	blst_p2s_mult_pippenger_scratch_sizeof
 	blst_p2s_mult_pippenger
+	blst_p2s_tile_pippenger
 	blst_map_to_g1
 	blst_map_to_g2
 	blst_encode_to_g1
@@ -178,6 +184,8 @@ EXPORTS
 	blst_fr_from
 	blst_fp_to
 	blst_fp_from
+	blst_fp_is_square
+	blst_fp2_is_square
 	blst_p1_from_jacobian
 	blst_p2_from_jacobian
 	blst_sk_to_pk2_in_g1
@@ -187,4 +195,9 @@ EXPORTS
 	blst_uniq_sizeof
 	blst_uniq_init
 	blst_uniq_test
+	blst_expand_message_xmd
+	blst_p1_unchecked_mult
+	blst_p2_unchecked_mult
+	blst_pairing_raw_aggregate
+	blst_pairing_as_fp12
 
