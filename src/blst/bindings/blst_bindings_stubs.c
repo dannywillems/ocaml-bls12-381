@@ -937,14 +937,14 @@ CAMLprim value caml_blst_g1_pippenger(value buffer, value jacobian_list,
   blst_p1_affine **ps =
       (const blst_p1_affine **)calloc(npoints_c, sizeof(blst_p1_affine *));
   byte **scalars_bs = (byte **)calloc(npoints_c, sizeof(byte *));
-  blst_scalar *scalar = (blst_scalar *)calloc(1, sizeof(blst_scalar));
+  blst_scalar scalar;
 
   for (int i = 0; i < npoints_c; i++) {
     ps[i] = (blst_p1_affine *)calloc(1, sizeof(blst_p1_affine));
     blst_p1_to_affine(ps[i], Blst_p1_val(Field(jacobian_list, i)));
     scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
-    blst_scalar_from_fr(scalar, Blst_fr_val(Field(scalars, i)));
-    blst_lendian_from_scalar(scalars_bs[i], scalar);
+    blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, i)));
+    blst_lendian_from_scalar(scalars_bs[i], &scalar);
   }
   void *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(npoints_c));
 
@@ -956,7 +956,6 @@ CAMLprim value caml_blst_g1_pippenger(value buffer, value jacobian_list,
     free(scalars_bs[i]);
   }
 
-  free(scalar);
   free(scalars_bs);
   free(ps);
   free(scratch);
@@ -972,14 +971,14 @@ CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
   blst_p2_affine **ps =
       (const blst_p2_affine **)calloc(npoints_c, sizeof(blst_p2_affine *));
   byte **scalars_bs = (byte **)calloc(npoints_c, sizeof(byte *));
-  blst_scalar *scalar = (blst_scalar *)calloc(1, sizeof(blst_scalar));
+  blst_scalar scalar;
 
   for (int i = 0; i < npoints_c; i++) {
     ps[i] = (blst_p2_affine *)calloc(1, sizeof(blst_p2_affine));
     blst_p2_to_affine(ps[i], Blst_p2_val(Field(jacobian_list, i)));
     scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
-    blst_scalar_from_fr(scalar, Blst_fr_val(Field(scalars, i)));
-    blst_lendian_from_scalar(scalars_bs[i], scalar);
+    blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, i)));
+    blst_lendian_from_scalar(scalars_bs[i], &scalar);
   }
   void *scratch = calloc(1, blst_p2s_mult_pippenger_scratch_sizeof(npoints_c));
 
@@ -991,7 +990,6 @@ CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
     free(scalars_bs[i]);
   }
 
-  free(scalar);
   free(scalars_bs);
   free(ps);
   free(scratch);
