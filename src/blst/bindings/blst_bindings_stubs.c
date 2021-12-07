@@ -930,9 +930,11 @@ CAMLprim value caml_blst_signature_keygen_stubs(value buffer, value ikm,
 }
 
 CAMLprim value caml_blst_g1_pippenger(value buffer, value jacobian_list,
-                                      value npoints, value scalars) {
-  CAMLparam4(buffer, jacobian_list, npoints, scalars);
+                                      value scalars, value start,
+                                      value npoints) {
+  CAMLparam5(buffer, jacobian_list, scalars, start, npoints);
   size_t npoints_c = ctypes_size_t_val(npoints);
+  size_t start_c = ctypes_size_t_val(start);
 
   blst_p1_affine **ps =
       (const blst_p1_affine **)calloc(npoints_c, sizeof(blst_p1_affine *));
@@ -941,9 +943,9 @@ CAMLprim value caml_blst_g1_pippenger(value buffer, value jacobian_list,
 
   for (int i = 0; i < npoints_c; i++) {
     ps[i] = (blst_p1_affine *)calloc(1, sizeof(blst_p1_affine));
-    blst_p1_to_affine(ps[i], Blst_p1_val(Field(jacobian_list, i)));
+    blst_p1_to_affine(ps[i], Blst_p1_val(Field(jacobian_list, start_c + i)));
     scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
-    blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, i)));
+    blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
     blst_lendian_from_scalar(scalars_bs[i], &scalar);
   }
   void *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(npoints_c));
@@ -964,9 +966,11 @@ CAMLprim value caml_blst_g1_pippenger(value buffer, value jacobian_list,
 }
 
 CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
-                                      value npoints, value scalars) {
-  CAMLparam4(buffer, jacobian_list, npoints, scalars);
+                                      value scalars, value start,
+                                      value npoints) {
+  CAMLparam5(buffer, jacobian_list, scalars, start, npoints);
   size_t npoints_c = ctypes_size_t_val(npoints);
+  size_t start_c = ctypes_size_t_val(start);
 
   blst_p2_affine **ps =
       (const blst_p2_affine **)calloc(npoints_c, sizeof(blst_p2_affine *));
@@ -975,9 +979,9 @@ CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
 
   for (int i = 0; i < npoints_c; i++) {
     ps[i] = (blst_p2_affine *)calloc(1, sizeof(blst_p2_affine));
-    blst_p2_to_affine(ps[i], Blst_p2_val(Field(jacobian_list, i)));
+    blst_p2_to_affine(ps[i], Blst_p2_val(Field(jacobian_list, start_c + i)));
     scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
-    blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, i)));
+    blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
     blst_lendian_from_scalar(scalars_bs[i], &scalar);
   }
   void *scratch = calloc(1, blst_p2s_mult_pippenger_scratch_sizeof(npoints_c));

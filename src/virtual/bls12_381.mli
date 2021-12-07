@@ -344,7 +344,7 @@ module G1 : sig
     the point at infinity, use [zero ()] *)
   val of_z_opt : x:Z.t -> y:Z.t -> t option
 
-  val pippenger : t array -> Scalar.t array -> t
+  val pippenger : ?start:int -> ?len:int -> t array -> Scalar.t array -> t
 end
 
 module G2 : sig
@@ -477,7 +477,7 @@ module G2 : sig
       c0. To create the point at infinity, use [zero ()] *)
   val of_z_opt : x:Z.t * Z.t -> y:Z.t * Z.t -> t option
 
-  val pippenger : t array -> Scalar.t array -> t
+  val pippenger : ?start:int -> ?len:int -> t array -> Scalar.t array -> t
 end
 
 module Pairing : sig
