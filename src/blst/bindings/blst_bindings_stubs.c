@@ -829,9 +829,11 @@ CAMLprim value caml_blst_final_exponentiation_stubs(value buffer, value p) {
   CAMLreturn(Val_unit);
 }
 
+static void finalize_free_pairing(value v) { free(Blst_pairing_val(v)); }
+
 static struct custom_operations blst_pairing_ops = {
     "blst_pairing",
-    custom_finalize_default,
+    finalize_free_pairing,
     custom_compare_default,
     custom_hash_default,
     custom_serialize_default,
@@ -855,7 +857,12 @@ CAMLprim value caml_blst_pairing_init_stubs(value check, value dst,
                                             value dst_length) {
   CAMLparam3(check, dst, dst_length);
   CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_pairing_ops, blst_pairing_sizeof(), 0, 1);
+  block = caml_alloc_custom(&blst_fp12_ops, sizeof(blst_pairing *), 0, 1);
+  void *p = calloc(1, blst_pairing_sizeof());
+  if (p == NULL)
+    caml_raise_out_of_memory();
+  blst_pairing **d = (blst_pairing **)Data_custom_val(block);
+  *d = p;
   blst_pairing_init(Blst_pairing_val(block), Bool_val(check), Bytes_val(dst),
                     ctypes_size_t_val(dst_length));
   CAMLreturn(block);

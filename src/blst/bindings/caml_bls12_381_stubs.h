@@ -21,7 +21,7 @@
 
 #define Blst_p2_affine_val(v) ((blst_p2_affine *)Data_custom_val(v))
 
-#define Blst_pairing_val(v) ((blst_pairing *)Data_custom_val(v))
+#define Blst_pairing_val(v) (*(blst_pairing **)Data_custom_val(v))
 
 #define Fr_val_k(v, k) (Blst_fr_val(Field(v, k)))
 
