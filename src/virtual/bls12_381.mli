@@ -222,6 +222,17 @@ module G1 : sig
       is given in jacobian coordinates *)
   type t
 
+  (** An element on the curve and in the prime subgroup, in affine coordinates *)
+  type affine
+
+  (** [affine_of_jacobian p] creates a new value of type [affine] representing
+      the point [p] in affine coordinates *)
+  val affine_of_jacobian : t -> affine
+
+  (** [jacobian_of_affine p] creates a new value of type [t] representing
+      the point [p] in jacobian coordinates *)
+  val jacobian_of_affine : affine -> t
+
   (** Contiguous C array containing points in affine coordinates *)
   type affine_array
 
@@ -410,6 +421,17 @@ module G2 : sig
   (** The type of the element on the curve and in the prime subgroup. The point
       is given in jacobian coordinates *)
   type t
+
+  (** An element on the curve and in the prime subgroup, in affine coordinates *)
+  type affine
+
+  (** [affine_of_jacobian p] creates a new value of type [affine] representing
+      the point [p] in affine coordinates *)
+  val affine_of_jacobian : t -> affine
+
+  (** [jacobian_of_affine p] creates a new value of type [t] representing
+      the point [p] in jacobian coordinates *)
+  val jacobian_of_affine : affine -> t
 
   (** Contiguous C array containing points in affine coordinates *)
   type affine_array

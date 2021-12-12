@@ -122,6 +122,8 @@ module G1 = struct
 
   type t = Stubs.jacobian
 
+  type affine = Stubs.affine
+
   type affine_array = Stubs.affine_array * int
 
   let global_buffer = Stubs.allocate_g1 ()
@@ -129,6 +131,16 @@ module G1 = struct
   let size_in_bytes = 96
 
   let memcpy dst src = Stubs.memcpy dst src
+
+  let affine_of_jacobian j =
+    let b = Stubs.allocate_g1_affine () in
+    Stubs.to_affine b j ;
+    b
+
+  let jacobian_of_affine a =
+    let b = Stubs.allocate_g1 () in
+    Stubs.from_affine b a ;
+    b
 
   let to_affine_array l =
     let length = Array.length l in

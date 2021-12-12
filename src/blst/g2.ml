@@ -119,11 +119,23 @@ end
 module G2 = struct
   type t = Stubs.jacobian
 
+  type affine = Stubs.affine
+
   type affine_array = Stubs.affine_array * int
 
   exception Not_on_curve of Bytes.t
 
   let size_in_bytes = 192
+
+  let affine_of_jacobian j =
+    let b = Stubs.allocate_g2_affine () in
+    Stubs.to_affine b j ;
+    b
+
+  let jacobian_of_affine a =
+    let b = Stubs.allocate_g2 () in
+    Stubs.from_affine b a ;
+    b
 
   let memcpy dst src = Stubs.memcpy dst src
 

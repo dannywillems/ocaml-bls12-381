@@ -59,6 +59,17 @@ let t9 =
   Bench.Test.create ~name:"hash_to_curve on G1" (fun () ->
       ignore (G1.hash_to_curve message dst))
 
-let command = Bench.make_command [t1; t2; t3; t4; t5; t6; t7; t8; t9]
+let t10 =
+  let p_jacobian = Bls12_381.G1.random () in
+  let p_affine = Bls12_381.G1.affine_of_jacobian p_jacobian in
+  Bench.Test.create ~name:"Affine to jacobian" (fun () ->
+      ignore (Bls12_381.G1.jacobian_of_affine p_affine))
+
+let t11 =
+  let p_jacobian = Bls12_381.G1.random () in
+  Bench.Test.create ~name:"Jacobian to affine" (fun () ->
+      ignore (Bls12_381.G1.affine_of_jacobian p_jacobian))
+
+let command = Bench.make_command [t1; t2; t3; t4; t5; t6; t7; t8; t9; t10; t11]
 
 let () = Core.Command.run command
