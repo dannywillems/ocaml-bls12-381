@@ -218,8 +218,24 @@ end
 module G1 : sig
   exception Not_on_curve of Bytes.t
 
-  (** The type of the element in the elliptic curve *)
+  (** The type of the element on the curve and in the prime subgroup. The point
+      is given in jacobian coordinates *)
   type t
+
+  (** Contiguous C array containing points in affine coordinates *)
+  type affine_array
+
+  (** [to_affine_array pts] builds a contiguous C array and
+      populate it with the points [pts] in affine coordinates.
+      Use it with [pippenger_with_affine_array] to get better performance.
+  *)
+  val to_affine_array : t array -> affine_array
+
+  (** Build a OCaml array of [t] values from the contiguous C array *)
+  val of_affine_array : affine_array -> t array
+
+  (** Return the number of elements in the array *)
+  val size_of_affine_array : affine_array -> int
 
   (** Actual number of bytes allocated for a value of type t *)
   val size_in_memory : int
@@ -344,14 +360,71 @@ module G1 : sig
     the point at infinity, use [zero ()] *)
   val of_z_opt : x:Z.t -> y:Z.t -> t option
 
+  (** [pippenger ?start ?len pts scalars] computes the multi
+      scalar exponentiation/multiplication. The scalars are given in [scalars] and
+      the points in [pts]. If [pts] and [scalars] are not of the same length,
+      perform the computation on the first [n] points where [n] is the smallest
+      size.
+      Arguments [start] and [len] can be used to take advantages of multicore
+      OCaml. Default value for [start] (resp. [len]) is [0] (resp. the length of
+      the array [scalars]).
+      Raise [Invalid_argument] if [start] or [len] would infer out of bounds
+      array access.
+
+      Perform allocations on the C heap to convert scalars to bytes and to
+      convert the points [pts] in affine coordinates as values of type [t] are
+      in jacobian coordinates.
+  *)
   val pippenger : ?start:int -> ?len:int -> t array -> Scalar.t array -> t
+
+  (** [pippenger_with_affine_array ?start ?len pts scalars] computes the multi
+      scalar exponentiation/multiplication. The scalars are given in [scalars] and
+      the points in [pts]. If [pts] and [scalars] are not of the same length,
+      perform the computation on the first [n] points where [n] is the smallest
+      size.
+      The differences with [pippenger] are
+        1. the points are loaded in a contiguous C array to speed up the access to
+           the elements by relying on the CPU cache
+        2. and the points are in affine coordinates, the form expected by the
+           algorithm implementation, avoiding new allocations and field
+           inversions required to convert from jacobian (representation of a
+           points of type [t], as expected by [pippenger]) to affine coordinates.
+      Expect a speed improvement around 20% compared to [pippenger], and less
+      allocation on the C heap.
+      A value of [affine_array] can be built using [to_affine_array].
+      Arguments [start] and [len] can be used to take advantages of multicore
+      OCaml. Default value for [start] (resp. [len]) is [0] (resp. the length of
+      the array [scalars]).
+      Raise [Invalid_argument] if [start] or [len] would infer out of bounds
+      array access.
+
+      Perform allocations on the C heap to convert scalars to bytes.
+  *)
+  val pippenger_with_affine_array :
+    ?start:int -> ?len:int -> affine_array -> Scalar.t array -> t
 end
 
 module G2 : sig
   exception Not_on_curve of Bytes.t
 
-  (** The type of the element in the elliptic curve *)
+  (** The type of the element on the curve and in the prime subgroup. The point
+      is given in jacobian coordinates *)
   type t
+
+  (** Contiguous C array containing points in affine coordinates *)
+  type affine_array
+
+  (** [to_affine_array pts] builds a contiguous C array and
+      populate it with the points [pts] in affine coordinates.
+      Use it with [pippenger_with_affine_array] to get better performance.
+  *)
+  val to_affine_array : t array -> affine_array
+
+  (** Build a OCaml array of [t] values from the contiguous C array *)
+  val of_affine_array : affine_array -> t array
+
+  (** Return the number of elements in the array *)
+  val size_of_affine_array : affine_array -> int
 
   (** Actual number of bytes allocated for a value of type t *)
   val size_in_memory : int
@@ -477,7 +550,43 @@ module G2 : sig
       c0. To create the point at infinity, use [zero ()] *)
   val of_z_opt : x:Z.t * Z.t -> y:Z.t * Z.t -> t option
 
+  (** [pippenger ?start ?len pts scalars] computes the multi
+      scalar exponentiation/multiplication. The scalars are given in [scalars] and
+      the points in [pts].
+      Arguments [start] and [len] can be used to take advantages of multicore
+      OCaml. Default value for [start] (resp. [len]) is [0] (resp. the length of
+      the array [scalars]).
+      Raise [Invalid_argument] if the arguments [pts] and [scalars] are not of
+      the same length or if [start] or [len] would infer out of bounds array access.
+
+      Perform allocations on the C heap to convert scalars to bytes and to
+      convert the points [pts] in affine coordinates as values of type [t] are
+      in jacobian coordinates.
+  *)
   val pippenger : ?start:int -> ?len:int -> t array -> Scalar.t array -> t
+
+  (** [pippenger_with_affine_array ?start ?len pts scalars] computes the multi
+      scalar exponentiation/multiplication. The scalars are given in [scalars] and
+      the points in [pts]. The differences with [pippenger] are
+        1. the points are loaded in a contiguous C array to speed up the access to
+           the elements by relying on the CPU cache
+        2. and the points are in affine coordinates, the form expected by the
+           algorithm implementation, avoiding new allocations and field
+           inversions required to convert from jacobian (representation of a
+           points of type [t], as expected by [pippenger]) to affine coordinates.
+      Expect a speed improvement around 20% compared to [pippenger], and less
+      allocation on the C heap.
+      A value of [affine_array] can be built using [to_affine_array].
+      Arguments [start] and [len] can be used to take advantages of multicore
+      OCaml. Default value for [start] (resp. [len]) is [0] (resp. the length of
+      the array [scalars]).
+      Raise [Invalid_argument] if the arguments [pts] and [scalars] are not of
+      the same length or if [start] or [len] would infer out of bounds array access.
+
+      Perform allocations on the C heap to convert scalars to bytes.
+  *)
+  val pippenger_with_affine_array :
+    ?start:int -> ?len:int -> affine_array -> Scalar.t array -> t
 end
 
 module Pairing : sig

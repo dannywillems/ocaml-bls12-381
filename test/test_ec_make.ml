@@ -39,6 +39,24 @@ module type G_SIG = sig
   (** The type of the element in the elliptic curve *)
   type t
 
+  (** Contiguous C array containing points in affine coordinates *)
+  type affine_array
+
+  (** [to_affine_array pts] builds a contiguous C array and
+      populate it with the points [pts] in affine coordinates.
+      Use it with [pippenger_with_affine_array] to get better performance.
+  *)
+  val to_affine_array : t array -> affine_array
+
+  (** Build a OCaml array of [t] values from the contiguous C array *)
+  val of_affine_array : affine_array -> t array
+
+  (** Return the number of elements in the array *)
+  val size_of_affine_array : affine_array -> int
+
+  (** Actual number of bytes allocated for a value of type t *)
+  val size_in_memory : int
+
   (** The size of a point representation, in bytes *)
   val size_in_bytes : int
 
@@ -85,6 +103,9 @@ module type G_SIG = sig
   (** Return [true] if the given element is zero *)
   val is_zero : t -> bool
 
+  (** [copy x] return a fresh copy of [x] *)
+  val copy : t -> t
+
   (** Generate a random element. The element is on the curve and in the prime
       subgroup.
   *)
@@ -118,8 +139,21 @@ module type G_SIG = sig
       The number of points can be smaller than the domain size, but not larger. The
       complexity is in [O(n log(m))] where [n] is the domain size and [m] the
       number of points.
+      A new array of size [n] is allocated and is returned. The parameters are
+      not modified.
    *)
   val fft : domain:Scalar.t array -> points:t array -> t array
+
+  (** [fft_inplace ~domain ~points] performs a Fourier transform on [points] using [domain]
+      The domain should be of the form [w^{i}] where [w] is a principal root of
+      unity. If the domain is of size [n], [w] must be a [n]-th principal root
+      of unity.
+      The number of points must be in the same size than the domain.
+      It does not return anything but modified the points directly. It does only
+      perform one allocation of a scalar for the FFT.
+      It is recommended to use this function if side-effect is acceptable.
+  *)
+  val fft_inplace : domain:Scalar.t array -> points:t array -> unit
 
   (** [ifft ~domain ~points] performs an inverse Fourier transform on [points]
       using [domain].
@@ -129,12 +163,19 @@ module type G_SIG = sig
       of unity.
       The domain size must be exactly the same than the number of points. The
       complexity is O(n log(n)) where [n] is the domain size.
+      A new array of size [n] is allocated and is returned. The parameters are
+      not modified.
   *)
   val ifft : domain:Scalar.t array -> points:t array -> t array
+
+  val ifft_inplace : domain:Scalar.t array -> points:t array -> unit
 
   val hash_to_curve : Bytes.t -> Bytes.t -> t
 
   val pippenger : ?start:int -> ?len:int -> t array -> Scalar.t array -> t
+
+  val pippenger_with_affine_array :
+    ?start:int -> ?len:int -> affine_array -> Scalar.t array -> t
 end
 
 module MakeBulkOperations (G : G_SIG) = struct
@@ -158,11 +199,217 @@ module MakeBulkOperations (G : G_SIG) = struct
     let right = G.pippenger ~start ~len ps ss in
     assert (G.(eq left right))
 
+  let test_pippenger_different_size () =
+    let n_ps = 1 + Random.int 10 in
+    let n_ss = 1 + Random.int 10 in
+    let ps = Array.init n_ps (fun _ -> G.random ()) in
+    let ss = Array.init n_ss (fun _ -> G.Scalar.random ()) in
+    let left =
+      let n = min n_ps n_ss in
+      let ps = Array.sub ps 0 n in
+      let ss = Array.sub ss 0 n in
+      let xs = List.combine (Array.to_list ps) (Array.to_list ss) in
+      List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
+    in
+    let right = G.pippenger ps ss in
+    assert (G.(eq left right))
+
+  let test_to_affine_array () =
+    let n = 1 + Random.int 1000 in
+    let p = Array.init n (fun _ -> G.random ()) in
+    let p' = G.of_affine_array (G.to_affine_array p) in
+    let p = Array.to_list p in
+    let p' = Array.to_list p' in
+    assert (List.for_all2 G.eq p p')
+
+  let test_size_of_affine_array () =
+    let n = 1 + Random.int 1000 in
+    let p = Array.init n (fun _ -> G.random ()) in
+    let p = G.to_affine_array p in
+    assert (G.size_of_affine_array p = n)
+
+  let test_pippenger_contiguous () =
+    let n = 1 + Random.int 10 in
+    let ps = Array.init n (fun _ -> G.random ()) in
+    let ps_contiguous = G.to_affine_array ps in
+    let ss = Array.init n (fun _ -> G.Scalar.random ()) in
+    let left =
+      let xs = List.combine (Array.to_list ps) (Array.to_list ss) in
+      List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
+    in
+    let right = G.pippenger_with_affine_array ps_contiguous ss in
+    if not (G.eq left right) then
+      Alcotest.failf
+        "n = %d. Expected output is %s, computed %s"
+        n
+        (Hex.show (Hex.of_bytes (G.to_bytes left)))
+        (Hex.show (Hex.of_bytes (G.to_bytes right)))
+
+  let test_pippenger_contiguous_chunk () =
+    let n = 10 + Random.int 1_000 in
+    let nb_chunks = 1 + Random.int 10 in
+    let chunk_size = n / nb_chunks in
+    let rest = n mod nb_chunks in
+    let ps = Array.init n (fun _ -> G.random ()) in
+    let ps_contiguous = G.to_affine_array ps in
+    let ss = Array.init n (fun _ -> G.Scalar.random ()) in
+    let left =
+      let xs = List.combine (Array.to_list ps) (Array.to_list ss) in
+      List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
+    in
+    let right =
+      let rec aux i acc =
+        if i = nb_chunks then
+          if rest <> 0 then
+            let start = i * chunk_size in
+            let len = rest in
+            let res =
+              G.pippenger_with_affine_array ~start ~len ps_contiguous ss
+            in
+            res :: acc
+          else acc
+        else
+          let start = i * chunk_size in
+          let len = chunk_size in
+          let res =
+            G.pippenger_with_affine_array ~start ~len ps_contiguous ss
+          in
+          let acc = res :: acc in
+          aux (i + 1) acc
+      in
+      let l = aux 0 [] in
+      List.fold_left G.add G.zero l
+    in
+    if not (G.eq left right) then
+      Alcotest.failf
+        "n = %d, chunk_size = %d, nb_chunks = %d. Expected output is %s, \
+         computed %s"
+        n
+        chunk_size
+        nb_chunks
+        (Hex.show (Hex.of_bytes (G.to_bytes left)))
+        (Hex.show (Hex.of_bytes (G.to_bytes right)))
+
+  let test_pippenger_contiguous_different_size () =
+    let n_ps = 1 + Random.int 10 in
+    let n_ss = 1 + Random.int 10 in
+    let ps = Array.init n_ps (fun _ -> G.random ()) in
+    let ps_contiguous = G.to_affine_array ps in
+    let ss = Array.init n_ss (fun _ -> G.Scalar.random ()) in
+    let left =
+      let n = min n_ps n_ss in
+      let ps = Array.sub ps 0 n in
+      let ss = Array.sub ss 0 n in
+      let xs = List.combine (Array.to_list ps) (Array.to_list ss) in
+      List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
+    in
+    let right = G.pippenger_with_affine_array ps_contiguous ss in
+    if not (G.eq left right) then
+      Alcotest.failf
+        "n_ss = %d, n_ps = %d. Expected output is %s, computed %s"
+        n_ss
+        n_ps
+        (Hex.show (Hex.of_bytes (G.to_bytes left)))
+        (Hex.show (Hex.of_bytes (G.to_bytes right)))
+
+  let test_pippenger_contiguous_with_start_argument () =
+    let n_ps = 1 + Random.int 10 in
+    let n_ss = 1 + Random.int 10 in
+    let ps = Array.init n_ps (fun _ -> G.random ()) in
+    let ps_contiguous = G.to_affine_array ps in
+
+    let ss = Array.init n_ss (fun _ -> G.Scalar.random ()) in
+    let n = min n_ps n_ss in
+    let start = Random.int n in
+    let left =
+      let ps = Array.sub ps start (n - start) in
+      let ss = Array.sub ss start (n - start) in
+      let xs = List.combine (Array.to_list ps) (Array.to_list ss) in
+      List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
+    in
+    let right = G.pippenger_with_affine_array ~start ps_contiguous ss in
+    if not (G.eq left right) then
+      Alcotest.failf
+        "n = %d, start = %d. Expected output is %s, computed %s"
+        n
+        start
+        (Hex.show (Hex.of_bytes (G.to_bytes left)))
+        (Hex.show (Hex.of_bytes (G.to_bytes right)))
+
+  let test_pippenger_contiguous_with_len_argument () =
+    let n_ps = 1 + Random.int 10 in
+    let n_ss = 1 + Random.int 10 in
+    let n = min n_ps n_ss in
+    let len = 1 + Random.int n in
+    let ps = Array.init n_ps (fun _ -> G.random ()) in
+    let ps_contiguous = G.to_affine_array ps in
+
+    let ss = Array.init n_ss (fun _ -> G.Scalar.random ()) in
+    let left =
+      let ps = Array.sub ps 0 len in
+      let ss = Array.sub ss 0 len in
+      let xs = List.combine (Array.to_list ps) (Array.to_list ss) in
+      List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
+    in
+    let right = G.pippenger_with_affine_array ~len ps_contiguous ss in
+    assert (G.(eq left right))
+
+  let test_pippenger_contiguous_with_start_and_len_argument () =
+    let n_ps = 1 + Random.int 10 in
+    let n_ss = 1 + Random.int 10 in
+    let ps = Array.init n_ps (fun _ -> G.random ()) in
+    let ps_contiguous = G.to_affine_array ps in
+    let ss = Array.init n_ss (fun _ -> G.Scalar.random ()) in
+    let n = min n_ps n_ss in
+    let start = Random.int n in
+    let len = 1 + Random.int (n - start) in
+    let left =
+      let ps = Array.sub ps start len in
+      let ss = Array.sub ss start len in
+      let xs = List.combine (Array.to_list ps) (Array.to_list ss) in
+      List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
+    in
+    let right = G.pippenger_with_affine_array ~start ~len ps_contiguous ss in
+    assert (G.(eq left right))
+
   let get_tests () =
     let open Alcotest in
     ( "Bulk operations",
       [ test_case "bulk add" `Quick (repeat 10 test_bulk_add);
-        test_case "pippenger" `Quick (repeat 10 test_pippenger) ] )
+        test_case "to_affine_array" `Quick (repeat 10 test_to_affine_array);
+        test_case
+          "size_of_affine_array"
+          `Quick
+          (repeat 10 test_size_of_affine_array);
+        test_case "pippenger" `Quick (repeat 10 test_pippenger);
+        test_case
+          "pippenger continuous chunk size"
+          `Quick
+          (repeat 10 test_pippenger_contiguous_chunk);
+        test_case
+          "pippenger different size"
+          `Quick
+          (repeat 10 test_pippenger_different_size);
+        test_case
+          "pippenger contiguous"
+          `Quick
+          (repeat 10 test_pippenger_contiguous);
+        test_case
+          "pippenger contiguous with different size"
+          `Quick
+          (repeat 10 test_pippenger_contiguous_different_size);
+        test_case
+          "pippenger contiguous with start argument"
+          `Quick
+          (repeat 10 test_pippenger_contiguous_with_start_argument);
+        test_case
+          "pippenger contiguous with start and len argument"
+          `Quick
+          (repeat 10 test_pippenger_contiguous_with_start_and_len_argument);
+        test_case
+          "pippenger contiguous with len argument"
+          `Quick
+          (repeat 10 test_pippenger_contiguous_with_len_argument) ] )
 end
 
 module MakeInplaceOperations (G : G_SIG) = struct

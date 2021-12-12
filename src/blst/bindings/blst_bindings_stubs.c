@@ -936,9 +936,11 @@ CAMLprim value caml_blst_signature_keygen_stubs(value buffer, value ikm,
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value caml_blst_g1_pippenger(value buffer, value jacobian_list,
-                                      value scalars, value start,
-                                      value npoints) {
+// Hypothesis: jacobian_list and scalars are arrays of size *at least* start +
+// npoints
+CAMLprim value caml_blst_g1_pippenger_stubs(value buffer, value jacobian_list,
+                                            value scalars, value start,
+                                            value npoints) {
   CAMLparam5(buffer, jacobian_list, scalars, start, npoints);
   size_t npoints_c = ctypes_size_t_val(npoints);
   size_t start_c = ctypes_size_t_val(start);
@@ -972,6 +974,8 @@ CAMLprim value caml_blst_g1_pippenger(value buffer, value jacobian_list,
   CAMLreturn(Val_unit);
 }
 
+// Hypothesis: jacobian_list and scalars are arrays of size *at least* start +
+// npoints
 CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
                                       value scalars, value start,
                                       value npoints) {
@@ -1008,7 +1012,7 @@ CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
   CAMLreturn(Val_unit);
 }
 
-// Hypothesis: fr_array_left and fr_array_right are of the same length
+// Hypothesis: fr_array_left and fr_array_right are both *at least* of size length
 CAMLprim value caml_blst_fr_inner_product_stubs(value buffer,
                                                 value fr_array_left,
                                                 value fr_array_right,
@@ -1023,5 +1027,153 @@ CAMLprim value caml_blst_fr_inner_product_stubs(value buffer,
     blst_fr_add(buffer_c, tmp, buffer_c);
   }
   free(tmp);
+  CAMLreturn(Val_unit);
+}
+
+static struct custom_operations blst_p1_affine_array_ops = {
+    "blst_p1_affine_array",     custom_finalize_default,
+    custom_compare_default,     custom_hash_default,
+    custom_serialize_default,   custom_deserialize_default,
+    custom_compare_ext_default, custom_fixed_length_default};
+
+CAMLprim value allocate_p1_affine_array_stubs(value n) {
+  CAMLparam1(n);
+  int n_c = Int_val(n);
+  CAMLlocal1(block);
+  block = caml_alloc_custom(&blst_p1_affine_array_ops,
+                            sizeof(blst_p1_affine) * n_c, 0, 1);
+  CAMLreturn(block);
+}
+
+CAMLprim value caml_blst_p1_affine_array_set_p1_points_stubs(value buffer,
+                                                             value l, value n) {
+  CAMLparam3(buffer, l, n);
+  int n_c = Int_val(n);
+  blst_p1_affine *buffer_c = Blst_p1_affine_val(buffer);
+
+  for (int i = 0; i < n_c; i++) {
+    blst_p1 *p = Blst_p1_val(Field(l, i));
+    blst_p1_to_affine(buffer_c + i, p);
+  }
+  CAMLreturn(Val_unit);
+}
+
+// NB: we do not check i is smaller than the array size because it is supposed
+// to be done on the caml side
+CAMLprim value caml_blst_p1_affine_array_get_stubs(value buffer, value list,
+                                                   value i) {
+  CAMLparam3(buffer, list, i);
+  blst_p1 *buffer_c = Blst_p1_val(buffer);
+  blst_p1_affine *list_c = Blst_p1_affine_val(list);
+  int i_c = Int_val(i);
+
+  blst_p1_from_affine(buffer_c, list_c + i_c);
+  CAMLreturn(Val_unit);
+}
+
+// Hypothesis: affine_list and scalars are arrays of size *at least* start +
+// length
+CAMLprim value caml_blst_g1_pippenger_contiguous_affine_array_stubs(
+    value buffer, value affine_list, value scalars, value start, value len) {
+  CAMLparam5(buffer, affine_list, scalars, start, len);
+  size_t start_c = ctypes_size_t_val(start);
+  size_t len_c = ctypes_size_t_val(len);
+  blst_p1_affine **l_c_address =
+      (blst_p1_affine **)(malloc(sizeof(blst_p1_affine *)));
+  *l_c_address = Blst_p1_affine_val(affine_list) + start_c;
+
+  byte **scalars_bs = (byte **)calloc(len_c, sizeof(byte *));
+  blst_scalar scalar;
+
+  for (int i = 0; i < len_c; i++) {
+    scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
+    blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
+    blst_lendian_from_scalar(scalars_bs[i], &scalar);
+  }
+  limb_t *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(len_c));
+
+  blst_p1s_mult_pippenger(Blst_p1_val(buffer), l_c_address, len_c, scalars_bs,
+                          256, scratch);
+
+  for (int i = 0; i < len_c; i++) {
+    free(scalars_bs[i]);
+  }
+  free(scalars_bs);
+  free(l_c_address);
+  free(scratch);
+
+  CAMLreturn(Val_unit);
+}
+
+static struct custom_operations blst_p2_affine_array_ops = {
+    "blst_p2_affine_array",     custom_finalize_default,
+    custom_compare_default,     custom_hash_default,
+    custom_serialize_default,   custom_deserialize_default,
+    custom_compare_ext_default, custom_fixed_length_default};
+
+CAMLprim value allocate_p2_affine_array_stubs(value n) {
+  CAMLparam1(n);
+  int n_c = Int_val(n);
+  CAMLlocal1(block);
+  block = caml_alloc_custom(&blst_p2_affine_array_ops,
+                            sizeof(blst_p2_affine) * n_c, 0, 1);
+  CAMLreturn(block);
+}
+
+CAMLprim value caml_blst_p2_affine_array_set_p2_points_stubs(value buffer,
+                                                             value l, value n) {
+  CAMLparam3(buffer, l, n);
+  int n_c = Int_val(n);
+  blst_p2_affine *buffer_c = Blst_p2_affine_val(buffer);
+
+  for (int i = 0; i < n_c; i++) {
+    blst_p2 *p = Blst_p2_val(Field(l, i));
+    blst_p2_to_affine(buffer_c + i, p);
+  }
+  CAMLreturn(Val_unit);
+}
+
+// NB: we do not check i is smaller than the array size because it is supposed
+// to be done on the caml side
+CAMLprim value caml_blst_p2_affine_array_get_stubs(value buffer, value list,
+                                                   value i) {
+  CAMLparam3(buffer, list, i);
+  blst_p2 *buffer_c = Blst_p2_val(buffer);
+  blst_p2_affine *list_c = Blst_p2_affine_val(list);
+  int i_c = Int_val(i);
+
+  blst_p2_from_affine(buffer_c, list_c + i_c);
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value caml_blst_g2_pippenger_contiguous_affine_array_stubs(
+    value buffer, value affine_list, value scalars, value start, value len) {
+  CAMLparam5(buffer, affine_list, scalars, start, len);
+  size_t start_c = ctypes_size_t_val(start);
+  size_t len_c = ctypes_size_t_val(len);
+  blst_p2_affine **l_c_address =
+      (blst_p2_affine **)(malloc(sizeof(blst_p2_affine *)));
+  *l_c_address = Blst_p2_affine_val(affine_list) + start_c;
+
+  byte **scalars_bs = (byte **)calloc(len_c, sizeof(byte *));
+  blst_scalar scalar;
+
+  for (int i = 0; i < len_c; i++) {
+    scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
+    blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
+    blst_lendian_from_scalar(scalars_bs[i], &scalar);
+  }
+  limb_t *scratch = calloc(1, blst_p2s_mult_pippenger_scratch_sizeof(len_c));
+
+  blst_p2s_mult_pippenger(Blst_p2_val(buffer), l_c_address, len_c, scalars_bs,
+                          256, scratch);
+
+  for (int i = 0; i < len_c; i++) {
+    free(scalars_bs[i]);
+  }
+  free(scalars_bs);
+  free(l_c_address);
+  free(scratch);
+
   CAMLreturn(Val_unit);
 }

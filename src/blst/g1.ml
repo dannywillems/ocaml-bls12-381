@@ -24,11 +24,20 @@
 (*****************************************************************************)
 
 module Stubs = struct
+  type affine_array
+
   type affine
 
   type jacobian
 
   external allocate_g1 : unit -> jacobian = "allocate_p1_stubs"
+
+  external allocate_g1_affine_contiguous_array : int -> affine_array
+    = "allocate_p1_affine_array_stubs"
+
+  external p1_affine_array_set_p1_points :
+    affine_array -> jacobian array -> int -> unit
+    = "caml_blst_p1_affine_array_set_p1_points_stubs"
 
   external allocate_g1_affine : unit -> affine = "allocate_p1_affine_stubs"
 
@@ -91,7 +100,18 @@ module Stubs = struct
     Fr.t array ->
     Unsigned.Size_t.t ->
     Unsigned.Size_t.t ->
-    unit = "caml_blst_g1_pippenger"
+    unit = "caml_blst_g1_pippenger_stubs"
+
+  external continuous_array_get : jacobian -> affine_array -> int -> unit
+    = "caml_blst_p1_affine_array_get_stubs"
+
+  external pippenger_with_affine_array :
+    jacobian ->
+    affine_array ->
+    Fr.t array ->
+    Unsigned.Size_t.t ->
+    Unsigned.Size_t.t ->
+    unit = "caml_blst_g1_pippenger_contiguous_affine_array_stubs"
 
   external mul_map_inplace : jacobian array -> Fr.Stubs.fr -> int -> unit
     = "caml_mul_map_g1_inplace_stubs"
@@ -102,11 +122,27 @@ module G1 = struct
 
   type t = Stubs.jacobian
 
+  type affine_array = Stubs.affine_array * int
+
   let global_buffer = Stubs.allocate_g1 ()
 
   let size_in_bytes = 96
 
   let memcpy dst src = Stubs.memcpy dst src
+
+  let to_affine_array l =
+    let length = Array.length l in
+    let buffer = Stubs.allocate_g1_affine_contiguous_array length in
+    Stubs.p1_affine_array_set_p1_points buffer l length ;
+    (buffer, length)
+
+  let of_affine_array (l, n) =
+    Array.init n (fun i ->
+        let p = Stubs.allocate_g1 () in
+        Stubs.continuous_array_get p l i ;
+        p)
+
+  let size_of_affine_array (_, n) = n
 
   let copy src =
     let dst = Stubs.allocate_g1 () in
@@ -300,7 +336,9 @@ module G1 = struct
     buffer
 
   let pippenger ?(start = 0) ?len ps ss =
-    let l = Array.length ps in
+    let l_ss = Array.length ss in
+    let l_ps = Array.length ps in
+    let l = min l_ss l_ps in
     let len = Option.value ~default:(l - start) len in
     if start < 0 || len < 1 || start + len > l then
       raise @@ Invalid_argument (Format.sprintf "start %i len %i" start len) ;
@@ -314,6 +352,24 @@ module G1 = struct
         (Unsigned.Size_t.of_int start)
         (Unsigned.Size_t.of_int len) ;
       buffer
+
+  let pippenger_with_affine_array ?(start = 0) ?len (ps, n) ss =
+    let l = min n (Array.length ss) in
+    let buffer = Stubs.allocate_g1 () in
+    let len = Option.value ~default:(l - start) len in
+    if start < 0 || len < 1 || start + len > n then
+      raise @@ Invalid_argument (Format.sprintf "start %i len %i" start len) ;
+    if len = 1 then (
+      Stubs.continuous_array_get buffer ps start ;
+      mul_inplace buffer ss.(start) )
+    else
+      Stubs.pippenger_with_affine_array
+        buffer
+        ps
+        ss
+        (Unsigned.Size_t.of_int start)
+        (Unsigned.Size_t.of_int len) ;
+    buffer
 end
 
 include G1
