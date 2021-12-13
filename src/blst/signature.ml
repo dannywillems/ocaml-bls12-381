@@ -75,6 +75,12 @@ type sk = Fr.Stubs.scalar
 
 type pk = Bytes.t
 
+let sk_size_in_bytes = Fr.size_in_bytes
+
+let pk_size_in_bytes = G1.size_in_bytes / 2
+
+let signature_size_in_bytes = G2.size_in_bytes / 2
+
 let sk_of_bytes_exn bytes =
   let buffer = Fr.Stubs.allocate_scalar () in
   if Bytes.length bytes > 32 then

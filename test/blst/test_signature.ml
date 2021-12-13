@@ -10,6 +10,33 @@ let read_file filename =
     close_in chan ;
     List.rev !lines
 
+let test_sk_size_in_bytes () =
+  let ikm = Bytes.init 32 (fun _ -> char_of_int (Random.int 256)) in
+  let sk = Bls12_381.Signature.generate_sk ikm in
+  assert (
+    Bls12_381.Signature.sk_size_in_bytes
+    = Bytes.length (Bls12_381.Signature.sk_to_bytes sk) )
+
+let test_pk_size_in_bytes () =
+  let ikm = Bytes.init 32 (fun _ -> char_of_int (Random.int 256)) in
+  let sk = Bls12_381.Signature.generate_sk ikm in
+  let pk = Bls12_381.Signature.derive_pk sk in
+  assert (
+    Bls12_381.Signature.pk_size_in_bytes
+    = Bytes.length (Bls12_381.Signature.pk_to_bytes pk) )
+
+let test_signature_size_in_bytes () =
+  let ikm = Bytes.init 32 (fun _ -> char_of_int (Random.int 256)) in
+  let sk = Bls12_381.Signature.generate_sk ikm in
+  let msg_length = 1 + Random.int 512 in
+  let msg = Bytes.init msg_length (fun _i -> char_of_int (Random.int 256)) in
+  let signature = Bls12_381.Signature.Basic.sign sk msg in
+  assert (Bls12_381.Signature.signature_size_in_bytes = Bytes.length signature) ;
+  let signature = Bls12_381.Signature.Aug.sign sk msg in
+  assert (Bls12_381.Signature.signature_size_in_bytes = Bytes.length signature) ;
+  let signature = Bls12_381.Signature.Pop.sign sk msg in
+  assert (Bls12_381.Signature.signature_size_in_bytes = Bytes.length signature)
+
 let test_keygen_raise_invalid_argument_if_ikm_too_small () =
   ignore
   @@ Alcotest.check_raises
@@ -685,6 +712,10 @@ let () =
       BasicProperties.get_tests ();
       AugProperties.get_tests ();
       PopProperties.get_tests ();
+      ( "Size in bytes",
+        [ test_case "sk" `Quick test_sk_size_in_bytes;
+          test_case "pk" `Quick test_pk_size_in_bytes;
+          test_case "signature" `Quick test_signature_size_in_bytes ] );
       ( "Proof of possession proof/verify properties",
         [ test_case
             "Prove and verify with correct keys"

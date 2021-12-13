@@ -519,6 +519,15 @@ module Signature : sig
   (* Not abstracting the type to avoid to write (de)serialisation routines *)
   type signature = Bytes.t
 
+  (** The size of a serialized value [sk] *)
+  val sk_size_in_bytes : int
+
+  (** The size of a serialized value [pk] *)
+  val pk_size_in_bytes : int
+
+  (** The size of a serialized value [signature] *)
+  val signature_size_in_bytes : int
+
   (** [sk_of_bytes_exn bs] attempts to deserialize [bs] into a secret key. [bs]
       must be the little endian representation of the secret key.
       In this case, secret keys are scalars of BLS12-381 and are encoded on 32
