@@ -8,6 +8,11 @@
  (modules bench_g1_bulk)
  (libraries bls12-381-unix))
 
+; (executable
+;  (name bench_g1_pippenger)
+;  (modules bench_g1_pippenger)
+;  (libraries bls12-381-unix domainslib))
+
 (executable
  (name bench_g2_bulk)
  (modules bench_g2_bulk)
