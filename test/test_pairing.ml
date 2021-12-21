@@ -32,7 +32,7 @@ let rec repeat n f =
     f
   else (
     f () ;
-    repeat (n - 1) f )
+    repeat (n - 1) f)
 
 module Properties = struct
   let with_zero_as_first_component () =
@@ -51,19 +51,19 @@ module Properties = struct
     assert (
       Fq12.eq
         (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
-        (Pairing.pairing (G1.mul g1 b) (G2.mul g2 a)) ) ;
+        (Pairing.pairing (G1.mul g1 b) (G2.mul g2 a))) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple (G1.mul g1 b) (G2.mul g2 a))) ) ;
+           (Pairing.miller_loop_simple (G1.mul g1 b) (G2.mul g2 a)))) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)]))
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop [(G1.mul g1 b, G2.mul g2 a)])) )
+           (Pairing.miller_loop [(G1.mul g1 b, G2.mul g2 a)])))
 
   let linearity_commutativity_scalar_with_only_one_scalar () =
     (* pairing(a * g_{1}, g_{2}) = pairing(a * g_{1}, g_{2})*)
@@ -73,19 +73,19 @@ module Properties = struct
     assert (
       Fq12.eq
         (Pairing.pairing g1 (G2.mul g2 a))
-        (Pairing.pairing (G1.mul g1 a) g2) ) ;
+        (Pairing.pairing (G1.mul g1 a) g2)) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple g1 (G2.mul g2 a)))
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple (G1.mul g1 a) g2)) ) ;
+           (Pairing.miller_loop_simple (G1.mul g1 a) g2))) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(g1, G2.mul g2 a)]))
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop [(G1.mul g1 a, g2)])) )
+           (Pairing.miller_loop [(G1.mul g1 a, g2)])))
 
   let linearity_scalar_in_scalar_with_only_one_scalar () =
     (* pairing(a * g_{1}, g_{2}) = pairing(g_{1}, g_{2}) ^ a*)
@@ -95,17 +95,17 @@ module Properties = struct
     assert (
       Fq12.eq
         (Pairing.pairing g1 (G2.mul g2 a))
-        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a)) ) ;
+        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a))) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple g1 (G2.mul g2 a)))
-        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a)) ) ;
+        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a))) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(g1, G2.mul g2 a)]))
-        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a)) )
+        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a)))
 
   let full_linearity () =
     let a = Fr.random () in
@@ -115,39 +115,39 @@ module Properties = struct
     assert (
       Fq12.eq
         (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
-        (Fq12.pow (Pairing.pairing g1 g2) (Z.mul (Fr.to_z a) (Fr.to_z b))) ) ;
+        (Fq12.pow (Pairing.pairing g1 g2) (Z.mul (Fr.to_z a) (Fr.to_z b)))) ;
     assert (
       Fq12.eq
         (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
-        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z (Fr.mul a b))) ) ;
+        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z (Fr.mul a b)))) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))
         (Fq12.pow
            (Pairing.final_exponentiation_exn (Pairing.miller_loop_simple g1 g2))
-           (Z.mul (Fr.to_z a) (Fr.to_z b))) ) ;
+           (Z.mul (Fr.to_z a) (Fr.to_z b)))) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))
         (Fq12.pow
            (Pairing.final_exponentiation_exn (Pairing.miller_loop_simple g1 g2))
-           (Fr.to_z (Fr.mul a b))) ) ;
+           (Fr.to_z (Fr.mul a b)))) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)]))
         (Fq12.pow
            (Pairing.final_exponentiation_exn (Pairing.miller_loop [(g1, g2)]))
-           (Z.mul (Fr.to_z a) (Fr.to_z b))) ) ;
+           (Z.mul (Fr.to_z a) (Fr.to_z b)))) ;
     assert (
       Fq12.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)]))
         (Fq12.pow
            (Pairing.final_exponentiation_exn (Pairing.miller_loop [(g1, g2)]))
-           (Fr.to_z (Fr.mul a b))) )
+           (Fr.to_z (Fr.mul a b))))
 
   let result_pairing_with_miller_loop_followed_by_final_exponentiation () =
     let a = Fr.random () in
@@ -158,12 +158,12 @@ module Properties = struct
       Fq12.eq
         (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b))) ) ;
+           (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))) ;
     assert (
       Fq12.eq
         (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
         (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)])) )
+           (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)])))
 
   let test_miller_loop_empty_list_returns_one () =
     assert (Fq12.is_one (Pairing.miller_loop []))
@@ -190,17 +190,16 @@ let test_vectors_one_one () =
     Fq12.eq
       (Pairing.final_exponentiation_exn
          (Pairing.miller_loop_simple G1.one G2.one))
-      result_pairing_one_one ) ;
+      result_pairing_one_one) ;
   (* We check the final exponentiation is not done already *)
   assert (
     not
       (Fq12.eq
          (Pairing.miller_loop_simple G1.one G2.one)
-         result_pairing_one_one) ) ;
+         result_pairing_one_one)) ;
   assert (
     not
-      (Fq12.eq (Pairing.miller_loop [(G1.one, G2.one)]) result_pairing_one_one)
-  )
+      (Fq12.eq (Pairing.miller_loop [(G1.one, G2.one)]) result_pairing_one_one))
 
 let test_vectors_one_one_two_miller_loop () =
   (* Compute P(1, 1) * P(1, 1) using miller loop and check it is equal to the
@@ -213,7 +212,7 @@ let test_vectors_one_one_two_miller_loop () =
     Fq12.eq
       (Pairing.final_exponentiation_exn
          (Pairing.miller_loop [(G1.one, G2.one); (G1.one, G2.one)]))
-      expected_result )
+      expected_result)
 
 let test_vectors_one_one_random_times_miller_loop () =
   (* Compute P(1, 1) n times using miller loop and check it is equal to the
@@ -230,7 +229,7 @@ let test_vectors_one_one_random_times_miller_loop () =
   assert (
     Fq12.eq
       (Pairing.final_exponentiation_exn (Pairing.miller_loop point_list))
-      expected_result )
+      expected_result)
 
 let test_miller_loop_pairing_random_number_of_points () =
   (* Check miller_loop followed by final exponentiation equals the product of

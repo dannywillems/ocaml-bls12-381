@@ -20,9 +20,9 @@ check-blst-version:
 
 lint:
   stage: lint
-  image: ocaml/opam:debian-ocaml-4.11
+  image: ocaml/opam:debian-ocaml-4.12
   before_script:
-    - opam install ocamlformat.0.15.0
+    - opam install ocamlformat.0.20.0
   script:
     - dune build @fmt
   rules:

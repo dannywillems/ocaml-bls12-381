@@ -153,7 +153,7 @@ module Fq12 = struct
     else if Z.equal n Z.one then x
     else
       let n = Z.erem n (Z.pred order) in
-      let (a, r) = Z.ediv_rem n two_z in
+      let a, r = Z.ediv_rem n two_z in
       let acc = pow x a in
       let acc_square = mul acc acc in
       if Z.equal r Z.zero then acc_square else mul acc_square x

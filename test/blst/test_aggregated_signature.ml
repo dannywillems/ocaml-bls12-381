@@ -174,7 +174,7 @@ module BasicProperties = struct
           `Quick
           test_verify_not_distinct_messages_should_raise_invalid_argument ]
     in
-    let (desc, tests) = get_tests () in
+    let desc, tests = get_tests () in
     (desc, List.concat [specific_tests; tests])
 end
 
@@ -217,7 +217,7 @@ module AugProperties = struct
           `Quick
           test_verify_same_msg ]
     in
-    let (desc, tests) = get_tests () in
+    let desc, tests = get_tests () in
     (desc, List.concat [specific_tests; tests])
 end
 
@@ -246,7 +246,7 @@ module PopProperties = struct
       Bls12_381.Signature.Pop.aggregate_verify
         pks_with_proofs
         msg
-        aggregated_signatures )
+        aggregated_signatures)
 
   let test_sign_and_verify_correct_signature_with_correct_pks_pops_and_incorrect_msg
       () =
@@ -278,7 +278,7 @@ module PopProperties = struct
         (Bls12_381.Signature.Pop.aggregate_verify
            pks_with_proofs
            msg'
-           aggregated_signatures) )
+           aggregated_signatures))
 
   let test_sign_and_verify_incorrect_signature_with_correct_pks_pops_msg () =
     let msg =
@@ -310,7 +310,7 @@ module PopProperties = struct
         (Bls12_381.Signature.Pop.aggregate_verify
            pks_with_proofs
            msg
-           aggregated_signatures) )
+           aggregated_signatures))
 
   let test_sign_and_verify_correct_signature_with_some_correct_pks_and_incorrect_pops_and_msg
       () =
@@ -343,7 +343,7 @@ module PopProperties = struct
         (Bls12_381.Signature.Pop.aggregate_verify
            pks_with_proofs
            msg
-           aggregated_signatures) )
+           aggregated_signatures))
 
   let test_sign_and_verify_correct_signature_with_some_incorrect_pks_pops_and_correct_msg
       () =
@@ -380,7 +380,7 @@ module PopProperties = struct
         (Bls12_381.Signature.Pop.aggregate_verify
            pks_with_proofs
            msg
-           aggregated_signatures) )
+           aggregated_signatures))
 
   let test_sign_and_verify_correct_signature_with_some_incorrect_pks_and_correct_pops_and_msg
       () =
@@ -413,7 +413,7 @@ module PopProperties = struct
         (Bls12_381.Signature.Pop.aggregate_verify
            pks_with_proofs
            msg
-           aggregated_signatures) )
+           aggregated_signatures))
 
   let get_tests () =
     let open Alcotest in

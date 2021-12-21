@@ -106,7 +106,7 @@ module Fr = struct
     if Bytes.length bs < size_in_bytes then (
       let padded_bytes = Bytes.make size_in_bytes '\000' in
       Bytes.blit bs 0 padded_bytes 0 (Bytes.length bs) ;
-      padded_bytes )
+      padded_bytes)
     else Bytes.copy bs
 
   let of_bytes_opt bs =
@@ -127,7 +127,7 @@ module Fr = struct
     if Bytes.length bs = size_in_bytes then (
       let buffer_scalar = Stubs.allocate_scalar () in
       Stubs.scalar_of_bytes_le buffer_scalar bs ;
-      Stubs.check_scalar buffer_scalar )
+      Stubs.check_scalar buffer_scalar)
     else false
 
   let zero = of_bytes_exn (Bytes.make size_in_bytes '\000')
@@ -259,7 +259,7 @@ module Fr = struct
     else if Z.equal n Z.one then x
     else
       let n = Z.erem n (Z.pred order) in
-      let (a, r) = Z.ediv_rem n two_z in
+      let a, r = Z.ediv_rem n two_z in
       let acc = pow x a in
       let acc_square = mul acc acc in
       if Z.equal r Z.zero then acc_square else mul acc_square x
@@ -285,7 +285,7 @@ module Fr = struct
 
   let factor_power_of_two =
     let rec aux i n =
-      let (q, r) = Z.ediv_rem n two_z in
+      let q, r = Z.ediv_rem n two_z in
       if Z.equal r Z.zero then aux Int.(succ i) q else (i, n)
     in
     aux 0 (Z.pred order)
@@ -307,7 +307,7 @@ module Fr = struct
     if not (is_quadratic_residue x) then None
     else
       (* https://en.wikipedia.org/wiki/Tonelli%E2%80%93Shanks_algorithm *)
-      let (s, q) = factor_power_of_two in
+      let s, q = factor_power_of_two in
       (* implies p = 3 mod 4 *)
       if Int.equal s 1 then
         (* r = x^((p + 1) / 4) *)

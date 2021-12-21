@@ -54,7 +54,7 @@ let rec repeat n f =
     f
   else (
     f () ;
-    repeat (n - 1) f )
+    repeat (n - 1) f)
 
 module Tests = Ff_pbt.MakeAll (Bls12_381.Fr)
 
@@ -176,14 +176,14 @@ module StringRepresentation = struct
         assert (
           Bls12_381.Fr.eq
             (Bls12_381.Fr.of_string x)
-            (Bls12_381.Fr.of_z (Z.of_string x)) ))
+            (Bls12_381.Fr.of_z (Z.of_string x))))
       test_vectors
 
   let test_of_string_to_string_consistency () =
     List.iter
       (fun x ->
         assert (
-          String.equal (Bls12_381.Fr.to_string (Bls12_381.Fr.of_string x)) x ))
+          String.equal (Bls12_381.Fr.to_string (Bls12_381.Fr.of_string x)) x))
       test_vectors
 
   let test_of_string_higher_than_the_modulus () =
@@ -218,7 +218,7 @@ module ZRepresentation = struct
 
   let test_of_z_one () =
     assert (
-      Bls12_381.Fr.eq Bls12_381.Fr.one (Bls12_381.Fr.of_z (Z.of_string "1")) )
+      Bls12_381.Fr.eq Bls12_381.Fr.one (Bls12_381.Fr.of_z (Z.of_string "1")))
 
   let test_random_of_z_and_to_z () =
     let x = Bls12_381.Fr.random () in
@@ -275,7 +275,7 @@ module BytesRepresentation = struct
     assert (
       Bls12_381.Fr.eq
         (Bls12_381.Fr.of_bytes_exn bytes)
-        (Bls12_381.Fr.of_string (Z.to_string r_z)) ) ;
+        (Bls12_381.Fr.of_string (Z.to_string r_z))) ;
     let r = Bls12_381.Fr.random () in
     (* Use Fr repr *)
     let bytes_r = Bls12_381.Fr.to_bytes r in
@@ -362,14 +362,14 @@ module TestVector = struct
         assert (
           Bls12_381.Fr.eq
             (Bls12_381.Fr.inverse_exn (Bls12_381.Fr.of_string e))
-            (Bls12_381.Fr.of_string i) ))
+            (Bls12_381.Fr.of_string i)))
       test_vectors ;
     List.iter
       (fun (e, i) ->
         assert (
           Bls12_381.Fr.eq
             (Bls12_381.Fr.inverse_exn (Bls12_381.Fr.of_string i))
-            (Bls12_381.Fr.of_string e) ))
+            (Bls12_381.Fr.of_string e)))
       test_vectors
 
   let test_add_bulk () =
@@ -379,7 +379,7 @@ module TestVector = struct
       Bls12_381.Fr.(
         eq
           (List.fold_left Bls12_381.Fr.add Bls12_381.Fr.zero xs)
-          (Bls12_381.Fr.add_bulk xs)) )
+          (Bls12_381.Fr.add_bulk xs)))
 
   let test_mul_bulk () =
     let n = 10 + Random.int 1_000 in
@@ -418,7 +418,7 @@ module TestVector = struct
             (Bls12_381.Fr.add
                (Bls12_381.Fr.of_string e1)
                (Bls12_381.Fr.of_string e2))
-            (Bls12_381.Fr.of_string expected_result) ))
+            (Bls12_381.Fr.of_string expected_result)))
       test_vectors ;
     List.iter
       (fun (e1, e2, expected_result) ->
@@ -427,7 +427,7 @@ module TestVector = struct
             (Bls12_381.Fr.add
                (Bls12_381.Fr.of_string e2)
                (Bls12_381.Fr.of_string e1))
-            (Bls12_381.Fr.of_string expected_result) ))
+            (Bls12_381.Fr.of_string expected_result)))
       test_vectors
 
   let test_mul () =
@@ -456,7 +456,7 @@ module TestVector = struct
             (Bls12_381.Fr.mul
                (Bls12_381.Fr.of_string e1)
                (Bls12_381.Fr.of_string e2))
-            (Bls12_381.Fr.of_string expected_result) ))
+            (Bls12_381.Fr.of_string expected_result)))
       test_vectors ;
     List.iter
       (fun (e1, e2, expected_result) ->
@@ -465,7 +465,7 @@ module TestVector = struct
             (Bls12_381.Fr.mul
                (Bls12_381.Fr.of_string e2)
                (Bls12_381.Fr.of_string e1))
-            (Bls12_381.Fr.of_string expected_result) ))
+            (Bls12_381.Fr.of_string expected_result)))
       test_vectors
 
   let test_opposite () =
@@ -488,14 +488,14 @@ module TestVector = struct
         assert (
           Bls12_381.Fr.eq
             (Bls12_381.Fr.negate (Bls12_381.Fr.of_string e1))
-            (Bls12_381.Fr.of_string expected_result) ))
+            (Bls12_381.Fr.of_string expected_result)))
       test_vectors ;
     List.iter
       (fun (e1, expected_result) ->
         assert (
           Bls12_381.Fr.eq
             (Bls12_381.Fr.negate (Bls12_381.Fr.of_string expected_result))
-            (Bls12_381.Fr.of_string e1) ))
+            (Bls12_381.Fr.of_string e1)))
       test_vectors
 
   let test_pow () =
@@ -522,7 +522,7 @@ module TestVector = struct
         assert (
           Bls12_381.Fr.eq
             (Bls12_381.Fr.pow (Bls12_381.Fr.of_string x) (Z.of_string e))
-            (Bls12_381.Fr.of_string expected_result) ))
+            (Bls12_381.Fr.of_string expected_result)))
       test_vectors
 
   let get_tests () =
@@ -1034,7 +1034,7 @@ let () =
   let open Alcotest in
   run
     "Fr"
-    ( TestVector.get_tests ()
+    (TestVector.get_tests ()
     :: ZRepresentation.get_tests ()
     :: Memory.get_tests ()
     :: AdditionalConstructors.get_tests ()
@@ -1043,4 +1043,4 @@ let () =
     :: OCamlComparisonOperators.get_tests ()
     :: InnerProduct.get_tests ()
     :: StringRepresentation.get_tests ()
-    :: FFT.get_tests () :: Tests.get_tests () )
+    :: FFT.get_tests () :: Tests.get_tests ())

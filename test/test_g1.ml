@@ -132,7 +132,7 @@ module Constructors = struct
     in
     let res = G1.of_z_opt ~x:x_res ~y:y_res in
     match (res, p1, p2) with
-    | (Some res, Some p1, Some p2) -> assert (G1.eq res (G1.add p1 p2))
+    | Some res, Some p1, Some p2 -> assert (G1.eq res (G1.add p1 p2))
     | _ -> assert false
 
   let test_vectors_zero_and_2_not_on_curve () =
@@ -359,8 +359,7 @@ module CompressedRepresentation = struct
     let x = Bls12_381.G1.random () in
     let x_uncompressed_bytes = Bls12_381.G1.to_bytes x in
     assert (
-      Option.is_none (Bls12_381.G1.of_compressed_bytes_opt x_uncompressed_bytes)
-    ) ;
+      Option.is_none (Bls12_381.G1.of_compressed_bytes_opt x_uncompressed_bytes)) ;
     try
       ignore @@ Bls12_381.G1.of_compressed_bytes_exn x_uncompressed_bytes ;
       assert false
@@ -394,7 +393,7 @@ module CompressedRepresentation = struct
 
   let get_tests () =
     let open Alcotest in
-    let (name, common_tests) = get_tests () in
+    let name, common_tests = get_tests () in
     ( name,
       test_case "vectors" `Quick test_vectors
       :: test_case

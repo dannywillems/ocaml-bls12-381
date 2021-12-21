@@ -132,7 +132,7 @@ module G1 = struct
         let buffer = Stubs.allocate_g1 () in
         Stubs.from_affine buffer buffer_affine ;
         let is_in_prime_subgroup = Stubs.in_g1 buffer in
-        if is_in_prime_subgroup then Some buffer else None )
+        if is_in_prime_subgroup then Some buffer else None)
       else None
 
   let of_bytes_exn bs =
@@ -163,7 +163,7 @@ module G1 = struct
       let buffer = Stubs.allocate_g1 () in
       Stubs.from_affine buffer buffer_affine ;
       let is_in_prime_subgroup = Stubs.in_g1 buffer in
-      if is_in_prime_subgroup then Some buffer else None )
+      if is_in_prime_subgroup then Some buffer else None)
     else None
 
   let of_compressed_bytes_exn bs =

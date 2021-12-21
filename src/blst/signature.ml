@@ -200,7 +200,7 @@ let core_verify pk msg signature_bytes ciphersuite =
         in
         if res = 0 then (
           Stubs.pairing_commit ctxt ;
-          Stubs.pairing_finalverify ctxt )
+          Stubs.pairing_finalverify ctxt)
         else false
       else false)
 
@@ -214,7 +214,7 @@ let aggregate_signature_opt signatures =
         | None -> None
         | Some signature ->
             let acc = G2.(add signature acc) in
-            aux signatures acc )
+            aux signatures acc)
   in
   let res = aux signatures G2.zero in
   Option.map G2.to_compressed_bytes res
@@ -291,7 +291,7 @@ let core_aggregate_verify pks_with_msgs aggregated_signature ciphersuite =
             let res = aux (Some signature_affine) pks_with_msgs ctxt in
             if res then (
               Stubs.pairing_commit ctxt ;
-              Stubs.pairing_finalverify ctxt )
+              Stubs.pairing_finalverify ctxt)
             else false)
   else false
 

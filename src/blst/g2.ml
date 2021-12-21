@@ -129,7 +129,7 @@ module G2 = struct
         let buffer = Stubs.allocate_g2 () in
         Stubs.from_affine buffer buffer_affine ;
         let is_in_prime_subgroup = Stubs.in_g2 buffer in
-        if is_in_prime_subgroup then Some buffer else None )
+        if is_in_prime_subgroup then Some buffer else None)
       else None
 
   let of_bytes_exn bs =
@@ -142,7 +142,7 @@ module G2 = struct
       let buffer = Stubs.allocate_g2 () in
       Stubs.from_affine buffer buffer_affine ;
       let is_in_prime_subgroup = Stubs.in_g2 buffer in
-      if is_in_prime_subgroup then Some buffer else None )
+      if is_in_prime_subgroup then Some buffer else None)
     else None
 
   let of_compressed_bytes_exn bs =
@@ -271,8 +271,8 @@ module G2 = struct
     buffer
 
   let of_z_opt ~x ~y =
-    let (x1, x2) = x in
-    let (y1, y2) = y in
+    let x1, x2 = x in
+    let y1, y2 = y in
     let x1_bytes = Bytes.of_string (Z.to_bits x1) in
     let x2_bytes = Bytes.of_string (Z.to_bits x2) in
     let y1_bytes = Bytes.of_string (Z.to_bits y1) in

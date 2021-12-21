@@ -28,7 +28,7 @@ let rec repeat n f =
     f
   else (
     f () ;
-    repeat (n - 1) f )
+    repeat (n - 1) f)
 
 (* copied from G_SIG to remove the dependency on
    bls12-381-gen
@@ -350,7 +350,7 @@ module MakeECProperties (G : G_SIG) = struct
       G.(
         eq
           (mul g (Scalar.add a (Scalar.negate a)))
-          (add (mul g a) (mul g (Scalar.negate a)))) )
+          (add (mul g a) (mul g (Scalar.negate a)))))
 
   (** a g + b + g = (a + b) g*)
   let additive_associativity_with_scalar () =

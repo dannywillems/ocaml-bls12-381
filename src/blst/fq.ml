@@ -56,7 +56,7 @@ module Fq = struct
     if Bytes.length bs < size_in_bytes then (
       let padded_bytes = Bytes.make size_in_bytes '\000' in
       Bytes.blit bs 0 padded_bytes 0 (Bytes.length bs) ;
-      padded_bytes )
+      padded_bytes)
     else Bytes.copy bs
 
   let of_bytes_opt bs =

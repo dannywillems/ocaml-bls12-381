@@ -15,7 +15,7 @@ let test_sk_size_in_bytes () =
   let sk = Bls12_381.Signature.generate_sk ikm in
   assert (
     Bls12_381.Signature.sk_size_in_bytes
-    = Bytes.length (Bls12_381.Signature.sk_to_bytes sk) )
+    = Bytes.length (Bls12_381.Signature.sk_to_bytes sk))
 
 let test_pk_size_in_bytes () =
   let ikm = Bytes.init 32 (fun _ -> char_of_int (Random.int 256)) in
@@ -23,7 +23,7 @@ let test_pk_size_in_bytes () =
   let pk = Bls12_381.Signature.derive_pk sk in
   assert (
     Bls12_381.Signature.pk_size_in_bytes
-    = Bytes.length (Bls12_381.Signature.pk_to_bytes pk) )
+    = Bytes.length (Bls12_381.Signature.pk_to_bytes pk))
 
 let test_signature_size_in_bytes () =
   let ikm = Bytes.init 32 (fun _ -> char_of_int (Random.int 256)) in
@@ -78,7 +78,7 @@ let test_pk_of_bytes_opt_accepts_points_in_the_subgroup_and_in_compressed_form
   let pk = Bls12_381.G1.random () in
   let pk_compressed_bytes = Bls12_381.G1.to_compressed_bytes pk in
   assert (
-    Option.is_some (Bls12_381.Signature.pk_of_bytes_opt pk_compressed_bytes) )
+    Option.is_some (Bls12_381.Signature.pk_of_bytes_opt pk_compressed_bytes))
 
 let test_pk_of_bytes_exn_accepts_points_in_the_subgroup_and_in_compressed_form
     () =
@@ -103,8 +103,7 @@ let test_pk_of_bytes_opt_does_not_accept_points_in_the_subgroup_and_in_uncompres
   let pk = Bls12_381.G1.random () in
   let pk_uncompressed_bytes = Bls12_381.G1.to_bytes pk in
   assert (
-    Option.is_none (Bls12_381.Signature.pk_of_bytes_opt pk_uncompressed_bytes)
-  )
+    Option.is_none (Bls12_381.Signature.pk_of_bytes_opt pk_uncompressed_bytes))
 
 let test_pk_to_bytes_of_bytes_exn_are_inverse_functions_on_valid_inputs () =
   let pk = Bls12_381.G1.random () in
@@ -113,7 +112,7 @@ let test_pk_to_bytes_of_bytes_exn_are_inverse_functions_on_valid_inputs () =
     Bytes.equal
       pk_bytes
       (Bls12_381.Signature.pk_to_bytes
-         (Bls12_381.Signature.pk_of_bytes_exn pk_bytes)) )
+         (Bls12_381.Signature.pk_of_bytes_exn pk_bytes)))
 
 let test_pk_to_bytes_of_bytes_opt_are_inverse_functions_on_valid_inputs () =
   let pk = Bls12_381.G1.random () in
@@ -122,7 +121,7 @@ let test_pk_to_bytes_of_bytes_opt_are_inverse_functions_on_valid_inputs () =
     Bytes.equal
       pk_bytes
       (Bls12_381.Signature.pk_to_bytes
-         (Option.get (Bls12_381.Signature.pk_of_bytes_opt pk_bytes))) )
+         (Option.get (Bls12_381.Signature.pk_of_bytes_opt pk_bytes))))
 
 let test_pk_to_bytes_unsafe_of_bytes_are_inverse_functions_on_valid_inputs () =
   let pk = Bls12_381.G1.random () in
@@ -131,7 +130,7 @@ let test_pk_to_bytes_unsafe_of_bytes_are_inverse_functions_on_valid_inputs () =
     Bytes.equal
       pk_bytes
       (Bls12_381.Signature.pk_to_bytes
-         (Bls12_381.Signature.unsafe_pk_of_bytes pk_bytes)) )
+         (Bls12_381.Signature.unsafe_pk_of_bytes pk_bytes)))
 
 let test_pk_to_bytes_unsafe_of_bytes_are_inverse_functions_on_any_input () =
   let pk_bytes =
@@ -141,7 +140,7 @@ let test_pk_to_bytes_unsafe_of_bytes_are_inverse_functions_on_any_input () =
     Bytes.equal
       pk_bytes
       (Bls12_381.Signature.pk_to_bytes
-         (Bls12_381.Signature.unsafe_pk_of_bytes pk_bytes)) )
+         (Bls12_381.Signature.unsafe_pk_of_bytes pk_bytes)))
 
 let test_unsafe_pk_of_bytes_copies_the_input () =
   let initial_pk_bytes =
@@ -469,7 +468,7 @@ module MakeTestVectorsFromFile (Scheme : SIG_SCHEME) = struct
       List.iter
         (fun content ->
           let contents = String.split_on_char ' ' content in
-          let (msg_str, ikm_str, expected_result_str) =
+          let msg_str, ikm_str, expected_result_str =
             (List.nth contents 0, List.nth contents 1, List.nth contents 2)
           in
           let msg = Hex.(to_bytes (`Hex msg_str)) in
@@ -560,7 +559,7 @@ let test_pop_g2_from_blst_sigs_ref_files files () =
     List.iter
       (fun content ->
         let contents = String.split_on_char ' ' content in
-        let (ikm_str, exp_result_str) =
+        let ikm_str, exp_result_str =
           (List.nth contents 1, List.nth contents 2)
         in
         let ikm_bytes = Hex.(to_bytes (`Hex ikm_str)) in

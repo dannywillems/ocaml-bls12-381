@@ -36,7 +36,7 @@ let fft (type a b) (module G : C with type group = a and type scalar = b)
       Array.append points (Array.init (n - len_points) (fun _ -> G.copy G.zero))
     else (
       assert (n = len_points) ;
-      points )
+      points)
   in
   G.fft_inplace output domain logn ;
   output

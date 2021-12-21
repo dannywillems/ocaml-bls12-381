@@ -17,7 +17,7 @@ let test_vectors_g1_from_bls_sigs_ref_files () =
     List.iter
       (fun content ->
         let contents = String.split_on_char ' ' content in
-        let (msg_str, expected_result_str) =
+        let msg_str, expected_result_str =
           (List.nth contents 0, List.nth contents 2)
         in
         let msg = Hex.(to_bytes (`Hex msg_str)) in
@@ -54,7 +54,7 @@ let test_vectors_g2_from_bls_sigs_ref_files () =
     List.iter
       (fun content ->
         let contents = String.split_on_char ' ' content in
-        let (msg_str, expected_result_str) =
+        let msg_str, expected_result_str =
           (List.nth contents 0, List.nth contents 2)
         in
         let msg = Hex.(to_bytes (`Hex msg_str)) in

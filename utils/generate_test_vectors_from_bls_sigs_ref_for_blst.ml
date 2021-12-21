@@ -18,7 +18,7 @@ let sig_files filenames sign_fn =
     List.iter
       (fun content ->
         let contents = String.split_on_char ' ' content in
-        let (msg_str, ikm_str, initial_res_str) =
+        let msg_str, ikm_str, initial_res_str =
           (List.nth contents 0, List.nth contents 1, List.nth contents 2)
         in
         let msg = Hex.(to_bytes (`Hex msg_str)) in
@@ -43,7 +43,7 @@ let pop_files filenames =
     List.iter
       (fun content ->
         let contents = String.split_on_char ' ' content in
-        let (dummy_str, ikm_str, initial_res_str) =
+        let dummy_str, ikm_str, initial_res_str =
           (List.nth contents 0, List.nth contents 1, List.nth contents 2)
         in
         let ikm = Hex.to_bytes (`Hex ikm_str) in
