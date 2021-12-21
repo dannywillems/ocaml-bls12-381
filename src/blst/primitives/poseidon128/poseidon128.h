@@ -16,7 +16,6 @@ typedef struct poseidon128_ctxt_s {
 
 int poseidon128_constants_init(blst_fr *akr, blst_fr **mds, int ark_len,
                                int mds_nb_rows, int mds_nb_cols);
-void poseidon128_finalize(void);
 void poseidon128_init(poseidon128_ctxt_t *ctxt, blst_fr *a, blst_fr *b,
                       blst_fr *c);
 void poseidon128_apply_perm(poseidon128_ctxt_t *ctxt);

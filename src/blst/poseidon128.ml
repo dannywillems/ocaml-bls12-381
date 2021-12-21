@@ -7,8 +7,6 @@ module Stubs = struct
     Fr.t array -> Fr.t array array -> int -> int -> int -> int
     = "caml_poseidon128_constants_init_stubs"
 
-  external finalize : unit -> unit = "caml_poseidon128_finalize_stubs"
-
   external init : ctxt -> Fr.t -> Fr.t -> Fr.t -> unit
     = "caml_poseidon128_init_stubs"
 
@@ -40,5 +38,3 @@ let get ctxt =
   let c = Fr.Stubs.mallocate_fr () in
   Stubs.get_state a b c ctxt ;
   [| a; b; c |]
-
-let finalize = Stubs.finalize

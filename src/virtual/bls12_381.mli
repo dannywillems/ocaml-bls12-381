@@ -677,8 +677,6 @@ module Poseidon128 : sig
   val apply_perm : ctxt -> unit
 
   val get : ctxt -> Fr.t array
-
-  val finalize : unit -> unit
 end
 
 (** Return [true] if the environment variable `BLST_PORTABLE` was set when
