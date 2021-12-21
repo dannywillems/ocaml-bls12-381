@@ -8,8 +8,7 @@ let t1 =
   let inputs = Array.init n ~f:(fun _i -> Bls12_381.Fr.random ()) in
   let name =
     Printf.sprintf
-      "Benchmark one permutation of Poseidon128 (Orchard parameters) with on \
-       an input of %d elements"
+      "Benchmark one permutation of Poseidon128 with on an input of %d elements"
       n
   in
   Bench.Test.create ~name (fun () ->
