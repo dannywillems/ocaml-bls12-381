@@ -47,7 +47,7 @@ let with_pool f =
       ~name:"pool"
       ()
   in
-  let res = f pool in
+  let res = Domainslib.Task.run pool (fun _ -> f pool) in
   Domainslib.Task.teardown_pool pool ;
   res
 
