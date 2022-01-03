@@ -25,10 +25,10 @@
 exception FailToComputeFinalExponentiation of Fq12.t
 
 module Stubs = struct
-  external miller_loop : Fq12.t -> G2.Stubs.affine -> G1.Stubs.affine -> unit
+  external miller_loop : Fq12.t -> G2.Stubs.affine -> G1.Stubs.affine -> int
     = "caml_blst_miller_loop_stubs"
 
-  external final_exponentiation : Fq12.t -> Fq12.t -> unit
+  external final_exponentiation : Fq12.t -> Fq12.t -> int
     = "caml_blst_final_exponentiation_stubs"
 end
 
@@ -36,9 +36,9 @@ let miller_loop_simple g1 g2 =
   let buffer = Fq12.Stubs.allocate_fq12 () in
   let g1_affine = G1.Stubs.allocate_g1_affine () in
   let g2_affine = G2.Stubs.allocate_g2_affine () in
-  G1.Stubs.to_affine g1_affine g1 ;
-  G2.Stubs.to_affine g2_affine g2 ;
-  Stubs.miller_loop buffer g2_affine g1_affine ;
+  ignore @@ G1.Stubs.to_affine g1_affine g1 ;
+  ignore @@ G2.Stubs.to_affine g2_affine g2 ;
+  ignore @@ Stubs.miller_loop buffer g2_affine g1_affine ;
   buffer
 
 let miller_loop l =
@@ -55,14 +55,14 @@ let final_exponentiation_opt x =
   if Fq12.is_zero x then None
   else
     let buffer = Fq12.Stubs.allocate_fq12 () in
-    Stubs.final_exponentiation buffer x ;
+    ignore @@ Stubs.final_exponentiation buffer x ;
     Some buffer
 
 let final_exponentiation_exn x =
   if Fq12.is_zero x then raise (FailToComputeFinalExponentiation x)
   else
     let buffer = Fq12.Stubs.allocate_fq12 () in
-    Stubs.final_exponentiation buffer x ;
+    ignore @@ Stubs.final_exponentiation buffer x ;
     buffer
 
 let pairing g1 g2 =

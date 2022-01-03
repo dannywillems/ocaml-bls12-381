@@ -1,5 +1,6 @@
 #include "blst.h"
 #define CAML_NAME_SPACE
+#include "blst_fr_misc.h"
 #include "caml_bls12_381_stubs.h"
 #include "ocaml_integers.h"
 #include <caml/alloc.h>
@@ -190,55 +191,55 @@ CAMLprim value mallocate_fr_stubs(value unit) {
 CAMLprim value caml_blst_fr_add_stubs(value ret, value p1, value p2) {
   CAMLparam3(ret, p1, p2);
   blst_fr_add(Blst_fr_val(ret), Blst_fr_val(p1), Blst_fr_val(p2));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fr_mul_stubs(value ret, value p1, value p2) {
   CAMLparam3(ret, p1, p2);
   blst_fr_mul(Blst_fr_val(ret), Blst_fr_val(p1), Blst_fr_val(p2));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fr_sqr_stubs(value ret, value p1) {
   CAMLparam2(ret, p1);
   blst_fr_sqr(Blst_fr_val(ret), Blst_fr_val(p1));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fr_eucl_inverse_stubs(value ret, value p1) {
   CAMLparam2(ret, p1);
   blst_fr_eucl_inverse(Blst_fr_val(ret), Blst_fr_val(p1));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fr_sub_stubs(value ret, value p1, value p2) {
   CAMLparam3(ret, p1, p2);
   blst_fr_sub(Blst_fr_val(ret), Blst_fr_val(p1), Blst_fr_val(p2));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_scalar_from_fr_stubs(value ret, value p1) {
   CAMLparam2(ret, p1);
   blst_scalar_from_fr(Blst_scalar_val(ret), Blst_fr_val(p1));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fr_from_scalar_stubs(value ret, value p1) {
   CAMLparam2(ret, p1);
   blst_fr_from_scalar(Blst_fr_val(ret), Blst_scalar_val(p1));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_scalar_to_bytes_stubs(value ret, value p1) {
   CAMLparam2(ret, p1);
   blst_lendian_from_scalar(Bytes_val(ret), Blst_scalar_val(p1));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_scalar_of_bytes_stubs(value ret, value p1) {
   CAMLparam2(ret, p1);
   blst_scalar_from_lendian(Blst_scalar_val(ret), Bytes_val(p1));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_check_scalar_stubs(value p1) {
@@ -250,7 +251,7 @@ CAMLprim value caml_blst_check_scalar_stubs(value p1) {
 CAMLprim value caml_blst_fr_memcpy_stubs(value dst, value src) {
   CAMLparam2(dst, src);
   memcpy(Blst_fr_val(dst), Blst_fr_val(src), sizeof(blst_fr));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 static struct custom_operations blst_fp_ops = {"blst_fp",
@@ -274,25 +275,25 @@ CAMLprim value allocate_fp_stubs(value unit) {
 CAMLprim value caml_blst_fp_of_bytes_stubs(value ret, value p1) {
   CAMLparam2(ret, p1);
   blst_fp_from_lendian(Blst_fp_val(ret), Bytes_val(p1));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp_to_bytes_stubs(value ret, value p1) {
   CAMLparam2(ret, p1);
   blst_lendian_from_fp(Bytes_val(ret), Blst_fp_val(p1));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp_add_stubs(value ret, value p1, value p2) {
   CAMLparam3(ret, p1, p2);
   blst_fp_add(Blst_fp_val(ret), Blst_fp_val(p1), Blst_fp_val(p2));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp_mul_stubs(value ret, value p1, value p2) {
   CAMLparam3(ret, p1, p2);
   blst_fp_mul(Blst_fp_val(ret), Blst_fp_val(p1), Blst_fp_val(p2));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp_sqrt_stubs(value ret, value p1) {
@@ -304,7 +305,7 @@ CAMLprim value caml_blst_fp_sqrt_stubs(value ret, value p1) {
 CAMLprim value caml_blst_fp_cneg_stubs(value buffer, value p, value b) {
   CAMLparam3(buffer, p, b);
   blst_fp_cneg(Blst_fp_val(buffer), Blst_fp_val(p), Bool_val(b));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 static struct custom_operations blst_fp2_ops = {"blst_fp2",
@@ -328,13 +329,13 @@ CAMLprim value allocate_fp2_stubs(value unit) {
 CAMLprim value caml_blst_fp2_add_stubs(value buffer, value p, value q) {
   CAMLparam3(buffer, p, q);
   blst_fp2_add(Blst_fp2_val(buffer), Blst_fp2_val(p), Blst_fp2_val(q));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp2_mul_stubs(value buffer, value p, value q) {
   CAMLparam3(buffer, p, q);
   blst_fp2_mul(Blst_fp2_val(buffer), Blst_fp2_val(p), Blst_fp2_val(q));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp2_sqrt_stubs(value buffer, value p) {
@@ -346,7 +347,7 @@ CAMLprim value caml_blst_fp2_sqrt_stubs(value buffer, value p) {
 CAMLprim value caml_blst_fp2_cneg_stubs(value buffer, value p, value b) {
   CAMLparam3(buffer, p, b);
   blst_fp2_cneg(Blst_fp2_val(buffer), Blst_fp2_val(p), Bool_val(b));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp2_assign_stubs(value p, value x1, value x2) {
@@ -362,7 +363,7 @@ CAMLprim value caml_blst_fp2_assign_stubs(value p, value x1, value x2) {
   (p_c->fp[1]).l[1] = x2_c->l[1];
   (p_c->fp[1]).l[2] = x2_c->l[2];
   (p_c->fp[1]).l[3] = x2_c->l[3];
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp2_zero_stubs(value buffer) {
@@ -371,7 +372,7 @@ CAMLprim value caml_blst_fp2_zero_stubs(value buffer) {
   blst_fp2 *buffer_c = Blst_fp2_val(buffer);
   blst_fp_from_lendian(&buffer_c->fp[0], zero_bytes);
   blst_fp_from_lendian(&buffer_c->fp[1], zero_bytes);
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp2_one_stubs(value buffer) {
@@ -381,7 +382,7 @@ CAMLprim value caml_blst_fp2_one_stubs(value buffer) {
   blst_fp_from_lendian(&buffer_c->fp[0], bytes);
   bytes[0] = 1;
   blst_fp_from_lendian(&buffer_c->fp[1], bytes);
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp2_of_bytes_components_stubs(value buffer, value x1,
@@ -391,7 +392,7 @@ CAMLprim value caml_blst_fp2_of_bytes_components_stubs(value buffer, value x1,
   // FIXME: add a check on the length
   blst_fp_from_lendian(&buffer_c->fp[0], Bytes_val(x1));
   blst_fp_from_lendian(&buffer_c->fp[1], Bytes_val(x2));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp2_to_bytes_stubs(value buffer, value p) {
@@ -401,7 +402,7 @@ CAMLprim value caml_blst_fp2_to_bytes_stubs(value buffer, value p) {
   byte *out = Bytes_val(buffer);
   blst_lendian_from_fp(out, &p_c->fp[0]);
   blst_lendian_from_fp(out + 48, &p_c->fp[1]);
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 static struct custom_operations blst_fp12_ops = {"blst_fp12",
@@ -425,7 +426,7 @@ CAMLprim value allocate_fp12_stubs(value unit) {
 CAMLprim value caml_blst_fp12_mul_stubs(value buffer, value p, value q) {
   CAMLparam3(buffer, p, q);
   blst_fp12_mul(Blst_fp12_val(buffer), Blst_fp12_val(p), Blst_fp12_val(q));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp12_is_equal_stubs(value p, value q) {
@@ -443,13 +444,13 @@ CAMLprim value caml_blst_fp12_is_one_stubs(value p) {
 CAMLprim value caml_blst_fp12_inverse_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_fp12_inverse(Blst_fp12_val(buffer), Blst_fp12_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp12_sqr_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_fp12_sqr(Blst_fp12_val(buffer), Blst_fp12_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp12_one_stubs(value buffer) {
@@ -458,7 +459,7 @@ CAMLprim value caml_blst_fp12_one_stubs(value buffer) {
   byte out[48] = {0};
   out[0] = 1;
   blst_fp_from_lendian(&(buffer_c->fp6[0].fp2[0].fp[0]), Bytes_val(out));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp12_to_bytes_stubs(value buffer, value p) {
@@ -479,8 +480,7 @@ CAMLprim value caml_blst_fp12_to_bytes_stubs(value buffer, value p) {
                        &(p_c->fp6[1].fp2[2].fp[0]));
   blst_lendian_from_fp(Bytes_val(buffer) + 11 * 48,
                        &(p_c->fp6[1].fp2[2].fp[1]));
-
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fp12_of_bytes_stubs(value buffer, value p) {
@@ -502,7 +502,7 @@ CAMLprim value caml_blst_fp12_of_bytes_stubs(value buffer, value p) {
   blst_fp_from_lendian(&(buffer_c->fp6[1].fp2[2].fp[1]),
                        Bytes_val(p) + 11 * 48);
 
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 static struct custom_operations blst_p1_ops = {"blst_p1",
@@ -541,26 +541,26 @@ CAMLprim value allocate_p1_affine_stubs(value unit) {
 CAMLprim value caml_blst_p1_to_affine_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_p1_to_affine(Blst_p1_affine_val(buffer), Blst_p1_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p1_from_affine_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_p1_from_affine(Blst_p1_val(buffer), Blst_p1_affine_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p1_double_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_p1_double(Blst_p1_val(buffer), Blst_p1_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p1_add_or_double_stubs(value buffer, value p,
                                                 value q) {
   CAMLparam3(buffer, p, q);
   blst_p1_add_or_double(Blst_p1_val(buffer), Blst_p1_val(p), Blst_p1_val(q));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p1_is_inf_stubs(value p) {
@@ -584,7 +584,7 @@ CAMLprim value caml_blst_p1_equal_stubs(value p, value q) {
 CAMLprim value caml_blst_p1_cneg_stubs(value p, value b) {
   CAMLparam2(p, b);
   blst_p1_cneg(Blst_p1_val(p), Bool_val(b));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p1_mult_stubs(value buffer, value p, value n,
@@ -592,19 +592,19 @@ CAMLprim value caml_blst_p1_mult_stubs(value buffer, value p, value n,
   CAMLparam4(buffer, p, n, size);
   blst_p1_mult(Blst_p1_val(buffer), Blst_p1_val(p), Bytes_val(n),
                ctypes_size_t_val(size));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p1_serialize_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_p1_serialize(Bytes_val(buffer), Blst_p1_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p1_compress_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_p1_compress(Bytes_val(buffer), Blst_p1_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p1_deserialize_stubs(value buffer, value p) {
@@ -629,7 +629,7 @@ CAMLprim value caml_blst_p1_hash_to_curve_stubs(value buffer, value msg,
                   ctypes_size_t_val(msg_length), Bytes_val(dst),
                   ctypes_size_t_val(dst_length), Bytes_val(aug),
                   ctypes_size_t_val(aug_length));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p1_hash_to_curve_stubs_bytecode(value *argv,
@@ -641,7 +641,7 @@ CAMLprim value caml_blst_p1_hash_to_curve_stubs_bytecode(value *argv,
 CAMLprim value caml_blst_p1_memcpy_stubs(value dst, value src) {
   CAMLparam2(dst, src);
   memcpy(Blst_p1_val(dst), Blst_p1_val(src), sizeof(blst_p1));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p1_set_coordinates_stubs(value buffer, value x,
@@ -652,7 +652,7 @@ CAMLprim value caml_blst_p1_set_coordinates_stubs(value buffer, value x,
   blst_fp *y_c = Blst_fp_val(y);
   buffer_c->x = *x_c;
   buffer_c->y = *y_c;
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 static struct custom_operations blst_p2_ops = {"blst_p2",
@@ -691,26 +691,26 @@ CAMLprim value allocate_p2_affine_stubs(value unit) {
 CAMLprim value caml_blst_p2_to_affine_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_p2_to_affine(Blst_p2_affine_val(buffer), Blst_p2_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p2_from_affine_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_p2_from_affine(Blst_p2_val(buffer), Blst_p2_affine_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p2_double_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_p2_double(Blst_p2_val(buffer), Blst_p2_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p2_add_or_double_stubs(value buffer, value p,
                                                 value q) {
   CAMLparam3(buffer, p, q);
   blst_p2_add_or_double(Blst_p2_val(buffer), Blst_p2_val(p), Blst_p2_val(q));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p2_is_inf_stubs(value p) {
@@ -734,26 +734,26 @@ CAMLprim value caml_blst_p2_equal_stubs(value p, value q) {
 CAMLprim value caml_blst_p2_cneg_stubs(value p, value b) {
   CAMLparam2(p, b);
   blst_p2_cneg(Blst_p2_val(p), Bool_val(b));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 CAMLprim value caml_blst_p2_mult_stubs(value buffer, value p, value n,
                                        value size) {
   CAMLparam4(buffer, p, n, size);
   blst_p2_mult(Blst_p2_val(buffer), Blst_p2_val(p), Bytes_val(n),
                ctypes_size_t_val(size));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p2_serialize_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_p2_serialize(Bytes_val(buffer), Blst_p2_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p2_compress_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_p2_compress(Bytes_val(buffer), Blst_p2_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p2_deserialize_stubs(value buffer, value p) {
@@ -778,7 +778,7 @@ CAMLprim value caml_blst_p2_hash_to_curve_stubs(value buffer, value msg,
                   ctypes_size_t_val(msg_length), Bytes_val(dst),
                   ctypes_size_t_val(dst_length), Bytes_val(aug),
                   ctypes_size_t_val(aug_length));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p2_hash_to_curve_stubs_bytecode(value *argv,
@@ -790,7 +790,7 @@ CAMLprim value caml_blst_p2_hash_to_curve_stubs_bytecode(value *argv,
 CAMLprim value caml_blst_p2_memcpy_stubs(value dst, value src) {
   CAMLparam2(dst, src);
   memcpy(Blst_p2_val(dst), Blst_p2_val(src), sizeof(blst_p2));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_p2_set_coordinates_stubs(value buffer, value x,
@@ -811,7 +811,7 @@ CAMLprim value caml_blst_p2_set_coordinates_stubs(value buffer, value x,
   blst_fp_from_lendian(&buffer_c->y.fp[0], out);
   blst_fp_from_lendian(&buffer_c->y.fp[1], out + 48);
 
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 // Pairing
@@ -820,13 +820,13 @@ CAMLprim value caml_blst_miller_loop_stubs(value buffer, value g2, value g1) {
   CAMLparam3(buffer, g2, g1);
   blst_miller_loop(Blst_fp12_val(buffer), Blst_p2_affine_val(g2),
                    Blst_p1_affine_val(g1));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_final_exponentiation_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_final_exp(Blst_fp12_val(buffer), Blst_fp12_val(p));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 static void finalize_free_pairing(value v) { free(Blst_pairing_val(v)); }
@@ -844,13 +844,13 @@ static struct custom_operations blst_pairing_ops = {
 CAMLprim value caml_blst_sk_to_pk_in_g1_stubs(value buffer, value scalar) {
   CAMLparam2(buffer, scalar);
   blst_sk_to_pk_in_g1(Blst_p1_val(buffer), Blst_scalar_val(scalar));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_sign_pk_in_g1_stubs(value buffer, value p, value s) {
   CAMLparam3(buffer, p, s);
   blst_sign_pk_in_g1(Blst_p2_val(buffer), Blst_p2_val(p), Blst_scalar_val(s));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_pairing_init_stubs(value check, value dst,
@@ -889,7 +889,7 @@ CAMLprim value caml_blst_aggregate_signature_stubs_bytecode(value *argv,
 CAMLprim value caml_blst_pairing_commit_stubs(value buffer) {
   CAMLparam1(buffer);
   blst_pairing_commit(Blst_pairing_val(buffer));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_pairing_finalverify_stubs(value buffer) {
@@ -933,7 +933,7 @@ CAMLprim value caml_blst_signature_keygen_stubs(value buffer, value ikm,
   blst_keygen(Blst_scalar_val(buffer), Bytes_val(ikm),
               ctypes_size_t_val(ikm_length), Bytes_val(key_info),
               ctypes_size_t_val(key_info_length));
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 // Hypothesis: jacobian_list and scalars are arrays of size *at least* start +
@@ -945,33 +945,64 @@ CAMLprim value caml_blst_g1_pippenger_stubs(value buffer, value jacobian_list,
   size_t npoints_c = ctypes_size_t_val(npoints);
   size_t start_c = ctypes_size_t_val(start);
 
-  blst_p1_affine **ps =
-      (const blst_p1_affine **)calloc(npoints_c, sizeof(blst_p1_affine *));
-  byte **scalars_bs = (byte **)calloc(npoints_c, sizeof(byte *));
+  // Allocating p1 values. Getting a segfault if not allocating addr_ps on the
+  // heap
+  blst_p1_affine **addr_ps =
+      (blst_p1_affine **)calloc(1, sizeof(blst_p1_affine *));
+  if (addr_ps == NULL) {
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  blst_p1_affine *ps =
+      (blst_p1_affine *)calloc(npoints_c, sizeof(blst_p1_affine));
+  if (ps == NULL) {
+    free(addr_ps);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  *addr_ps = ps;
+
+  // Allocating byte array for scalars conversions. Getting a segfault if not
+  // allocating addr_scalars_bs on the heap
+  byte **addr_scalars_bs = (byte **)calloc(1, sizeof(byte *));
+  if (addr_scalars_bs == NULL) {
+    free(addr_ps);
+    free(ps);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  byte *scalars_bs = (byte *)calloc(npoints_c * 32, sizeof(byte));
+  if (scalars_bs == NULL) {
+    free(addr_ps);
+    free(ps);
+    free(addr_scalars_bs);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  *addr_scalars_bs = scalars_bs;
+
   blst_scalar scalar;
 
   for (int i = 0; i < npoints_c; i++) {
-    ps[i] = (blst_p1_affine *)calloc(1, sizeof(blst_p1_affine));
-    blst_p1_to_affine(ps[i], Blst_p1_val(Field(jacobian_list, start_c + i)));
-    scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
+    blst_p1_to_affine(ps + i, Blst_p1_val(Field(jacobian_list, start_c + i)));
     blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
-    blst_lendian_from_scalar(scalars_bs[i], &scalar);
+    blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
   }
   void *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(npoints_c));
-
-  blst_p1s_mult_pippenger(Blst_p1_val(buffer), ps, npoints_c, scalars_bs, 256,
-                          scratch);
-
-  for (int i = 0; i < npoints_c; i++) {
-    free(ps[i]);
-    free(scalars_bs[i]);
+  if (scratch == NULL) {
+    free(addr_ps);
+    free(ps);
+    free(addr_scalars_bs);
+    free(scalars_bs);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
 
-  free(scalars_bs);
+  blst_p1s_mult_pippenger(Blst_p1_val(buffer), addr_ps, npoints_c,
+                          addr_scalars_bs, 256, scratch);
+
+  free(addr_ps);
   free(ps);
+  free(addr_scalars_bs);
+  free(scalars_bs);
   free(scratch);
 
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 // Hypothesis: jacobian_list and scalars are arrays of size *at least* start +
@@ -983,36 +1014,67 @@ CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
   size_t npoints_c = ctypes_size_t_val(npoints);
   size_t start_c = ctypes_size_t_val(start);
 
-  blst_p2_affine **ps =
-      (const blst_p2_affine **)calloc(npoints_c, sizeof(blst_p2_affine *));
-  byte **scalars_bs = (byte **)calloc(npoints_c, sizeof(byte *));
+  // Allocating p2 values. Getting a segfault if not allocating addr_ps on the
+  // heap
+  blst_p2_affine **addr_ps =
+      (blst_p2_affine **)calloc(1, sizeof(blst_p2_affine *));
+  if (addr_ps == NULL) {
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  blst_p2_affine *ps =
+      (blst_p2_affine *)calloc(npoints_c, sizeof(blst_p2_affine));
+  if (ps == NULL) {
+    free(addr_ps);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  *addr_ps = ps;
+
+  // Allocating byte array for scalars conversions. Getting a segfault if not
+  // allocating addr_scalars_bs on the heap
+  byte **addr_scalars_bs = (byte **)calloc(1, sizeof(byte *));
+  if (addr_scalars_bs == NULL) {
+    free(addr_ps);
+    free(ps);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  byte *scalars_bs = (byte *)calloc(npoints_c * 32, sizeof(byte));
+  if (scalars_bs == NULL) {
+    free(addr_ps);
+    free(ps);
+    free(addr_scalars_bs);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  *addr_scalars_bs = scalars_bs;
   blst_scalar scalar;
 
   for (int i = 0; i < npoints_c; i++) {
-    ps[i] = (blst_p2_affine *)calloc(1, sizeof(blst_p2_affine));
-    blst_p2_to_affine(ps[i], Blst_p2_val(Field(jacobian_list, start_c + i)));
-    scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
+    blst_p2_to_affine(ps + i, Blst_p2_val(Field(jacobian_list, start_c + i)));
     blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
-    blst_lendian_from_scalar(scalars_bs[i], &scalar);
+    blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
   }
   void *scratch = calloc(1, blst_p2s_mult_pippenger_scratch_sizeof(npoints_c));
-
-  blst_p2s_mult_pippenger(Blst_p2_val(buffer), ps, npoints_c, scalars_bs, 256,
-                          scratch);
-
-  for (int i = 0; i < npoints_c; i++) {
-    free(ps[i]);
-    free(scalars_bs[i]);
+  if (scratch == NULL) {
+    free(addr_ps);
+    free(ps);
+    free(addr_scalars_bs);
+    free(scalars_bs);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
 
-  free(scalars_bs);
+  blst_p2s_mult_pippenger(Blst_p2_val(buffer), addr_ps, npoints_c,
+                          addr_scalars_bs, 256, scratch);
+
+  free(addr_ps);
   free(ps);
+  free(addr_scalars_bs);
+  free(scalars_bs);
   free(scratch);
 
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
-// Hypothesis: fr_array_left and fr_array_right are both *at least* of size length
+// Hypothesis: fr_array_left and fr_array_right are both *at least* of size
+// length
 CAMLprim value caml_blst_fr_inner_product_stubs(value buffer,
                                                 value fr_array_left,
                                                 value fr_array_right,
@@ -1027,7 +1089,7 @@ CAMLprim value caml_blst_fr_inner_product_stubs(value buffer,
     blst_fr_add(buffer_c, tmp, buffer_c);
   }
   free(tmp);
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 static struct custom_operations blst_p1_affine_array_ops = {
@@ -1055,7 +1117,7 @@ CAMLprim value caml_blst_p1_affine_array_set_p1_points_stubs(value buffer,
     blst_p1 *p = Blst_p1_val(Field(l, i));
     blst_p1_to_affine(buffer_c + i, p);
   }
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 // NB: we do not check i is smaller than the array size because it is supposed
@@ -1068,7 +1130,7 @@ CAMLprim value caml_blst_p1_affine_array_get_stubs(value buffer, value list,
   int i_c = Int_val(i);
 
   blst_p1_from_affine(buffer_c, list_c + i_c);
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 // Hypothesis: affine_list and scalars are arrays of size *at least* start +
@@ -1078,31 +1140,54 @@ CAMLprim value caml_blst_g1_pippenger_contiguous_affine_array_stubs(
   CAMLparam5(buffer, affine_list, scalars, start, len);
   size_t start_c = ctypes_size_t_val(start);
   size_t len_c = ctypes_size_t_val(len);
-  blst_p1_affine **l_c_address =
-      (blst_p1_affine **)(malloc(sizeof(blst_p1_affine *)));
-  *l_c_address = Blst_p1_affine_val(affine_list) + start_c;
 
-  byte **scalars_bs = (byte **)calloc(len_c, sizeof(byte *));
+  // Allocating p1 values. Getting a segfault if not allocating addr_ps on the
+  // heap
+  blst_p1_affine **addr_ps =
+      (blst_p1_affine **)calloc(1, sizeof(blst_p1_affine *));
+  if (addr_ps == NULL) {
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  *addr_ps = Blst_p1_affine_val(affine_list) + start_c;
+
+  // Allocating byte array for scalars conversions. Getting a segfault if not
+  // allocating addr_scalars_bs on the heap
+  byte **addr_scalars_bs = (byte **)calloc(1, sizeof(byte *));
+  if (addr_scalars_bs == NULL) {
+    free(addr_ps);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  byte *scalars_bs = (byte *)calloc(len_c * 32, sizeof(byte));
+  if (scalars_bs == NULL) {
+    free(addr_ps);
+    free(addr_scalars_bs);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  *addr_scalars_bs = scalars_bs;
   blst_scalar scalar;
 
   for (int i = 0; i < len_c; i++) {
-    scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
     blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
-    blst_lendian_from_scalar(scalars_bs[i], &scalar);
+    blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
   }
-  limb_t *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(len_c));
 
-  blst_p1s_mult_pippenger(Blst_p1_val(buffer), l_c_address, len_c, scalars_bs,
+  limb_t *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(len_c));
+  if (scratch == NULL) {
+    free(addr_ps);
+    free(addr_scalars_bs);
+    free(scalars_bs);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+
+  blst_p1s_mult_pippenger(Blst_p1_val(buffer), addr_ps, len_c, addr_scalars_bs,
                           256, scratch);
 
-  for (int i = 0; i < len_c; i++) {
-    free(scalars_bs[i]);
-  }
+  free(addr_ps);
+  free(addr_scalars_bs);
   free(scalars_bs);
-  free(l_c_address);
   free(scratch);
 
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 static struct custom_operations blst_p2_affine_array_ops = {
@@ -1130,7 +1215,7 @@ CAMLprim value caml_blst_p2_affine_array_set_p2_points_stubs(value buffer,
     blst_p2 *p = Blst_p2_val(Field(l, i));
     blst_p2_to_affine(buffer_c + i, p);
   }
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 // NB: we do not check i is smaller than the array size because it is supposed
@@ -1143,7 +1228,7 @@ CAMLprim value caml_blst_p2_affine_array_get_stubs(value buffer, value list,
   int i_c = Int_val(i);
 
   blst_p2_from_affine(buffer_c, list_c + i_c);
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_g2_pippenger_contiguous_affine_array_stubs(
@@ -1151,29 +1236,52 @@ CAMLprim value caml_blst_g2_pippenger_contiguous_affine_array_stubs(
   CAMLparam5(buffer, affine_list, scalars, start, len);
   size_t start_c = ctypes_size_t_val(start);
   size_t len_c = ctypes_size_t_val(len);
-  blst_p2_affine **l_c_address =
-      (blst_p2_affine **)(malloc(sizeof(blst_p2_affine *)));
-  *l_c_address = Blst_p2_affine_val(affine_list) + start_c;
 
-  byte **scalars_bs = (byte **)calloc(len_c, sizeof(byte *));
+  // Allocating p2 values. Getting a segfault if not allocating addr_ps on the
+  // heap
+  blst_p2_affine **addr_ps =
+      (blst_p2_affine **)calloc(1, sizeof(blst_p2_affine *));
+  if (addr_ps == NULL) {
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  *addr_ps = Blst_p2_affine_val(affine_list) + start_c;
+
+  // Allocating byte array for scalars conversions. Getting a segfault if not
+  // allocating addr_scalars_bs on the heap
+  byte **addr_scalars_bs = (byte **)calloc(1, sizeof(byte *));
+  if (addr_scalars_bs == NULL) {
+    free(addr_ps);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  byte *scalars_bs = (byte *)calloc(len_c * 32, sizeof(byte));
+  if (scalars_bs == NULL) {
+    free(addr_ps);
+    free(addr_scalars_bs);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+  *addr_scalars_bs = scalars_bs;
+
   blst_scalar scalar;
 
   for (int i = 0; i < len_c; i++) {
-    scalars_bs[i] = (byte *)calloc(32, sizeof(byte));
     blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
-    blst_lendian_from_scalar(scalars_bs[i], &scalar);
+    blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
   }
   limb_t *scratch = calloc(1, blst_p2s_mult_pippenger_scratch_sizeof(len_c));
+  if (scratch == NULL) {
+    free(addr_ps);
+    free(addr_scalars_bs);
+    free(scalars_bs);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
 
-  blst_p2s_mult_pippenger(Blst_p2_val(buffer), l_c_address, len_c, scalars_bs,
+  blst_p2s_mult_pippenger(Blst_p2_val(buffer), addr_ps, len_c, addr_scalars_bs,
                           256, scratch);
 
-  for (int i = 0; i < len_c; i++) {
-    free(scalars_bs[i]);
-  }
+  free(addr_ps);
+  free(addr_scalars_bs);
   free(scalars_bs);
-  free(l_c_address);
   free(scratch);
 
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }

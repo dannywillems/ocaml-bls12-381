@@ -9,10 +9,10 @@ module Stubs = struct
     Unsigned.Size_t.t ->
     unit = "caml_blst_signature_keygen_stubs"
 
-  external sk_to_pk : G1.t -> Fr.Stubs.scalar -> unit
+  external sk_to_pk : G1.t -> Fr.Stubs.scalar -> int
     = "caml_blst_sk_to_pk_in_g1_stubs"
 
-  external sign : G2.t -> G2.t -> Fr.Stubs.scalar -> unit
+  external sign : G2.t -> G2.t -> Fr.Stubs.scalar -> int
     = "caml_blst_sign_pk_in_g1_stubs"
 
   external pairing_init : bool -> Bytes.t -> Unsigned.Size_t.t -> ctxt
@@ -29,7 +29,7 @@ module Stubs = struct
     int
     = "caml_blst_aggregate_signature_bytecode_stubs" "caml_blst_aggregate_signature_stubs"
 
-  external pairing_commit : ctxt -> unit = "caml_blst_pairing_commit_stubs"
+  external pairing_commit : ctxt -> int = "caml_blst_pairing_commit_stubs"
 
   external pairing_finalverify : ctxt -> bool
     = "caml_blst_pairing_finalverify_stubs"
@@ -90,12 +90,12 @@ let sk_of_bytes_exn bytes =
           endian")
   else
     let sk = Fr.of_bytes_exn bytes in
-    Fr.Stubs.scalar_of_fr buffer sk ;
+    ignore @@ Fr.Stubs.scalar_of_fr buffer sk ;
     buffer
 
 let sk_to_bytes sk =
   let bytes = Bytes.make 32 '\000' in
-  Fr.Stubs.scalar_to_bytes_le bytes sk ;
+  ignore @@ Fr.Stubs.scalar_to_bytes_le bytes sk ;
   bytes
 
 let generate_sk ?(key_info = Bytes.empty) ikm =
@@ -148,13 +148,13 @@ let pk_to_bytes pk_bytes = Bytes.copy pk_bytes
 
 let derive_pk sk =
   let buffer_g1 = G1.Stubs.allocate_g1 () in
-  Stubs.sk_to_pk buffer_g1 sk ;
+  ignore @@ Stubs.sk_to_pk buffer_g1 sk ;
   G1.to_compressed_bytes buffer_g1
 
 let core_sign sk message ciphersuite =
   let hash = G2.hash_to_curve message ciphersuite in
   let buffer = G2.Stubs.allocate_g2 () in
-  Stubs.sign buffer hash sk ;
+  ignore @@ Stubs.sign buffer hash sk ;
   G2.to_compressed_bytes buffer
 
 let core_verify pk msg signature_bytes ciphersuite =
@@ -199,7 +199,7 @@ let core_verify pk msg signature_bytes ciphersuite =
             Unsigned.Size_t.zero
         in
         if res = 0 then (
-          Stubs.pairing_commit ctxt ;
+          ignore @@ Stubs.pairing_commit ctxt ;
           Stubs.pairing_finalverify ctxt)
         else false
       else false)
@@ -287,10 +287,10 @@ let core_aggregate_verify pks_with_msgs aggregated_signature ciphersuite =
     | Some aggregated_signature ->
         with_aggregation_ctxt ciphersuite (fun ctxt ->
             let signature_affine = G2.Stubs.allocate_g2_affine () in
-            G2.Stubs.to_affine signature_affine aggregated_signature ;
+            ignore @@ G2.Stubs.to_affine signature_affine aggregated_signature ;
             let res = aux (Some signature_affine) pks_with_msgs ctxt in
             if res then (
-              Stubs.pairing_commit ctxt ;
+              ignore @@ Stubs.pairing_commit ctxt ;
               Stubs.pairing_finalverify ctxt)
             else false)
   else false

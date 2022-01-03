@@ -33,27 +33,25 @@ module Stubs = struct
 
   external mallocate_fr : unit -> fr = "mallocate_fr_stubs"
 
-  external scalar_of_fr : scalar -> fr -> unit
-    = "caml_blst_scalar_from_fr_stubs"
+  external scalar_of_fr : scalar -> fr -> int = "caml_blst_scalar_from_fr_stubs"
 
-  external fr_of_scalar : fr -> scalar -> unit
-    = "caml_blst_fr_from_scalar_stubs"
+  external fr_of_scalar : fr -> scalar -> int = "caml_blst_fr_from_scalar_stubs"
 
   external fr_of_bytes_le : fr -> Bytes.t -> bool
     = "caml_blst_fr_from_lendian_stubs"
 
-  external fr_to_bytes_le : Bytes.t -> fr -> unit
+  external fr_to_bytes_le : Bytes.t -> fr -> int
     = "caml_blst_lendian_from_fr_stubs"
 
-  external scalar_of_bytes_le : scalar -> Bytes.t -> unit
+  external scalar_of_bytes_le : scalar -> Bytes.t -> int
     = "caml_blst_scalar_of_bytes_stubs"
 
-  external scalar_to_bytes_le : Bytes.t -> scalar -> unit
+  external scalar_to_bytes_le : Bytes.t -> scalar -> int
     = "caml_blst_scalar_to_bytes_stubs"
 
   external check_scalar : scalar -> bool = "caml_blst_check_scalar_stubs"
 
-  external add : fr -> fr -> fr -> unit = "caml_blst_fr_add_stubs"
+  external add : fr -> fr -> fr -> int = "caml_blst_fr_add_stubs"
 
   external eq : fr -> fr -> bool = "caml_blst_fr_is_equal_stubs"
 
@@ -61,23 +59,23 @@ module Stubs = struct
 
   external is_one : fr -> bool = "caml_blst_fr_is_one_stubs"
 
-  external sub : fr -> fr -> fr -> unit = "caml_blst_fr_sub_stubs"
+  external sub : fr -> fr -> fr -> int = "caml_blst_fr_sub_stubs"
 
-  external mul : fr -> fr -> fr -> unit = "caml_blst_fr_mul_stubs"
+  external mul : fr -> fr -> fr -> int = "caml_blst_fr_mul_stubs"
 
-  external sqr : fr -> fr -> unit = "caml_blst_fr_sqr_stubs"
+  external sqr : fr -> fr -> int = "caml_blst_fr_sqr_stubs"
 
-  external eucl_inverse : fr -> fr -> unit = "caml_blst_fr_eucl_inverse_stubs"
+  external eucl_inverse : fr -> fr -> int = "caml_blst_fr_eucl_inverse_stubs"
 
-  external memcpy : fr -> fr -> unit = "caml_blst_fr_memcpy_stubs"
+  external memcpy : fr -> fr -> int = "caml_blst_fr_memcpy_stubs"
 
-  external fft_inplace : fr array -> fr array -> int -> unit
+  external fft_inplace : fr array -> fr array -> int -> int
     = "caml_fft_fr_inplace_stubs"
 
-  external mul_map_inplace : fr array -> fr -> int -> unit
+  external mul_map_inplace : fr array -> fr -> int -> int
     = "caml_mul_map_fr_inplace_stubs"
 
-  external inner_product : fr -> fr array -> fr array -> int -> unit
+  external inner_product : fr -> fr array -> fr array -> int -> int
     = "caml_blst_fr_inner_product_stubs"
 end
 
@@ -92,7 +90,7 @@ module Fr = struct
 
   let copy src =
     let dst = Stubs.mallocate_fr () in
-    Stubs.memcpy dst src ;
+    ignore @@ Stubs.memcpy dst src ;
     dst
 
   let size_in_bytes = 32
@@ -126,7 +124,7 @@ module Fr = struct
   let check_bytes bs =
     if Bytes.length bs = size_in_bytes then (
       let buffer_scalar = Stubs.allocate_scalar () in
-      Stubs.scalar_of_bytes_le buffer_scalar bs ;
+      ignore @@ Stubs.scalar_of_bytes_le buffer_scalar bs ;
       Stubs.check_scalar buffer_scalar)
     else false
 
@@ -139,7 +137,7 @@ module Fr = struct
 
   let to_bytes x =
     let buffer_bytes = Bytes.make size_in_bytes '\000' in
-    Stubs.fr_to_bytes_le buffer_bytes x ;
+    ignore @@ Stubs.fr_to_bytes_le buffer_bytes x ;
     buffer_bytes
 
   let size_in_memory = Obj.reachable_words (Obj.magic one) * 8
@@ -166,33 +164,33 @@ module Fr = struct
 
   let add x y =
     let buffer = Stubs.mallocate_fr () in
-    Stubs.add buffer x y ;
+    ignore @@ Stubs.add buffer x y ;
     buffer
 
   let add_inplace x y =
-    Stubs.add global_buffer x y ;
-    Stubs.memcpy x global_buffer
+    ignore @@ Stubs.add global_buffer x y ;
+    ignore @@ Stubs.memcpy x global_buffer
 
   let add_bulk xs =
     let buffer = Stubs.callocate_fr () in
-    List.iter (fun x -> Stubs.add buffer buffer x) xs ;
+    List.iter (fun x -> ignore @@ Stubs.add buffer buffer x) xs ;
     buffer
 
   let ( + ) = add
 
   let mul x y =
     let buffer = Stubs.mallocate_fr () in
-    Stubs.mul buffer x y ;
+    ignore @@ Stubs.mul buffer x y ;
     buffer
 
   let mul_inplace x y =
-    Stubs.mul global_buffer x y ;
-    Stubs.memcpy x global_buffer
+    ignore @@ Stubs.mul global_buffer x y ;
+    ignore @@ Stubs.memcpy x global_buffer
 
   let mul_bulk xs =
     let buffer = Stubs.callocate_fr () in
-    Stubs.add buffer buffer one ;
-    List.iter (fun x -> Stubs.mul buffer buffer x) xs ;
+    ignore @@ Stubs.add buffer buffer one ;
+    List.iter (fun x -> ignore @@ Stubs.mul buffer buffer x) xs ;
     buffer
 
   let ( * ) = mul
@@ -201,7 +199,7 @@ module Fr = struct
     if is_zero x then None
     else
       let buffer = Stubs.mallocate_fr () in
-      Stubs.eucl_inverse buffer x ;
+      ignore @@ Stubs.eucl_inverse buffer x ;
       Some buffer
 
   let inverse_exn x =
@@ -209,38 +207,38 @@ module Fr = struct
 
   let inverse_exn_inplace x =
     if is_zero x then raise Division_by_zero
-    else Stubs.eucl_inverse global_buffer x ;
-    Stubs.memcpy x global_buffer
+    else ignore @@ Stubs.eucl_inverse global_buffer x ;
+    ignore @@ Stubs.memcpy x global_buffer
 
   let sub a b =
     let buffer = Stubs.mallocate_fr () in
-    Stubs.sub buffer a b ;
+    ignore @@ Stubs.sub buffer a b ;
     buffer
 
   let sub_inplace x y =
-    Stubs.sub global_buffer x y ;
-    Stubs.memcpy x global_buffer
+    ignore @@ Stubs.sub global_buffer x y ;
+    ignore @@ Stubs.memcpy x global_buffer
 
   let square x =
     let buffer = Stubs.mallocate_fr () in
-    Stubs.sqr buffer x ;
+    ignore @@ Stubs.sqr buffer x ;
     buffer
 
   let square_inplace x =
-    Stubs.mul global_buffer x x ;
-    Stubs.memcpy x global_buffer
+    ignore @@ Stubs.mul global_buffer x x ;
+    ignore @@ Stubs.memcpy x global_buffer
 
   let double x = x + x
 
   let double_inplace x =
-    Stubs.add global_buffer x x ;
-    Stubs.memcpy x global_buffer
+    ignore @@ Stubs.add global_buffer x x ;
+    ignore @@ Stubs.memcpy x global_buffer
 
   let negate x = sub zero x
 
   let negate_inplace x =
-    Stubs.sub global_buffer zero x ;
-    Stubs.memcpy x global_buffer
+    ignore @@ Stubs.sub global_buffer zero x ;
+    ignore @@ Stubs.memcpy x global_buffer
 
   let ( - ) = negate
 
@@ -360,7 +358,7 @@ module Fr = struct
 
   let fft_inplace ~domain ~points =
     let logn = Z.log2 (Z.of_int (Array.length points)) in
-    Stubs.fft_inplace points domain logn
+    ignore @@ Stubs.fft_inplace points domain logn
 
   let ifft ~domain ~points = Fft.ifft (module M) ~domain ~points
 
@@ -368,8 +366,8 @@ module Fr = struct
     let n = Array.length points in
     let logn = Z.log2 (Z.of_int n) in
     let n_inv = inverse_exn (of_z (Z.of_int n)) in
-    Stubs.fft_inplace points domain logn ;
-    Stubs.mul_map_inplace points n_inv n
+    ignore @@ Stubs.fft_inplace points domain logn ;
+    ignore @@ Stubs.mul_map_inplace points n_inv n
 
   let compare x y = Stdlib.compare (to_bytes x) (to_bytes y)
 
@@ -378,14 +376,14 @@ module Fr = struct
       raise (Invalid_argument "Both parameters must be of the same length")
     else
       let res = Stubs.callocate_fr () in
-      Stubs.inner_product res a b (Array.length a) ;
+      ignore @@ Stubs.inner_product res a b (Array.length a) ;
       res
 
   let inner_product_opt a b =
     if Array.length a <> Array.length b then None
     else
       let res = Stubs.callocate_fr () in
-      Stubs.inner_product res a b (Array.length a) ;
+      ignore @@ Stubs.inner_product res a b (Array.length a) ;
       Some res
 
   let of_int x = of_z (Z.of_int x)

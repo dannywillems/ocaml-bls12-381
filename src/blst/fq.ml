@@ -27,17 +27,17 @@ module Stubs = struct
 
   external allocate_fq : unit -> fp = "allocate_fp_stubs"
 
-  external of_bytes_le : fp -> Bytes.t -> unit = "caml_blst_fp_of_bytes_stubs"
+  external of_bytes_le : fp -> Bytes.t -> int = "caml_blst_fp_of_bytes_stubs"
 
-  external to_bytes_le : Bytes.t -> fp -> unit = "caml_blst_fp_to_bytes_stubs"
+  external to_bytes_le : Bytes.t -> fp -> int = "caml_blst_fp_to_bytes_stubs"
 
-  external add : fp -> fp -> fp -> unit = "caml_blst_fp_add_stubs"
+  external add : fp -> fp -> fp -> int = "caml_blst_fp_add_stubs"
 
-  external mul : fp -> fp -> fp -> unit = "caml_blst_fp_mul_stubs"
+  external mul : fp -> fp -> fp -> int = "caml_blst_fp_mul_stubs"
 
   external sqrt : fp -> fp -> bool = "caml_blst_fp_sqrt_stubs"
 
-  external cneg : fp -> fp -> bool -> unit = "caml_blst_fp_cneg_stubs"
+  external cneg : fp -> fp -> bool -> int = "caml_blst_fp_cneg_stubs"
 end
 
 module Fq = struct
@@ -64,7 +64,7 @@ module Fq = struct
     else
       let bs = pad_if_require bs in
       let buffer = Stubs.allocate_fq () in
-      Stubs.of_bytes_le buffer bs ;
+      ignore @@ Stubs.of_bytes_le buffer bs ;
       Some buffer
 
   let of_bytes_exn bs =
@@ -84,7 +84,7 @@ module Fq = struct
 
   let to_bytes x =
     let buffer_bytes = Bytes.make size_in_bytes '\000' in
-    Stubs.to_bytes_le buffer_bytes x ;
+    ignore @@ Stubs.to_bytes_le buffer_bytes x ;
     buffer_bytes
 
   let rec random ?state () =
@@ -97,21 +97,21 @@ module Fq = struct
 
   let add x y =
     let buffer = Stubs.allocate_fq () in
-    Stubs.add buffer x y ;
+    ignore @@ Stubs.add buffer x y ;
     buffer
 
   let ( + ) = add
 
   let mul x y =
     let buffer = Stubs.allocate_fq () in
-    Stubs.mul buffer x y ;
+    ignore @@ Stubs.mul buffer x y ;
     buffer
 
   let ( * ) = mul
 
   let negate x =
     let buffer = Stubs.allocate_fq () in
-    Stubs.cneg buffer x true ;
+    ignore @@ Stubs.cneg buffer x true ;
     buffer
 
   let sqrt_opt x =

@@ -27,21 +27,21 @@ module Stubs = struct
 
   external allocate_fq12 : unit -> fp12 = "allocate_fp12_stubs"
 
-  external mul : fp12 -> fp12 -> fp12 -> unit = "caml_blst_fp12_mul_stubs"
+  external mul : fp12 -> fp12 -> fp12 -> int = "caml_blst_fp12_mul_stubs"
 
-  external one : fp12 -> unit = "caml_blst_fp12_one_stubs"
+  external one : fp12 -> int = "caml_blst_fp12_one_stubs"
 
   external equal : fp12 -> fp12 -> bool = "caml_blst_fp12_is_equal_stubs"
 
   external is_one : fp12 -> bool = "caml_blst_fp12_is_one_stubs"
 
-  external inverse : fp12 -> fp12 -> unit = "caml_blst_fp12_inverse_stubs"
+  external inverse : fp12 -> fp12 -> int = "caml_blst_fp12_inverse_stubs"
 
-  external sqr : fp12 -> fp12 -> unit = "caml_blst_fp12_sqr_stubs"
+  external sqr : fp12 -> fp12 -> int = "caml_blst_fp12_sqr_stubs"
 
-  external to_bytes : Bytes.t -> fp12 -> unit = "caml_blst_fp12_to_bytes_stubs"
+  external to_bytes : Bytes.t -> fp12 -> int = "caml_blst_fp12_to_bytes_stubs"
 
-  external of_bytes : fp12 -> Bytes.t -> unit = "caml_blst_fp12_of_bytes_stubs"
+  external of_bytes : fp12 -> Bytes.t -> int = "caml_blst_fp12_of_bytes_stubs"
 end
 
 module Fq12 = struct
@@ -60,14 +60,14 @@ module Fq12 = struct
 
   let to_bytes p =
     let buffer = Bytes.make size_in_bytes '\000' in
-    Stubs.to_bytes buffer p ;
+    ignore @@ Stubs.to_bytes buffer p ;
     buffer
 
   let of_bytes_opt bs =
     if Bytes.length bs <> size_in_bytes then None
     else
       let buffer = Stubs.allocate_fq12 () in
-      Stubs.of_bytes buffer bs ;
+      ignore @@ Stubs.of_bytes buffer bs ;
       Some buffer
 
   let random ?state () =
@@ -78,7 +78,7 @@ module Fq12 = struct
         Bytes.empty
         (List.init 12 (fun _ -> Fq.(to_bytes (random ()))))
     in
-    Stubs.of_bytes buffer bs ;
+    ignore @@ Stubs.of_bytes buffer bs ;
     buffer
 
   let of_bytes_exn bs =
@@ -86,7 +86,7 @@ module Fq12 = struct
 
   let one =
     let buffer = Stubs.allocate_fq12 () in
-    Stubs.one buffer ;
+    ignore @@ Stubs.one buffer ;
     buffer
 
   let zero = Stubs.allocate_fq12 ()
@@ -103,21 +103,21 @@ module Fq12 = struct
 
   let mul x y =
     let buffer = Stubs.allocate_fq12 () in
-    Stubs.mul buffer x y ;
+    ignore @@ Stubs.mul buffer x y ;
     buffer
 
   let inverse_opt x =
     if is_zero x then None
     else
       let buffer = Stubs.allocate_fq12 () in
-      Stubs.inverse buffer x ;
+      ignore @@ Stubs.inverse buffer x ;
       Some buffer
 
   let inverse_exn x =
     if is_zero x then raise Division_by_zero
     else
       let buffer = Stubs.allocate_fq12 () in
-      Stubs.inverse buffer x ;
+      ignore @@ Stubs.inverse buffer x ;
       buffer
 
   let of_z x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 =
@@ -127,7 +127,7 @@ module Fq12 = struct
     in
     let bs = Bytes.concat Bytes.empty coordinates in
     let buffer = Stubs.allocate_fq12 () in
-    Stubs.of_bytes buffer bs ;
+    ignore @@ Stubs.of_bytes buffer bs ;
     buffer
 
   let of_string x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11 =

@@ -11,9 +11,9 @@ module type C = sig
 
   val scalar_of_z : Z.t -> scalar
 
-  val fft_inplace : group array -> scalar array -> int -> unit
+  val fft_inplace : group array -> scalar array -> int -> int
 
-  val mul_map_inplace : group array -> scalar -> int -> unit
+  val mul_map_inplace : group array -> scalar -> int -> int
 end
 
 let fft (type a b) (module G : C with type group = a and type scalar = b)
@@ -38,7 +38,7 @@ let fft (type a b) (module G : C with type group = a and type scalar = b)
       assert (n = len_points) ;
       points)
   in
-  G.fft_inplace output domain logn ;
+  ignore @@ G.fft_inplace output domain logn ;
   output
 
 let ifft (type a b) (module G : C with type group = a and type scalar = b)
@@ -47,5 +47,5 @@ let ifft (type a b) (module G : C with type group = a and type scalar = b)
   assert (power = Array.length points) ;
   let points = fft (module G) ~domain ~points in
   let power_inv = G.inverse_exn_scalar (G.scalar_of_z (Z.of_int power)) in
-  G.mul_map_inplace points power_inv power ;
+  ignore @@ G.mul_map_inplace points power_inv power ;
   points

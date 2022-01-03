@@ -20,9 +20,9 @@ module type C = sig
 
   val scalar_of_z : Z.t -> scalar
 
-  val fft_inplace : group array -> scalar array -> int -> unit
+  val fft_inplace : group array -> scalar array -> int -> int
 
-  val mul_map_inplace : group array -> scalar -> int -> unit
+  val mul_map_inplace : group array -> scalar -> int -> int
 end
 
 val fft :

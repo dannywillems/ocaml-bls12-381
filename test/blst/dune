@@ -15,33 +15,12 @@
 (copy_files ../test_vectors/pop_g2/{*})
 
 (tests
- (names
-  test_fr
-  test_g1
-  test_g1_fft
-  test_g2
-  test_g2_fft
-  test_pairing
-  test_random_state
-  test_hash_to_curve
-  test_signature
-  test_aggregated_signature
-  test_poseidon128)
- (modules
-  test_fr
-  test_g1
-  test_g1_fft
-  test_g2
-  test_g2_fft
-  test_pairing
-  test_ec_make
-  test_random_state
-  test_hash_to_curve
-  test_signature
-  test_poseidon128
-  ark128
-  mds128
-  test_aggregated_signature)
+ (names test_fr test_g1 test_g1_fft test_g2 test_g2_fft test_pairing
+   test_random_state test_hash_to_curve test_signature
+   test_aggregated_signature test_poseidon128)
+ (modules test_fr test_g1 test_g1_fft test_g2 test_g2_fft test_pairing
+   test_ec_make test_random_state test_hash_to_curve test_signature
+   test_poseidon128 ark128 mds128 test_aggregated_signature)
  (package bls12-381-unix)
  (deps
   fft_test_vector_g1_2

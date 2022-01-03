@@ -36,20 +36,20 @@ module Stubs = struct
     = "allocate_p1_affine_array_stubs"
 
   external p1_affine_array_set_p1_points :
-    affine_array -> jacobian array -> int -> unit
+    affine_array -> jacobian array -> int -> int
     = "caml_blst_p1_affine_array_set_p1_points_stubs"
 
   external allocate_g1_affine : unit -> affine = "allocate_p1_affine_stubs"
 
-  external from_affine : jacobian -> affine -> unit
+  external from_affine : jacobian -> affine -> int
     = "caml_blst_p1_from_affine_stubs"
 
-  external to_affine : affine -> jacobian -> unit
+  external to_affine : affine -> jacobian -> int
     = "caml_blst_p1_to_affine_stubs"
 
-  external double : jacobian -> jacobian -> unit = "caml_blst_p1_double_stubs"
+  external double : jacobian -> jacobian -> int = "caml_blst_p1_double_stubs"
 
-  external dadd : jacobian -> jacobian -> jacobian -> unit
+  external dadd : jacobian -> jacobian -> jacobian -> int
     = "caml_blst_p1_add_or_double_stubs"
 
   external is_zero : jacobian -> bool = "caml_blst_p1_is_inf_stubs"
@@ -58,19 +58,18 @@ module Stubs = struct
 
   external equal : jacobian -> jacobian -> bool = "caml_blst_p1_equal_stubs"
 
-  external cneg : jacobian -> bool -> unit = "caml_blst_p1_cneg_stubs"
+  external cneg : jacobian -> bool -> int = "caml_blst_p1_cneg_stubs"
 
-  external mult : jacobian -> jacobian -> Bytes.t -> Unsigned.Size_t.t -> unit
+  external mult : jacobian -> jacobian -> Bytes.t -> Unsigned.Size_t.t -> int
     = "caml_blst_p1_mult_stubs"
 
   external deserialize : affine -> Bytes.t -> int
     = "caml_blst_p1_deserialize_stubs"
 
-  external serialize : Bytes.t -> jacobian -> unit
+  external serialize : Bytes.t -> jacobian -> int
     = "caml_blst_p1_serialize_stubs"
 
-  external compress : Bytes.t -> jacobian -> unit
-    = "caml_blst_p1_compress_stubs"
+  external compress : Bytes.t -> jacobian -> int = "caml_blst_p1_compress_stubs"
 
   external uncompress : affine -> Bytes.t -> int
     = "caml_blst_p1_uncompress_stubs"
@@ -83,15 +82,15 @@ module Stubs = struct
     Unsigned.Size_t.t ->
     Bytes.t ->
     Unsigned.Size_t.t ->
-    unit
+    int
     = "caml_blst_p1_hash_to_curve_stubs_bytecode" "caml_blst_p1_hash_to_curve_stubs"
 
-  external memcpy : jacobian -> jacobian -> unit = "caml_blst_p1_memcpy_stubs"
+  external memcpy : jacobian -> jacobian -> int = "caml_blst_p1_memcpy_stubs"
 
-  external set_affine_coordinates : affine -> Fq.t -> Fq.t -> unit
+  external set_affine_coordinates : affine -> Fq.t -> Fq.t -> int
     = "caml_blst_p1_set_coordinates_stubs"
 
-  external fft_inplace : jacobian array -> Fr.Stubs.fr array -> int -> unit
+  external fft_inplace : jacobian array -> Fr.Stubs.fr array -> int -> int
     = "caml_fft_g1_inplace_stubs"
 
   external pippenger :
@@ -100,9 +99,9 @@ module Stubs = struct
     Fr.t array ->
     Unsigned.Size_t.t ->
     Unsigned.Size_t.t ->
-    unit = "caml_blst_g1_pippenger_stubs"
+    int = "caml_blst_g1_pippenger_stubs"
 
-  external continuous_array_get : jacobian -> affine_array -> int -> unit
+  external continuous_array_get : jacobian -> affine_array -> int -> int
     = "caml_blst_p1_affine_array_get_stubs"
 
   external pippenger_with_affine_array :
@@ -111,9 +110,9 @@ module Stubs = struct
     Fr.t array ->
     Unsigned.Size_t.t ->
     Unsigned.Size_t.t ->
-    unit = "caml_blst_g1_pippenger_contiguous_affine_array_stubs"
+    int = "caml_blst_g1_pippenger_contiguous_affine_array_stubs"
 
-  external mul_map_inplace : jacobian array -> Fr.Stubs.fr -> int -> unit
+  external mul_map_inplace : jacobian array -> Fr.Stubs.fr -> int -> int
     = "caml_mul_map_g1_inplace_stubs"
 end
 
@@ -130,28 +129,28 @@ module G1 = struct
 
   let size_in_bytes = 96
 
-  let memcpy dst src = Stubs.memcpy dst src
+  let memcpy dst src = ignore @@ Stubs.memcpy dst src
 
   let affine_of_jacobian j =
     let b = Stubs.allocate_g1_affine () in
-    Stubs.to_affine b j ;
+    ignore @@ Stubs.to_affine b j ;
     b
 
   let jacobian_of_affine a =
     let b = Stubs.allocate_g1 () in
-    Stubs.from_affine b a ;
+    ignore @@ Stubs.from_affine b a ;
     b
 
   let to_affine_array l =
     let length = Array.length l in
     let buffer = Stubs.allocate_g1_affine_contiguous_array length in
-    Stubs.p1_affine_array_set_p1_points buffer l length ;
+    ignore @@ Stubs.p1_affine_array_set_p1_points buffer l length ;
     (buffer, length)
 
   let of_affine_array (l, n) =
     Array.init n (fun i ->
         let p = Stubs.allocate_g1 () in
-        Stubs.continuous_array_get p l i ;
+        ignore @@ Stubs.continuous_array_get p l i ;
         p)
 
   let size_of_affine_array (_, n) = n
@@ -178,7 +177,7 @@ module G1 = struct
       let res = Stubs.deserialize buffer_affine bs in
       if res = 0 then (
         let buffer = Stubs.allocate_g1 () in
-        Stubs.from_affine buffer buffer_affine ;
+        ignore @@ Stubs.from_affine buffer buffer_affine ;
         let is_in_prime_subgroup = Stubs.in_g1 buffer in
         if is_in_prime_subgroup then Some buffer else None)
       else None
@@ -209,7 +208,7 @@ module G1 = struct
     let res = Stubs.uncompress buffer_affine bs in
     if res = 0 then (
       let buffer = Stubs.allocate_g1 () in
-      Stubs.from_affine buffer buffer_affine ;
+      ignore @@ Stubs.from_affine buffer buffer_affine ;
       let is_in_prime_subgroup = Stubs.in_g1 buffer in
       if is_in_prime_subgroup then Some buffer else None)
     else None
@@ -221,12 +220,12 @@ module G1 = struct
 
   let to_bytes p =
     let buffer = Bytes.make size_in_bytes '\000' in
-    Stubs.serialize buffer p ;
+    ignore @@ Stubs.serialize buffer p ;
     buffer
 
   let to_compressed_bytes p =
     let buffer = Bytes.make (size_in_bytes / 2) '\000' in
-    Stubs.compress buffer p ;
+    ignore @@ Stubs.compress buffer p ;
     buffer
 
   let add x y =
@@ -234,31 +233,36 @@ module G1 = struct
        point
     *)
     let buffer = Stubs.allocate_g1 () in
-    Stubs.dadd buffer x y ;
+    ignore @@ Stubs.dadd buffer x y ;
     buffer
 
   let add_inplace x y =
-    Stubs.dadd global_buffer x y ;
+    ignore @@ Stubs.dadd global_buffer x y ;
     memcpy x global_buffer
 
   let add_bulk xs =
     let buffer = Stubs.allocate_g1 () in
-    List.iter (fun x -> Stubs.dadd buffer buffer x) xs ;
+    List.iter (fun x -> ignore @@ Stubs.dadd buffer buffer x) xs ;
     buffer
 
   let double x =
     let buffer = Stubs.allocate_g1 () in
-    Stubs.double buffer x ;
+    ignore @@ Stubs.double buffer x ;
     buffer
 
   let mul g n =
     let buffer = Stubs.allocate_g1 () in
     let bytes = Fr.to_bytes n in
-    Stubs.mult buffer g bytes (Unsigned.Size_t.of_int (32 * 8)) ;
+    ignore @@ Stubs.mult buffer g bytes (Unsigned.Size_t.of_int (32 * 8)) ;
     buffer
 
   let mul_inplace g n =
-    Stubs.mult global_buffer g (Fr.to_bytes n) (Unsigned.Size_t.of_int (32 * 8)) ;
+    ignore
+    @@ Stubs.mult
+         global_buffer
+         g
+         (Fr.to_bytes n)
+         (Unsigned.Size_t.of_int (32 * 8)) ;
     memcpy g global_buffer
 
   let b = Fq.(one + one + one + one)
@@ -275,9 +279,9 @@ module G1 = struct
     | Some y ->
         let y = if Random.bool () then y else Fq.negate y in
         let p_affine = Stubs.allocate_g1_affine () in
-        Stubs.set_affine_coordinates p_affine x y ;
+        ignore @@ Stubs.set_affine_coordinates p_affine x y ;
         let p = Stubs.allocate_g1 () in
-        Stubs.from_affine p p_affine ;
+        ignore @@ Stubs.from_affine p p_affine ;
         mul p cofactor_fr
 
   let eq g1 g2 = Stubs.equal g1 g2
@@ -288,16 +292,16 @@ module G1 = struct
 
   let negate g =
     let buffer = copy g in
-    Stubs.cneg buffer true ;
+    ignore @@ Stubs.cneg buffer true ;
     buffer
 
   let of_z_opt ~x ~y =
     let x = Fq.of_z x in
     let y = Fq.of_z y in
     let buffer_affine = Stubs.allocate_g1_affine () in
-    Stubs.set_affine_coordinates buffer_affine x y ;
+    ignore @@ Stubs.set_affine_coordinates buffer_affine x y ;
     let buffer = Stubs.allocate_g1 () in
-    Stubs.from_affine buffer buffer_affine ;
+    ignore @@ Stubs.from_affine buffer buffer_affine ;
     if Stubs.in_g1 buffer then Some buffer else None
 
   module M = struct
@@ -322,7 +326,7 @@ module G1 = struct
 
   let fft_inplace ~domain ~points =
     let logn = Z.log2 (Z.of_int (Array.length points)) in
-    Stubs.fft_inplace points domain logn
+    ignore @@ Stubs.fft_inplace points domain logn
 
   let ifft ~domain ~points = Fft.ifft (module M) ~domain ~points
 
@@ -330,21 +334,22 @@ module G1 = struct
     let n = Array.length points in
     let logn = Z.log2 (Z.of_int n) in
     let n_inv = Fr.inverse_exn (Fr.of_z (Z.of_int n)) in
-    Stubs.fft_inplace points domain logn ;
-    Stubs.mul_map_inplace points n_inv n
+    ignore @@ Stubs.fft_inplace points domain logn ;
+    ignore @@ Stubs.mul_map_inplace points n_inv n
 
   let hash_to_curve message dst =
     let message_length = Bytes.length message in
     let dst_length = Bytes.length dst in
     let buffer = Stubs.allocate_g1 () in
-    Stubs.hash_to_curve
-      buffer
-      message
-      (Unsigned.Size_t.of_int message_length)
-      dst
-      (Unsigned.Size_t.of_int dst_length)
-      Bytes.empty
-      Unsigned.Size_t.zero ;
+    ignore
+    @@ Stubs.hash_to_curve
+         buffer
+         message
+         (Unsigned.Size_t.of_int message_length)
+         dst
+         (Unsigned.Size_t.of_int dst_length)
+         Bytes.empty
+         Unsigned.Size_t.zero ;
     buffer
 
   let pippenger ?(start = 0) ?len ps ss =
@@ -357,12 +362,15 @@ module G1 = struct
     if len = 1 then mul ps.(start) ss.(start)
     else
       let buffer = Stubs.allocate_g1 () in
-      Stubs.pippenger
-        buffer
-        ps
-        ss
-        (Unsigned.Size_t.of_int start)
-        (Unsigned.Size_t.of_int len) ;
+      let res =
+        Stubs.pippenger
+          buffer
+          ps
+          ss
+          (Unsigned.Size_t.of_int start)
+          (Unsigned.Size_t.of_int len)
+      in
+      assert (res = 0) ;
       buffer
 
   let pippenger_with_affine_array ?(start = 0) ?len (ps, n) ss =
@@ -371,16 +379,19 @@ module G1 = struct
     let len = Option.value ~default:(l - start) len in
     if start < 0 || len < 1 || start + len > n then
       raise @@ Invalid_argument (Format.sprintf "start %i len %i" start len) ;
-    if len = 1 then (
-      Stubs.continuous_array_get buffer ps start ;
-      mul_inplace buffer ss.(start) )
+    (if len = 1 then (
+     ignore @@ Stubs.continuous_array_get buffer ps start ;
+     mul_inplace buffer ss.(start))
     else
-      Stubs.pippenger_with_affine_array
-        buffer
-        ps
-        ss
-        (Unsigned.Size_t.of_int start)
-        (Unsigned.Size_t.of_int len) ;
+      let res =
+        Stubs.pippenger_with_affine_array
+          buffer
+          ps
+          ss
+          (Unsigned.Size_t.of_int start)
+          (Unsigned.Size_t.of_int len)
+      in
+      assert (res = 0)) ;
     buffer
 end
 

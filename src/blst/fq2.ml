@@ -27,22 +27,22 @@ module Stubs = struct
 
   external allocate_fp2 : unit -> t = "allocate_fp2_stubs"
 
-  external add : t -> t -> t -> unit = "caml_blst_fp2_add_stubs"
+  external add : t -> t -> t -> int = "caml_blst_fp2_add_stubs"
 
-  external mul : t -> t -> t -> unit = "caml_blst_fp2_mul_stubs"
+  external mul : t -> t -> t -> int = "caml_blst_fp2_mul_stubs"
 
   external sqrt : t -> t -> bool = "caml_blst_fp2_sqrt_stubs"
 
-  external cneg : t -> t -> bool -> unit = "caml_blst_fp2_cneg_stubs"
+  external cneg : t -> t -> bool -> int = "caml_blst_fp2_cneg_stubs"
 
-  external to_bytes : Bytes.t -> t -> unit = "caml_blst_fp2_to_bytes_stubs"
+  external to_bytes : Bytes.t -> t -> int = "caml_blst_fp2_to_bytes_stubs"
 
-  external of_bytes_components : t -> Bytes.t -> Bytes.t -> unit
+  external of_bytes_components : t -> Bytes.t -> Bytes.t -> int
     = "caml_blst_fp2_of_bytes_components_stubs"
 
-  external zero : t -> unit = "caml_blst_fp2_zero_stubs"
+  external zero : t -> int = "caml_blst_fp2_zero_stubs"
 
-  external one : t -> unit = "caml_blst_fp2_one_stubs"
+  external one : t -> int = "caml_blst_fp2_one_stubs"
 end
 
 module Fq2 = struct
@@ -58,7 +58,7 @@ module Fq2 = struct
       let buffer = Stubs.allocate_fp2 () in
       let x_bytes = Bytes.sub bs 0 48 in
       let y_bytes = Bytes.sub bs 48 48 in
-      Stubs.of_bytes_components buffer x_bytes y_bytes ;
+      ignore @@ Stubs.of_bytes_components buffer x_bytes y_bytes ;
       Some buffer
 
   let of_bytes_exn bs : t =
@@ -69,17 +69,17 @@ module Fq2 = struct
 
   let zero =
     let buffer = Stubs.allocate_fp2 () in
-    Stubs.zero buffer ;
+    ignore @@ Stubs.zero buffer ;
     buffer
 
   let one =
     let buffer = Stubs.allocate_fp2 () in
-    Stubs.one buffer ;
+    ignore @@ Stubs.one buffer ;
     buffer
 
   let to_bytes p =
     let buffer = Bytes.make size_in_bytes '\000' in
-    Stubs.to_bytes buffer p ;
+    ignore @@ Stubs.to_bytes buffer p ;
     buffer
 
   let random ?state () =
@@ -89,19 +89,19 @@ module Fq2 = struct
     let buffer = Stubs.allocate_fp2 () in
     let x_bytes = Fq.to_bytes x in
     let y_bytes = Fq.to_bytes y in
-    Stubs.of_bytes_components buffer x_bytes y_bytes ;
+    ignore @@ Stubs.of_bytes_components buffer x_bytes y_bytes ;
     buffer
 
   let add x y =
     let buffer = Stubs.allocate_fp2 () in
-    Stubs.add buffer x y ;
+    ignore @@ Stubs.add buffer x y ;
     buffer
 
   let ( + ) = add
 
   let mul x y =
     let buffer = Stubs.allocate_fp2 () in
-    Stubs.mul buffer x y ;
+    ignore @@ Stubs.mul buffer x y ;
     buffer
 
   let ( * ) = mul
@@ -113,7 +113,7 @@ module Fq2 = struct
 
   let negate x =
     let buffer = Stubs.allocate_fp2 () in
-    Stubs.cneg buffer x true ;
+    ignore @@ Stubs.cneg buffer x true ;
     buffer
 end
 
