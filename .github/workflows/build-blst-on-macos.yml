@@ -43,7 +43,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2.1.0
       - uses: uraimo/run-on-arch-action@v2.1.1
-        name: build
+        name: build on s390x
         with:
           arch: s390x
           distro: ubuntu20.04
