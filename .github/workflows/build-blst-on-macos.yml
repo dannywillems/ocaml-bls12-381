@@ -50,22 +50,26 @@ jobs:
 
           run: |
             uname --machine
-            apt-get update -y
-            apt-get install ocaml opam -y
+            cut -d: -f1 /etc/passwd
+            ls -al /
+            ls -al /home
+            useradd --user-group --system --create-home --no-log-init -u 1001 app
+            # apt-get update -y
+            # apt-get install ocaml opam -y
             su - $(id -un 1001)
-            opam init --bare -y
-            opam switch create . --no-install --packages ocaml-base-compiler.4.12.1
-            eval $(opam env)
-            ocaml --version
-            opam --version
-            opam depext -i -y conf-pkg-config conf-libffi
-            opam depext -i -y zarith
-            opam pin add bls12-381.dev . --no-action
-            opam pin add bls12-381-unix.dev . --no-action
-            opam install bls12-381 -y --with-test --deps-only
-            opam install bls12-381-unix -y --with-test --deps-only
-            # For benchmark repository
-            opam install core_bench -y
-            dune build
-            dune build @install
-            dune runtest
+            # opam init --bare -y
+            # opam switch create . --no-install --packages ocaml-base-compiler.4.12.1
+            # eval $(opam env)
+            # ocaml --version
+            # opam --version
+            # opam depext -i -y conf-pkg-config conf-libffi
+            # opam depext -i -y zarith
+            # opam pin add bls12-381.dev . --no-action
+            # opam pin add bls12-381-unix.dev . --no-action
+            # opam install bls12-381 -y --with-test --deps-only
+            # opam install bls12-381-unix -y --with-test --deps-only
+            # # For benchmark repository
+            # opam install core_bench -y
+            # dune build
+            # dune build @install
+            # dune runtest
