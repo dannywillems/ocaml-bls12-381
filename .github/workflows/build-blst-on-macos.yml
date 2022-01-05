@@ -52,6 +52,7 @@ jobs:
             uname --machine
             apt-get update -y
             apt-get install ocaml opam -y
+            su - $(id -un 1001)
             opam init --bare -y
             opam switch create . --no-install --packages ocaml-base-compiler.4.12.1
             eval $(opam env)
