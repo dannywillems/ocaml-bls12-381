@@ -50,23 +50,21 @@ jobs:
 
           run: |
             uname --machine
-      - name: Use OCaml 4.12.1
-        uses: ocaml/setup-ocaml@v2
-        with:
-          ocaml-compiler: 4.12.1
-      - run: |
-          uname --machine
-          sudo apt-get update -y
-          opam depext -i -y conf-pkg-config conf-libffi
-          ocaml --version
-          opam --version
-          opam depext -i -y zarith
-          opam pin add bls12-381.dev . --no-action
-          opam pin add bls12-381-unix.dev . --no-action
-          opam install bls12-381 -y --with-test --deps-only
-          opam install bls12-381-unix -y --with-test --deps-only
-          # For benchmark repository
-          opam install core_bench
-          dune build
-          dune build @install
-          dune runtest
+            sudo apt-get update -y
+            sudo apt-get install ocaml opam
+            opam init --bare
+            opam switch create . --no-install --packages ocaml-base-compiler.4.12.1
+            eval $(opam env)
+            ocaml --version
+            opam --version
+            opam depext -i -y conf-pkg-config conf-libffi
+            opam depext -i -y zarith
+            opam pin add bls12-381.dev . --no-action
+            opam pin add bls12-381-unix.dev . --no-action
+            opam install bls12-381 -y --with-test --deps-only
+            opam install bls12-381-unix -y --with-test --deps-only
+            # For benchmark repository
+            opam install core_bench
+            dune build
+            dune build @install
+            dune runtest
