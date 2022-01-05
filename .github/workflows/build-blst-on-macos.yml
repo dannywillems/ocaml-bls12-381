@@ -43,13 +43,30 @@ jobs:
     steps:
       - uses: actions/checkout@v2.1.0
       - uses: uraimo/run-on-arch-action@v2.1.1
-        name: build on s390x
+        name: use architecture s390x
         with:
           arch: s390x
           distro: ubuntu20.04
 
           run: |
             uname --machine
-
-
-
+      - name: Use OCaml 4.12.1
+        uses: ocaml/setup-ocaml@v2
+        with:
+          ocaml-compiler: 4.12.1
+      - run: |
+          uname --machine
+          sudo apt-get update -y
+          opam depext -i -y conf-pkg-config conf-libffi
+          ocaml --version
+          opam --version
+          opam depext -i -y zarith
+          opam pin add bls12-381.dev . --no-action
+          opam pin add bls12-381-unix.dev . --no-action
+          opam install bls12-381 -y --with-test --deps-only
+          opam install bls12-381-unix -y --with-test --deps-only
+          # For benchmark repository
+          opam install core_bench
+          dune build
+          dune build @install
+          dune runtest
