@@ -64,7 +64,7 @@ jobs:
             opam install bls12-381 -y --with-test --deps-only
             opam install bls12-381-unix -y --with-test --deps-only
             # For benchmark repository
-            opam install core_bench
+            opam install core_bench -y
             dune build
             dune build @install
             dune runtest
