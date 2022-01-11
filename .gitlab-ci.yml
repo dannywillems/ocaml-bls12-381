@@ -46,7 +46,7 @@ lint-c:
   rules:
     - when: always
 
-.build-test: &build_definition
+.build-test-ubuntu: &build_definition_ubuntu
   stage: build
   before_script:
     # Always update system package manager + setup OPAM env
@@ -75,26 +75,114 @@ lint-c:
   rules:
     - when: always
 
-build-ocaml-4.08:
-  <<: *build_definition
+build-ocaml-4.08-ubuntu:
+  <<: *build_definition_ubuntu
   image: ocaml/opam:debian-ocaml-4.08
 
-build-ocaml-4.09:
-  <<: *build_definition
+build-ocaml-4.09-ubuntu:
+  <<: *build_definition_ubuntu
   image: ocaml/opam:debian-ocaml-4.09
 
-build-ocaml-4.10:
-  <<: *build_definition
+build-ocaml-4.10-ubuntu:
+  <<: *build_definition_ubuntu
   image: ocaml/opam:debian-ocaml-4.10
 
-build-ocaml-4.11:
-  <<: *build_definition
+build-ocaml-4.11-ubuntu:
+  <<: *build_definition_ubuntu
   image: ocaml/opam:debian-ocaml-4.11
 
-# Not using the same images than the others as it seems 4.12 images are too old
-build-ocaml-4.12:
-  <<: *build_definition
+build-ocaml-4.12-ubuntu:
+  <<: *build_definition_ubuntu
   image: ocaml/opam:debian-ocaml-4.12
+
+build-ocaml-4.13-ubuntu:
+  <<: *build_definition_ubuntu
+  image: ocaml/opam:debian-ocaml-4.13
+
+build-ocaml-4.14-ubuntu:
+  <<: *build_definition_ubuntu
+  image: ocaml/opam:debian-ocaml-4.14
+
+.build-test-alpine: &build_definition_alpine
+  stage: build
+  before_script:
+    # Always update system package manager + setup OPAM env
+    - eval $(opam env)
+    - opam update
+    - opam depext -i -y conf-pkg-config conf-libffi
+    # List versions and environments
+    - ocaml --version
+    - opam --version
+    - echo $OPAM_SWITCH_PREFIX
+  script:
+    # Install external dependencies
+    - opam depext -i -y zarith
+    # Pin for later installation
+    - opam pin add bls12-381.dev . --no-action
+    - opam pin add bls12-381-unix.dev . --no-action
+    # Install the dependencies
+    - opam install bls12-381 -y --with-test --deps-only
+    - opam install bls12-381-unix -y --with-test --deps-only
+    - dune build @install
+    - dune runtest
+  rules:
+    - when: always
+
+build-ocaml-4.08-alpine-3.14:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.14-ocaml-4.08
+
+build-ocaml-4.09-alpine-3.14:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.14-ocaml-4.09
+
+build-ocaml-4.10-alpine-3.14:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.14-ocaml-4.10
+
+build-ocaml-4.11-alpine-3.14:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.14-ocaml-4.11
+
+build-ocaml-4.12-alpine-3.14:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.14-ocaml-4.12
+
+build-ocaml-4.13-alpine-3.14:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.14-ocaml-4.13
+
+build-ocaml-4.14-alpine-3.14:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.14-ocaml-4.14
+
+build-ocaml-4.08-alpine-3.15:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.15-ocaml-4.08
+
+build-ocaml-4.09-alpine-3.15:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.15-ocaml-4.09
+
+build-ocaml-4.10-alpine-3.15:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.15-ocaml-4.10
+
+build-ocaml-4.11-alpine-3.15:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.15-ocaml-4.11
+
+build-ocaml-4.12-alpine-3.15:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.15-ocaml-4.12
+
+build-ocaml-4.13-alpine-3.15:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.15-ocaml-4.13
+
+build-ocaml-4.14-alpine-3.15:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.15-ocaml-4.14
 
 # Benchmarks
 .benchmark: &benchmark_definition
