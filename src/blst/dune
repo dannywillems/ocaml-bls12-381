@@ -50,7 +50,7 @@
  (instrumentation
   (backend bisect_ppx))
  (private_modules fq fq2 Blst_bindings Blst_stubs fft)
- (libraries hex zarith ctypes ctypes.foreign)
+ (libraries hex zarith ctypes)
  (library_flags :standard -linkall -ccopt -lpthread)
  (foreign_archives blst)
  (foreign_stubs
