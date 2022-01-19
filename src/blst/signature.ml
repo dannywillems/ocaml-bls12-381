@@ -27,7 +27,7 @@ module Stubs = struct
     Bytes.t ->
     Unsigned.Size_t.t ->
     int
-    = "caml_blst_aggregate_signature_bytecode_stubs" "caml_blst_aggregate_signature_stubs"
+    = "caml_blst_aggregate_signature_stubs_bytecode" "caml_blst_aggregate_signature_stubs"
 
   external pairing_commit : ctxt -> int = "caml_blst_pairing_commit_stubs"
 
