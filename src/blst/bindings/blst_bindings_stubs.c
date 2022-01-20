@@ -829,6 +829,7 @@ CAMLprim value caml_blst_final_exponentiation_stubs(value buffer, value p) {
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
+// For signatures
 static void finalize_free_pairing(value v) { free(Blst_pairing_val(v)); }
 
 static struct custom_operations blst_pairing_ops = {
@@ -841,18 +842,7 @@ static struct custom_operations blst_pairing_ops = {
     custom_compare_ext_default,
     custom_fixed_length_default};
 
-CAMLprim value caml_blst_sk_to_pk_in_g1_stubs(value buffer, value scalar) {
-  CAMLparam2(buffer, scalar);
-  blst_sk_to_pk_in_g1(Blst_p1_val(buffer), Blst_scalar_val(scalar));
-  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
-}
-
-CAMLprim value caml_blst_sign_pk_in_g1_stubs(value buffer, value p, value s) {
-  CAMLparam3(buffer, p, s);
-  blst_sign_pk_in_g1(Blst_p2_val(buffer), Blst_p2_val(p), Blst_scalar_val(s));
-  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
-}
-
+// Common to both instantiations
 CAMLprim value caml_blst_pairing_init_stubs(value check, value dst,
                                             value dst_length) {
   CAMLparam3(check, dst, dst_length);
@@ -868,24 +858,6 @@ CAMLprim value caml_blst_pairing_init_stubs(value check, value dst,
   CAMLreturn(block);
 }
 
-CAMLprim value caml_blst_aggregate_signature_stubs(value buffer, value g1,
-                                                   value g2, value msg,
-                                                   value msg_length, value aug,
-                                                   value aug_length) {
-  CAMLparam5(buffer, g1, g2, msg, msg_length);
-  CAMLxparam2(aug, aug_length);
-  int r = blst_pairing_aggregate_pk_in_g1(
-      Blst_pairing_val(buffer), Blst_p1_affine_val(g1), Blst_p2_affine_val(g2),
-      Bytes_val(msg), ctypes_size_t_val(msg_length), Bytes_val(aug),
-      ctypes_size_t_val(aug_length));
-  CAMLreturn(Val_int(r));
-}
-
-CAMLprim value caml_blst_aggregate_signature_stubs_bytecode(value *argv,
-                                                            int argn) {
-  return caml_blst_aggregate_signature_stubs(argv[0], argv[1], argv[2], argv[3],
-                                             argv[4], argv[5], argv[6]);
-}
 CAMLprim value caml_blst_pairing_commit_stubs(value buffer) {
   CAMLparam1(buffer);
   blst_pairing_commit(Blst_pairing_val(buffer));
@@ -896,6 +868,48 @@ CAMLprim value caml_blst_pairing_finalverify_stubs(value buffer) {
   CAMLparam1(buffer);
   bool r = blst_pairing_finalverify(Blst_pairing_val(buffer), NULL);
   CAMLreturn(Val_bool(r));
+}
+
+CAMLprim value caml_blst_signature_keygen_stubs(value buffer, value ikm,
+                                                value ikm_length,
+                                                value key_info,
+                                                value key_info_length) {
+  CAMLparam5(buffer, ikm, ikm_length, key_info, key_info_length);
+  blst_keygen(Blst_scalar_val(buffer), Bytes_val(ikm),
+              ctypes_size_t_val(ikm_length), Bytes_val(key_info),
+              ctypes_size_t_val(key_info_length));
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+// Pk in G1, Signature in G2
+CAMLprim value caml_blst_sk_to_pk_in_g1_stubs(value buffer, value scalar) {
+  CAMLparam2(buffer, scalar);
+  blst_sk_to_pk_in_g1(Blst_p1_val(buffer), Blst_scalar_val(scalar));
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+CAMLprim value caml_blst_sign_pk_in_g1_stubs(value buffer, value p, value s) {
+  CAMLparam3(buffer, p, s);
+  blst_sign_pk_in_g1(Blst_p2_val(buffer), Blst_p2_val(p), Blst_scalar_val(s));
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+CAMLprim value caml_blst_aggregate_signature_pk_in_g1_stubs(
+    value buffer, value g1, value g2, value msg, value msg_length, value aug,
+    value aug_length) {
+  CAMLparam5(buffer, g1, g2, msg, msg_length);
+  CAMLxparam2(aug, aug_length);
+  int r = blst_pairing_aggregate_pk_in_g1(
+      Blst_pairing_val(buffer), Blst_p1_affine_val(g1), Blst_p2_affine_val(g2),
+      Bytes_val(msg), ctypes_size_t_val(msg_length), Bytes_val(aug),
+      ctypes_size_t_val(aug_length));
+  CAMLreturn(Val_int(r));
+}
+
+CAMLprim value
+caml_blst_aggregate_signature_pk_in_g1_stubs_bytecode(value *argv, int argn) {
+  return caml_blst_aggregate_signature_pk_in_g1_stubs(
+      argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]);
 }
 
 CAMLprim value caml_blst_pairing_chk_n_mul_n_aggr_pk_in_g1_stubs(
@@ -925,15 +939,64 @@ CAMLprim value caml_blst_pairing_chk_n_mul_n_aggr_pk_in_g1_stubs_bytecode(
       argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7],
       argv[8], argv[9], argv[10]);
 }
-CAMLprim value caml_blst_signature_keygen_stubs(value buffer, value ikm,
-                                                value ikm_length,
-                                                value key_info,
-                                                value key_info_length) {
-  CAMLparam5(buffer, ikm, ikm_length, key_info, key_info_length);
-  blst_keygen(Blst_scalar_val(buffer), Bytes_val(ikm),
-              ctypes_size_t_val(ikm_length), Bytes_val(key_info),
-              ctypes_size_t_val(key_info_length));
+
+// Pk in G2, signature in G1
+CAMLprim value caml_blst_sk_to_pk_in_g2_stubs(value buffer, value scalar) {
+  CAMLparam2(buffer, scalar);
+  blst_sk_to_pk_in_g2(Blst_p2_val(buffer), Blst_scalar_val(scalar));
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+CAMLprim value caml_blst_sign_pk_in_g2_stubs(value buffer, value p, value s) {
+  CAMLparam3(buffer, p, s);
+  blst_sign_pk_in_g2(Blst_p1_val(buffer), Blst_p1_val(p), Blst_scalar_val(s));
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+CAMLprim value caml_blst_aggregate_signature_pk_in_g2_stubs(
+    value buffer, value g1, value g2, value msg, value msg_length, value aug,
+    value aug_length) {
+  CAMLparam5(buffer, g1, g2, msg, msg_length);
+  CAMLxparam2(aug, aug_length);
+  int r = blst_pairing_aggregate_pk_in_g2(
+      Blst_pairing_val(buffer), Blst_p2_affine_val(g1), Blst_p1_affine_val(g2),
+      Bytes_val(msg), ctypes_size_t_val(msg_length), Bytes_val(aug),
+      ctypes_size_t_val(aug_length));
+  CAMLreturn(Val_int(r));
+}
+
+CAMLprim value
+caml_blst_aggregate_signature_pk_in_g2_stubs_bytecode(value *argv, int argn) {
+  return caml_blst_aggregate_signature_pk_in_g2_stubs(
+      argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6]);
+}
+
+CAMLprim value caml_blst_pairing_chk_n_mul_n_aggr_pk_in_g2_stubs(
+    value buffer, value pk, value check_pk, value signature,
+    value check_signature, value scalar, value nbits, value msg,
+    value msg_length, value aug, value aug_length) {
+  CAMLparam5(buffer, pk, check_pk, signature, check_signature);
+  CAMLxparam5(scalar, nbits, msg, msg_length, aug);
+  CAMLxparam1(aug_length);
+  blst_p1_affine *signature_c;
+  if (Is_none(signature)) {
+    signature_c = NULL;
+  } else {
+    signature_c = Blst_p1_affine_val(Some_val(signature));
+  }
+  int r = blst_pairing_chk_n_mul_n_aggr_pk_in_g2(
+      Blst_pairing_val(buffer), Blst_p2_affine_val(pk), Bool_val(check_pk),
+      signature_c, Bool_val(check_signature), Bytes_val(scalar),
+      ctypes_size_t_val(nbits), Bytes_val(msg), ctypes_size_t_val(msg_length),
+      Bytes_val(aug), ctypes_size_t_val(aug_length));
+  CAMLreturn(Val_int(r));
+}
+
+CAMLprim value caml_blst_pairing_chk_n_mul_n_aggr_pk_in_g2_stubs_bytecode(
+    value *argv, int argn) {
+  return caml_blst_pairing_chk_n_mul_n_aggr_pk_in_g2_stubs(
+      argv[0], argv[1], argv[2], argv[3], argv[4], argv[5], argv[6], argv[7],
+      argv[8], argv[9], argv[10]);
 }
 
 // Hypothesis: jacobian_list and scalars are arrays of size *at least* start +

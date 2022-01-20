@@ -644,20 +644,8 @@ module Signature : sig
   (** Type of the secret keys. *)
   type sk
 
-  (** Type of the public keys *)
-  type pk
-
-  (* Not abstracting the type to avoid to write (de)serialisation routines *)
-  type signature = Bytes.t
-
   (** The size of a serialized value [sk] *)
   val sk_size_in_bytes : int
-
-  (** The size of a serialized value [pk] *)
-  val pk_size_in_bytes : int
-
-  (** The size of a serialized value [signature] *)
-  val signature_size_in_bytes : int
 
   (** [sk_of_bytes_exn bs] attempts to deserialize [bs] into a secret key. [bs]
       must be the little endian representation of the secret key.
@@ -673,128 +661,338 @@ module Signature : sig
   *)
   val sk_to_bytes : sk -> Bytes.t
 
-  (** Build a value of type [pk] without performing any check on the input.
-      It is safe to use this function when verifying a signature as the
-      signature function verifies if the point is in the prime subgroup. Using
-      [unsafe_pk_of_bytes] removes a verification performed twice when used
-      [pk_of_bytes_exn] or [pk_of_bytes_opt].
-
-      The expected bytes format are the compressed form of a point on G1.
-   *)
-  val unsafe_pk_of_bytes : Bytes.t -> pk
-
-  (** Build a value of type [pk] safely, i.e. the function checks the bytes
-      given in parameters represents a point on the curve and in the prime subgroup.
-      Raise [Invalid_argument] if the bytes are not in the correct format or does
-      not represent a point in the prime subgroup.
-
-      The expected bytes format are the compressed form of a point on G1.
-  *)
-  val pk_of_bytes_exn : Bytes.t -> pk
-
-  (** Build a value of type [pk] safely, i.e. the function checks the bytes
-      given in parameters represents a point on the curve and in the prime subgroup.
-      Return [None] if the bytes are not in the correct format or does
-      not represent a point in the prime subgroup.
-
-      The expected bytes format are the compressed form of a point on G1.
-  *)
-  val pk_of_bytes_opt : Bytes.t -> pk option
-
-  (** Returns a bytes representation of a value of type [pk]. The output is the
-      compressed form a the point G1.t the [pk] represents.
-  *)
-  val pk_to_bytes : pk -> Bytes.t
-
   (** [generate_sk ?key_info ikm] generates a new (random) secret key. [ikm]
        must be at least 32 bytes (otherwise, raise [Invalid_argument]). The
        default value of [key_info] is the empty bytes sequence.
   *)
   val generate_sk : ?key_info:Bytes.t -> Bytes.t -> sk
 
-  (** [derive_pk sk] derives the corresponding public key of [sk]. *)
-  val derive_pk : sk -> pk
-
-  (** [aggregate_signature_opt signatures] aggregates the signatures [signatures], following
-      https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-2.8.
-      Return [None] if [INVALID] is expected in the specification
+  (** BLS signatures instantiation minimizing the size of the public keys (48
+      bytes) but use longer signatures (96 bytes).
   *)
-  val aggregate_signature_opt : Bytes.t list -> Bytes.t option
+  module MinPk : sig
+    (** Type of the public keys *)
+    type pk
 
-  (**
-    https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1
+    (** The size of a serialized value [pk] *)
+    val pk_size_in_bytes : int
 
-    In a basic scheme, rogue key attacks are handled by requiring all
-    messages signed by an aggregate signature to be distinct.  This
-    requirement is enforced in the definition of AggregateVerify.
+    (** The size of a serialized value [signature] *)
+    val signature_size_in_bytes : int
 
-    The Sign and Verify functions are identical to CoreSign and
-    CoreVerify (Section 2), respectively.
-  *)
-  module Basic : sig
-    val sign : sk -> Bytes.t -> signature
+    (** Build a value of type [pk] without performing any check on the input.
+        It is safe to use this function when verifying a signature as the
+        signature function verifies if the point is in the prime subgroup. Using
+        [unsafe_pk_of_bytes] removes a verification performed twice when used
+        [pk_of_bytes_exn] or [pk_of_bytes_opt].
 
-    val verify : pk -> Bytes.t -> signature -> bool
-
-    (** raise [Invalid_argument] if the messages are not distinct *)
-    val aggregate_verify : (pk * Bytes.t) list -> signature -> bool
-  end
-
-  (**
-    https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2
-
-    In a message augmentation scheme, signatures are generated over the
-    concatenation of the public key and the message, ensuring that
-    messages signed by different public keys are distinct.
-  *)
-  module Aug : sig
-    val sign : sk -> Bytes.t -> signature
-
-    val verify : pk -> Bytes.t -> signature -> bool
-
-    val aggregate_verify : (pk * Bytes.t) list -> signature -> bool
-  end
-
-  (**
-     https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3
-
-     A proof of possession scheme uses a separate public key validation
-     step, called a proof of possession, to defend against rogue key
-     attacks.  This enables an optimization to aggregate signature
-     verification for the case that all signatures are on the same
-     message.
-  *)
-
-  module Pop : sig
-    type proof = Bytes.t
-
-    (** Equivalent to [core_sign] with the DST given in the specification
-        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
+        The expected bytes format are the compressed form of a point on G2.
     *)
-    val sign : sk -> Bytes.t -> signature
+    val unsafe_pk_of_bytes : Bytes.t -> pk
 
-    (** Equivalent to [core_verify] with the DST given in the specification
-        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
+    (** Build a value of type [pk] safely, i.e. the function checks the bytes
+        given in parameters represents a point on the curve and in the prime subgroup.
+        Raise [Invalid_argument] if the bytes are not in the correct format or does
+        not represent a point in the prime subgroup.
+
+        The expected bytes format are the compressed form of a point on G2.
     *)
-    val verify : pk -> Bytes.t -> signature -> bool
+    val pk_of_bytes_exn : Bytes.t -> pk
 
-    (** [pop_proof sk] implements
+    (** Build a value of type [pk] safely, i.e. the function checks the bytes
+        given in parameters represents a point on the curve and in the prime subgroup.
+        Return [None] if the bytes are not in the correct format or does
+        not represent a point in the prime subgroup.
+
+        The expected bytes format are the compressed form of a point on G2.
+    *)
+    val pk_of_bytes_opt : Bytes.t -> pk option
+
+    (** Returns a bytes representation of a value of type [pk]. The output is the
+        compressed form a the point G1.t the [pk] represents.
+    *)
+    val pk_to_bytes : pk -> Bytes.t
+
+    (** [derive_pk sk] derives the corresponding public key of [sk]. *)
+    val derive_pk : sk -> pk
+
+    (** Type of the signatures *)
+    type signature
+
+    (** Build a value of type [signature] without performing any check on the input.
+        It is safe to use this function when verifying a signature as the
+        signature function verifies if the point is in the prime subgroup. Using
+        [unsafe_signature_of_bytes] removes a verification performed twice when used
+        [signature_of_bytes_exn] or [signature_of_bytes_opt].
+
+        The expected bytes format are the compressed form of a point on G2.
+   *)
+    val unsafe_signature_of_bytes : Bytes.t -> signature
+
+    (** Build a value of type [signature] safely, i.e. the function checks the bytes
+        given in parameters represents a point on the curve and in the prime subgroup.
+        Raise [Invalid_argument] if the bytes are not in the correct format or does
+        not represent a point in the prime subgroup.
+
+        The expected bytes format are the compressed form of a point on G2.
+    *)
+    val signature_of_bytes_exn : Bytes.t -> signature
+
+    (** Build a value of type [pk] safely, i.e. the function checks the bytes
+        given in parameters represents a point on the curve and in the prime subgroup.
+        Return [None] if the bytes are not in the correct format or does
+        not represent a point in the prime subgroup.
+
+        The expected bytes format are the compressed form of a point on G2.
+    *)
+    val signature_of_bytes_opt : Bytes.t -> signature option
+
+    (** Returns a bytes representation of a value of type [signature]. The output is the
+        compressed form a the point [G2.t] the [signature] represents.
+    *)
+    val signature_to_bytes : signature -> Bytes.t
+
+    (** [aggregate_signature_opt signatures] aggregates the signatures
+        [signatures], following
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-2.8.
+        Return [None] if [INVALID] is expected in the specification
+    *)
+    val aggregate_signature_opt : signature list -> signature option
+
+    (** Follow https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1
+
+        In a basic scheme, rogue key attacks are handled by requiring all
+        messages signed by an aggregate signature to be distinct.  This
+        requirement is enforced in the definition of AggregateVerify.
+
+        The Sign and Verify functions are identical to CoreSign and
+        CoreVerify (Section 2), respectively.
+    *)
+    module Basic : sig
+      val sign : sk -> Bytes.t -> signature
+
+      val verify : pk -> Bytes.t -> signature -> bool
+
+      (** Raise [Invalid_argument] if the messages are not distinct *)
+      val aggregate_verify : (pk * Bytes.t) list -> signature -> bool
+    end
+
+    (** Follow https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2
+
+        In a message augmentation scheme, signatures are generated over the
+        concatenation of the public key and the message, ensuring that
+        messages signed by different public keys are distinct.
+    *)
+    module Aug : sig
+      val sign : sk -> Bytes.t -> signature
+
+      val verify : pk -> Bytes.t -> signature -> bool
+
+      val aggregate_verify : (pk * Bytes.t) list -> signature -> bool
+    end
+
+    (** Follow https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3
+
+        A proof of possession scheme uses a separate public key validation
+        step, called a proof of possession, to defend against rogue key
+        attacks.  This enables an optimization to aggregate signature
+        verification for the case that all signatures are on the same
+        message.
+    *)
+    module Pop : sig
+      type proof = Bytes.t
+
+      (** Equivalent to [core_sign] with the DST given in the specification
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
+      *)
+      val sign : sk -> Bytes.t -> signature
+
+      (** Equivalent to [core_verify] with the DST given in the specification
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
+      *)
+      val verify : pk -> Bytes.t -> signature -> bool
+
+      (** [pop_proof sk] implements
          https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.2
-    *)
-    val pop_prove : sk -> proof
+      *)
+      val pop_prove : sk -> proof
 
-    (** [pop_verify pk signature] implements
+      (** [pop_verify pk signature] implements
         https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.3
-    *)
-    val pop_verify : pk -> proof -> bool
+      *)
+      val pop_verify : pk -> proof -> bool
 
-    (**
-      [aggregate_verify pks msg aggregated_signature] performs a aggregate
-      signature verification. It supposes the same message [msg] has been
-      signed. It implements the FastAggregateVerify algorithm specified in
-      https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.4
+      (**
+        [aggregate_verify pks msg aggregated_signature] performs a aggregate
+        signature verification. It supposes the same message [msg] has been
+        signed. It implements the FastAggregateVerify algorithm specified in
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.4
+      *)
+      val aggregate_verify : (pk * proof) list -> Bytes.t -> signature -> bool
+    end
+  end
+
+  (** BLS signatures instantiation minimizing the size of the signatures (48
+      bytes) but use longer public keys (96 bytes).
+  *)
+  module MinSig : sig
+    (** Type of the public keys *)
+    type pk
+
+    (** The size of a serialized value [pk] *)
+    val pk_size_in_bytes : int
+
+    (** Build a value of type [pk] without performing any check on the input.
+        It is safe to use this function when verifying a signature as the
+        signature function verifies if the point is in the prime subgroup. Using
+        [unsafe_pk_of_bytes] removes a verification performed twice when used
+        [pk_of_bytes_exn] or [pk_of_bytes_opt].
+
+        The expected bytes format are the compressed form of a point on G2.
     *)
-    val aggregate_verify : (pk * proof) list -> Bytes.t -> signature -> bool
+    val unsafe_pk_of_bytes : Bytes.t -> pk
+
+    (** Build a value of type [pk] safely, i.e. the function checks the bytes
+        given in parameters represents a point on the curve and in the prime subgroup.
+        Raise [Invalid_argument] if the bytes are not in the correct format or does
+        not represent a point in the prime subgroup.
+
+        The expected bytes format are the compressed form of a point on G2.
+    *)
+    val pk_of_bytes_exn : Bytes.t -> pk
+
+    (** Build a value of type [pk] safely, i.e. the function checks the bytes
+        given in parameters represents a point on the curve and in the prime subgroup.
+        Return [None] if the bytes are not in the correct format or does
+        not represent a point in the prime subgroup.
+
+        The expected bytes format are the compressed form of a point on G2.
+    *)
+    val pk_of_bytes_opt : Bytes.t -> pk option
+
+    (** Returns a bytes representation of a value of type [pk]. The output is the
+        compressed form a the point [G2.t] the [pk] represents.
+    *)
+    val pk_to_bytes : pk -> Bytes.t
+
+    (** [derive_pk sk] derives the corresponding public key of [sk]. *)
+    val derive_pk : sk -> pk
+
+    (** Type of the signatures *)
+    type signature
+
+    (** The size of a serialized value [signature] *)
+    val signature_size_in_bytes : int
+
+    (** Build a value of type [signature] without performing any check on the input.
+        It is safe to use this function when verifying a signature as the
+        signature function verifies if the point is in the prime subgroup. Using
+        [unsafe_signature_of_bytes] removes a verification performed twice when used
+        [signature_of_bytes_exn] or [signature_of_bytes_opt].
+
+        The expected bytes format are the compressed form of a point on G1.
+   *)
+    val unsafe_signature_of_bytes : Bytes.t -> signature
+
+    (** Build a value of type [signature] safely, i.e. the function checks the bytes
+        given in parameters represents a point on the curve and in the prime subgroup.
+        Raise [Invalid_argument] if the bytes are not in the correct format or does
+        not represent a point in the prime subgroup.
+
+        The expected bytes format are the compressed form of a point on G1.
+    *)
+    val signature_of_bytes_exn : Bytes.t -> signature
+
+    (** Build a value of type [signature] safely, i.e. the function checks the bytes
+        given in parameters represents a point on the curve and in the prime subgroup.
+        Return [None] if the bytes are not in the correct format or does
+        not represent a point in the prime subgroup.
+
+        The expected bytes format are the compressed form of a point on G1.
+    *)
+    val signature_of_bytes_opt : Bytes.t -> signature option
+
+    (** Returns a bytes representation of a value of type [signature]. The output is the
+        compressed form a the point [G1.t] the [signature] represents.
+    *)
+    val signature_to_bytes : signature -> Bytes.t
+
+    (** [aggregate_signature_opt signatures] aggregates the signatures [signatures], following
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-2.8.
+        Return [None] if [INVALID] is expected in the specification
+    *)
+    val aggregate_signature_opt : signature list -> signature option
+
+    (** Follow https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1
+
+        In a basic scheme, rogue key attacks are handled by requiring all
+        messages signed by an aggregate signature to be distinct.  This
+        requirement is enforced in the definition of AggregateVerify.
+
+        The Sign and Verify functions are identical to CoreSign and
+        CoreVerify (Section 2), respectively.
+    *)
+    module Basic : sig
+      val sign : sk -> Bytes.t -> signature
+
+      val verify : pk -> Bytes.t -> signature -> bool
+
+      (** Raise [Invalid_argument] if the messages are not distinct *)
+      val aggregate_verify : (pk * Bytes.t) list -> signature -> bool
+    end
+
+    (** Follow https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2
+
+        In a message augmentation scheme, signatures are generated over the
+        concatenation of the public key and the message, ensuring that
+        messages signed by different public keys are distinct.
+    *)
+    module Aug : sig
+      val sign : sk -> Bytes.t -> signature
+
+      val verify : pk -> Bytes.t -> signature -> bool
+
+      val aggregate_verify : (pk * Bytes.t) list -> signature -> bool
+    end
+
+    (** Follow https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3
+
+        A proof of possession scheme uses a separate public key validation
+        step, called a proof of possession, to defend against rogue key
+        attacks.  This enables an optimization to aggregate signature
+        verification for the case that all signatures are on the same
+        message.
+    *)
+    module Pop : sig
+      type proof = Bytes.t
+
+      (** Equivalent to [core_sign] with the DST given in the specification
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
+      *)
+      val sign : sk -> Bytes.t -> signature
+
+      (** Equivalent to [core_verify] with the DST given in the specification
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
+      *)
+      val verify : pk -> Bytes.t -> signature -> bool
+
+      (** [pop_proof sk] implements
+         https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.2
+      *)
+      val pop_prove : sk -> proof
+
+      (** [pop_verify pk proof] implements
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.3
+      *)
+      val pop_verify : pk -> proof -> bool
+
+      (** [aggregate_verify pks msg aggregated_signature] performs a aggregate
+          signature verification. It supposes the same message [msg] has been
+          signed. It implements the FastAggregateVerify algorithm specified in
+          https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.4
+      *)
+      val aggregate_verify : (pk * proof) list -> Bytes.t -> signature -> bool
+    end
   end
 end
 
