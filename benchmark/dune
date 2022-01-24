@@ -19,6 +19,11 @@
  (libraries bls12-381-unix))
 
 (executable
+ (name bench_fq12)
+ (modules bench_fq12)
+ (libraries core_bench bls12-381-unix))
+
+(executable
  (name bench_fr_bulk)
  (modules bench_fr_bulk)
  (libraries bls12-381-unix))
