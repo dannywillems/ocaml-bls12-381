@@ -1008,10 +1008,8 @@ CAMLprim value caml_blst_g1_pippenger_stubs(value buffer, value jacobian_list,
   size_t npoints_c = ctypes_size_t_val(npoints);
   size_t start_c = ctypes_size_t_val(start);
 
-  // Allocating p1 values. Getting a segfault if not allocating addr_ps on the
-  // heap
   blst_p1_affine **addr_ps =
-      (blst_p1_affine **)calloc(1, sizeof(blst_p1_affine *));
+      (blst_p1_affine **)calloc(npoints_c, sizeof(blst_p1_affine *));
   if (addr_ps == NULL) {
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
@@ -1021,11 +1019,8 @@ CAMLprim value caml_blst_g1_pippenger_stubs(value buffer, value jacobian_list,
     free(addr_ps);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
-  *addr_ps = ps;
 
-  // Allocating byte array for scalars conversions. Getting a segfault if not
-  // allocating addr_scalars_bs on the heap
-  byte **addr_scalars_bs = (byte **)calloc(1, sizeof(byte *));
+  byte **addr_scalars_bs = (byte **)calloc(npoints_c, sizeof(byte *));
   if (addr_scalars_bs == NULL) {
     free(addr_ps);
     free(ps);
@@ -1038,7 +1033,6 @@ CAMLprim value caml_blst_g1_pippenger_stubs(value buffer, value jacobian_list,
     free(addr_scalars_bs);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
-  *addr_scalars_bs = scalars_bs;
 
   blst_scalar scalar;
 
@@ -1046,6 +1040,8 @@ CAMLprim value caml_blst_g1_pippenger_stubs(value buffer, value jacobian_list,
     blst_p1_to_affine(ps + i, Blst_p1_val(Field(jacobian_list, start_c + i)));
     blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
     blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
+    addr_scalars_bs[i] = scalars_bs + i * 32;
+    addr_ps[i] = ps + i;
   }
   void *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(npoints_c));
   if (scratch == NULL) {
@@ -1077,10 +1073,8 @@ CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
   size_t npoints_c = ctypes_size_t_val(npoints);
   size_t start_c = ctypes_size_t_val(start);
 
-  // Allocating p2 values. Getting a segfault if not allocating addr_ps on the
-  // heap
   blst_p2_affine **addr_ps =
-      (blst_p2_affine **)calloc(1, sizeof(blst_p2_affine *));
+      (blst_p2_affine **)calloc(npoints_c, sizeof(blst_p2_affine *));
   if (addr_ps == NULL) {
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
@@ -1092,9 +1086,7 @@ CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
   }
   *addr_ps = ps;
 
-  // Allocating byte array for scalars conversions. Getting a segfault if not
-  // allocating addr_scalars_bs on the heap
-  byte **addr_scalars_bs = (byte **)calloc(1, sizeof(byte *));
+  byte **addr_scalars_bs = (byte **)calloc(npoints_c, sizeof(byte *));
   if (addr_scalars_bs == NULL) {
     free(addr_ps);
     free(ps);
@@ -1107,14 +1099,16 @@ CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
     free(addr_scalars_bs);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
-  *addr_scalars_bs = scalars_bs;
   blst_scalar scalar;
 
   for (int i = 0; i < npoints_c; i++) {
     blst_p2_to_affine(ps + i, Blst_p2_val(Field(jacobian_list, start_c + i)));
     blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
     blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
+    addr_scalars_bs[i] = scalars_bs + i * 32;
+    addr_ps[i] = ps + i;
   }
+
   void *scratch = calloc(1, blst_p2s_mult_pippenger_scratch_sizeof(npoints_c));
   if (scratch == NULL) {
     free(addr_ps);
@@ -1203,19 +1197,15 @@ CAMLprim value caml_blst_g1_pippenger_contiguous_affine_array_stubs(
   CAMLparam5(buffer, affine_list, scalars, start, len);
   size_t start_c = ctypes_size_t_val(start);
   size_t len_c = ctypes_size_t_val(len);
+  blst_p1_affine *affine_list_c = Blst_p1_affine_val(affine_list);
 
-  // Allocating p1 values. Getting a segfault if not allocating addr_ps on the
-  // heap
   blst_p1_affine **addr_ps =
-      (blst_p1_affine **)calloc(1, sizeof(blst_p1_affine *));
+      (blst_p1_affine **)calloc(len_c, sizeof(blst_p1_affine *));
   if (addr_ps == NULL) {
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
-  *addr_ps = Blst_p1_affine_val(affine_list) + start_c;
 
-  // Allocating byte array for scalars conversions. Getting a segfault if not
-  // allocating addr_scalars_bs on the heap
-  byte **addr_scalars_bs = (byte **)calloc(1, sizeof(byte *));
+  byte **addr_scalars_bs = (byte **)calloc(len_c, sizeof(byte *));
   if (addr_scalars_bs == NULL) {
     free(addr_ps);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
@@ -1226,12 +1216,13 @@ CAMLprim value caml_blst_g1_pippenger_contiguous_affine_array_stubs(
     free(addr_scalars_bs);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
-  *addr_scalars_bs = scalars_bs;
   blst_scalar scalar;
 
   for (int i = 0; i < len_c; i++) {
     blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
     blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
+    addr_scalars_bs[i] = scalars_bs + i * 32;
+    addr_ps[i] = affine_list_c + start_c + i;
   }
 
   limb_t *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(len_c));
@@ -1300,18 +1291,13 @@ CAMLprim value caml_blst_g2_pippenger_contiguous_affine_array_stubs(
   size_t start_c = ctypes_size_t_val(start);
   size_t len_c = ctypes_size_t_val(len);
 
-  // Allocating p2 values. Getting a segfault if not allocating addr_ps on the
-  // heap
   blst_p2_affine **addr_ps =
-      (blst_p2_affine **)calloc(1, sizeof(blst_p2_affine *));
+      (blst_p2_affine **)calloc(len_c, sizeof(blst_p2_affine *));
   if (addr_ps == NULL) {
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
-  *addr_ps = Blst_p2_affine_val(affine_list) + start_c;
 
-  // Allocating byte array for scalars conversions. Getting a segfault if not
-  // allocating addr_scalars_bs on the heap
-  byte **addr_scalars_bs = (byte **)calloc(1, sizeof(byte *));
+  byte **addr_scalars_bs = (byte **)calloc(len_c, sizeof(byte *));
   if (addr_scalars_bs == NULL) {
     free(addr_ps);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
@@ -1322,13 +1308,14 @@ CAMLprim value caml_blst_g2_pippenger_contiguous_affine_array_stubs(
     free(addr_scalars_bs);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
-  *addr_scalars_bs = scalars_bs;
 
   blst_scalar scalar;
 
   for (int i = 0; i < len_c; i++) {
     blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
     blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
+    addr_scalars_bs[i] = scalars_bs + i * 32;
+    addr_ps[i] = Blst_p2_affine_val(affine_list) + start_c + i;
   }
   limb_t *scratch = calloc(1, blst_p2s_mult_pippenger_scratch_sizeof(len_c));
   if (scratch == NULL) {
