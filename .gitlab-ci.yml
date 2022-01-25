@@ -46,7 +46,9 @@ lint-c:
   rules:
     - when: always
 
-.build-test-ubuntu: &build_definition_ubuntu
+# Build pipeline for alpine
+# Keep it close to the one for other distributions
+.build-test-debian: &build_definition_debian
   stage: build
   before_script:
     # Always update system package manager + setup OPAM env
@@ -76,34 +78,38 @@ lint-c:
   rules:
     - when: always
 
-build-ocaml-4.08-ubuntu:
-  <<: *build_definition_ubuntu
+build-ocaml-4.08-debian:
+  <<: *build_definition_debian
   image: ocaml/opam:debian-ocaml-4.08
 
-build-ocaml-4.09-ubuntu:
-  <<: *build_definition_ubuntu
+build-ocaml-4.09-debian:
+  <<: *build_definition_debian
   image: ocaml/opam:debian-ocaml-4.09
 
-build-ocaml-4.10-ubuntu:
-  <<: *build_definition_ubuntu
+build-ocaml-4.10-debian:
+  <<: *build_definition_debian
   image: ocaml/opam:debian-ocaml-4.10
 
-build-ocaml-4.11-ubuntu:
-  <<: *build_definition_ubuntu
+build-ocaml-4.11-debian:
+  <<: *build_definition_debian
   image: ocaml/opam:debian-ocaml-4.11
 
-build-ocaml-4.12-ubuntu:
-  <<: *build_definition_ubuntu
+build-ocaml-4.12-debian:
+  <<: *build_definition_debian
   image: ocaml/opam:debian-ocaml-4.12
 
-build-ocaml-4.13-ubuntu:
-  <<: *build_definition_ubuntu
+build-ocaml-4.13-debian:
+  <<: *build_definition_debian
   image: ocaml/opam:debian-ocaml-4.13
 
-build-ocaml-4.14-ubuntu:
-  <<: *build_definition_ubuntu
+build-ocaml-4.14-debian:
+  <<: *build_definition_debian
   image: ocaml/opam:debian-ocaml-4.14
 
+# Build pipeline for alpine
+# Keep it close to the one for other distributions
+# Keep it close to utils/Dockerfile-alpine to be able to debug alpine on a dev
+# machine.
 .build-test-alpine: &build_definition_alpine
   stage: build
   before_script:
