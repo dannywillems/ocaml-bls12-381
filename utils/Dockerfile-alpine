@@ -1,0 +1,38 @@
+# This is a Dockerfile to build an image to help debugging in an alpine environment
+# Try to keep it close to the CI build for alpine in .gitlab-ci
+# Run
+# docker build \
+#    --build-arg=OCAML_VERSION=4.11 \
+#    --build-arg=ALPINE_VERSION=3.14 \
+#    -t ocaml-bls12-381-alpine \
+#    -f utils/Dockerfile-alpine \
+#    .
+
+ARG OCAML_VERSION
+ARG ALPINE_VERSION
+
+FROM ocaml/opam:alpine-${ALPINE_VERSION}-ocaml-${OCAML_VERSION}
+
+# use alpine /bin/ash and set pipefail.
+# see https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#run
+SHELL ["/bin/ash", "-o", "pipefail", "-c"]
+
+# Not copying benchmark for the moment. Require to install core_bench
+# COPY benchmark/ benchmark/
+COPY --chown=opam common/ common/
+COPY --chown=opam src/ src/
+COPY --chown=opam test/ test/
+COPY --chown=opam bls12-381.opam .
+COPY --chown=opam bls12-381-unix.opam .
+COPY --chown=opam dune-project .
+
+RUN sudo apk add gdb build-base strace
+
+# For debugging purpose
+RUN sudo apk add vim
+
+RUN eval $(opam env) && \
+  opam update && \
+  opam depext -i -y conf-pkg-config conf-libffi && \
+  opam depext -i -y zarith && \
+  opam install . --deps-only --with-test
