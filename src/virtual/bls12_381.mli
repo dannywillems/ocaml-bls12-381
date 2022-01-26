@@ -385,6 +385,8 @@ module G1 : sig
       Perform allocations on the C heap to convert scalars to bytes and to
       convert the points [pts] in affine coordinates as values of type [t] are
       in jacobian coordinates.
+
+      {b Warning.} Undefined behavior if the point to infinity is in the array
   *)
   val pippenger : ?start:int -> ?len:int -> t array -> Scalar.t array -> t
 
@@ -410,6 +412,8 @@ module G1 : sig
       array access.
 
       Perform allocations on the C heap to convert scalars to bytes.
+
+      {b Warning.} Undefined behavior if the point to infinity is in the array
   *)
   val pippenger_with_affine_array :
     ?start:int -> ?len:int -> affine_array -> Scalar.t array -> t
@@ -584,6 +588,8 @@ module G2 : sig
       Perform allocations on the C heap to convert scalars to bytes and to
       convert the points [pts] in affine coordinates as values of type [t] are
       in jacobian coordinates.
+
+      {b Warning.} Undefined behavior if the point to infinity is in the array
   *)
   val pippenger : ?start:int -> ?len:int -> t array -> Scalar.t array -> t
 
@@ -606,6 +612,8 @@ module G2 : sig
       the same length or if [start] or [len] would infer out of bounds array access.
 
       Perform allocations on the C heap to convert scalars to bytes.
+
+      {b Warning.} Undefined behavior if the point to infinity is in the array
   *)
   val pippenger_with_affine_array :
     ?start:int -> ?len:int -> affine_array -> Scalar.t array -> t
