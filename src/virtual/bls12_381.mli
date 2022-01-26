@@ -33,10 +33,12 @@ module Fq12 : sig
   (** The neutral element of the multiplicative subgroup *)
   val one : t
 
-  (** [is_zero x] returns [true] if [x] is the neutral element of the additive subgroup *)
+  (** [is_zero x] returns [true] if [x] is the neutral element of the additive
+      subgroup *)
   val is_zero : t -> bool
 
-  (** [is_one x] returns [true] if [x] is the neutral element for the multiplication *)
+  (** [is_one x] returns [true] if [x] is the neutral element for the
+       multiplication *)
   val is_one : t -> bool
 
   val mul : t -> t -> t
@@ -202,11 +204,13 @@ module Fr : sig
   val compare : t -> t -> int
 
   (** [inner_product_exn a b] returns the inner product of [a] and [b], i.e.
-      sum(a_i * b_i). Raise [Invalid_argument] if the arguments are not of the same
-      length *)
+      sum(a_i * b_i). Raise [Invalid_argument] if the arguments are not of the
+      same length *)
   val inner_product_exn : t array -> t array -> t
 
-  (** Same than [inner_product_exn] but returns an option instead of raising an exception *)
+  (** Same than {!inner_product_exn} but returns an option instead of raising an
+      exception
+  *)
   val inner_product_opt : t array -> t array -> t option
 
   (** [of_int x] is equivalent to [of_z (Z.of_int x)]. If [x] is is negative,
@@ -222,7 +226,8 @@ module G1 : sig
       is given in jacobian coordinates *)
   type t
 
-  (** An element on the curve and in the prime subgroup, in affine coordinates *)
+  (** An element on the curve and in the prime subgroup, in affine
+      coordinates *)
   type affine
 
   (** [affine_of_jacobian p] creates a new value of type [affine] representing
@@ -238,7 +243,7 @@ module G1 : sig
 
   (** [to_affine_array pts] builds a contiguous C array and
       populate it with the points [pts] in affine coordinates.
-      Use it with [pippenger_with_affine_array] to get better performance.
+      Use it with {!pippenger_with_affine_array} to get better performance.
   *)
   val to_affine_array : t array -> affine_array
 
@@ -256,18 +261,22 @@ module G1 : sig
 
   module Scalar : Ff_sig.PRIME with type t = Fr.t
 
-  (** Create an empty value to store an element of the curve. DO NOT USE THIS TO
-      DO COMPUTATIONS WITH, UNDEFINED BEHAVIORS MAY HAPPEN *)
+  (** Create an empty value to store an element of the curve.
+
+      {b Warning} Do not use this to do computations with, undefined behaviors
+      may happen
+  *)
   val empty : unit -> t
 
   (** Check if a point, represented as a byte array, is on the curve **)
   val check_bytes : Bytes.t -> bool
 
-  (** Attempt to construct a point from a byte array of length [size_in_bytes]. *)
+  (** Attempt to construct a point from a byte array of length
+     {!size_in_bytes}. *)
   val of_bytes_opt : Bytes.t -> t option
 
-  (** Attempt to construct a point from a byte array of length [size_in_bytes].
-      Raise [Not_on_curve] if the point is not on the curve
+  (** Attempt to construct a point from a byte array of length {!size_in_bytes}.
+      Raise {!Not_on_curve} if the point is not on the curve
   *)
   val of_bytes_exn : Bytes.t -> t
 
@@ -379,7 +388,8 @@ module G1 : sig
       Arguments [start] and [len] can be used to take advantages of multicore
       OCaml. Default value for [start] (resp. [len]) is [0] (resp. the length of
       the array [scalars]).
-      Raise [Invalid_argument] if [start] or [len] would infer out of bounds
+
+      @raise Invalid_argument if [start] or [len] would infer out of bounds
       array access.
 
       Perform allocations on the C heap to convert scalars to bytes and to
@@ -395,20 +405,21 @@ module G1 : sig
       the points in [pts]. If [pts] and [scalars] are not of the same length,
       perform the computation on the first [n] points where [n] is the smallest
       size.
-      The differences with [pippenger] are
+      The differences with {!pippenger} are
         1. the points are loaded in a contiguous C array to speed up the access to
            the elements by relying on the CPU cache
         2. and the points are in affine coordinates, the form expected by the
            algorithm implementation, avoiding new allocations and field
            inversions required to convert from jacobian (representation of a
-           points of type [t], as expected by [pippenger]) to affine coordinates.
-      Expect a speed improvement around 20% compared to [pippenger], and less
+           points of type [t], as expected by {!pippenger}) to affine coordinates.
+      Expect a speed improvement around 20% compared to {!pippenger}, and less
       allocation on the C heap.
-      A value of [affine_array] can be built using [to_affine_array].
+      A value of [affine_array] can be built using {!to_affine_array}.
       Arguments [start] and [len] can be used to take advantages of multicore
       OCaml. Default value for [start] (resp. [len]) is [0] (resp. the length of
       the array [scalars]).
-      Raise [Invalid_argument] if [start] or [len] would infer out of bounds
+
+      @raise Invalid_argument if [start] or [len] would infer out of bounds
       array access.
 
       Perform allocations on the C heap to convert scalars to bytes.
@@ -582,8 +593,10 @@ module G2 : sig
       Arguments [start] and [len] can be used to take advantages of multicore
       OCaml. Default value for [start] (resp. [len]) is [0] (resp. the length of
       the array [scalars]).
-      Raise [Invalid_argument] if the arguments [pts] and [scalars] are not of
-      the same length or if [start] or [len] would infer out of bounds array access.
+
+      @raise Invalid_argument if the arguments [pts] and [scalars] are not of
+      the same length or if [start] or [len] would infer out of bounds array
+      access.
 
       Perform allocations on the C heap to convert scalars to bytes and to
       convert the points [pts] in affine coordinates as values of type [t] are
@@ -608,8 +621,10 @@ module G2 : sig
       Arguments [start] and [len] can be used to take advantages of multicore
       OCaml. Default value for [start] (resp. [len]) is [0] (resp. the length of
       the array [scalars]).
-      Raise [Invalid_argument] if the arguments [pts] and [scalars] are not of
-      the same length or if [start] or [len] would infer out of bounds array access.
+
+      @raise Invalid_argument if the arguments [pts] and [scalars] are not of
+      the same length or if [start] or [len] would infer out of bounds array
+      access.
 
       Perform allocations on the C heap to convert scalars to bytes.
 
@@ -642,12 +657,15 @@ module Pairing : sig
         the point is null *)
   val final_exponentiation_opt : Fq12.t -> Fq12.t option
 
-  (** Compute the final exponentiation of the given point. Raise
-        [FailToComputeFinalExponentiation] if the point is null *)
+  (** Compute the final exponentiation of the given point.
+
+      @raise FailToComputeFinalExponentiation if the point is null
+  *)
   val final_exponentiation_exn : Fq12.t -> Fq12.t
 end
 
-(** Follow https://tools.ietf.org/pdf/draft-irtf-cfrg-bls-signature-04.pdf *)
+(** Follow {{: https://tools.ietf.org/pdf/draft-irtf-cfrg-bls-signature-04.pdf }
+    the BLS signature draft of CFRG, version 4 } *)
 module Signature : sig
   (** Type of the secret keys. *)
   type sk
@@ -659,8 +677,9 @@ module Signature : sig
       must be the little endian representation of the secret key.
       In this case, secret keys are scalars of BLS12-381 and are encoded on 32
       bytes. The bytes sequence might be less of 32 bytes and in this case, the
-      bytes sequence is padded on the right by 0's. If the bytes sequence is
-      longer than 32 bytes, raise [Invalid_argument].
+      bytes sequence is padded on the right by 0's.
+
+      @raise Invalid_argument if the bytes sequence is longer than 32 bytes
   *)
   val sk_of_bytes_exn : Bytes.t -> sk
 
@@ -688,11 +707,11 @@ module Signature : sig
     (** The size of a serialized value [signature] *)
     val signature_size_in_bytes : int
 
-    (** Build a value of type [pk] without performing any check on the input.
+    (** Build a value of type {!pk} without performing any check on the input.
         It is safe to use this function when verifying a signature as the
         signature function verifies if the point is in the prime subgroup. Using
-        [unsafe_pk_of_bytes] removes a verification performed twice when used
-        [pk_of_bytes_exn] or [pk_of_bytes_opt].
+        {!unsafe_pk_of_bytes} removes a verification performed twice when used
+        {!pk_of_bytes_exn} or {!pk_of_bytes_opt}.
 
         The expected bytes format are the compressed form of a point on G2.
     *)
@@ -707,7 +726,7 @@ module Signature : sig
     *)
     val pk_of_bytes_exn : Bytes.t -> pk
 
-    (** Build a value of type [pk] safely, i.e. the function checks the bytes
+    (** Build a value of type {!pk} safely, i.e. the function checks the bytes
         given in parameters represents a point on the curve and in the prime subgroup.
         Return [None] if the bytes are not in the correct format or does
         not represent a point in the prime subgroup.
@@ -716,7 +735,7 @@ module Signature : sig
     *)
     val pk_of_bytes_opt : Bytes.t -> pk option
 
-    (** Returns a bytes representation of a value of type [pk]. The output is the
+    (** Returns a bytes representation of a value of type {!pk}. The output is the
         compressed form a the point G1.t the [pk] represents.
     *)
     val pk_to_bytes : pk -> Bytes.t
@@ -727,17 +746,17 @@ module Signature : sig
     (** Type of the signatures *)
     type signature
 
-    (** Build a value of type [signature] without performing any check on the input.
+    (** Build a value of type {!signature} without performing any check on the input.
         It is safe to use this function when verifying a signature as the
         signature function verifies if the point is in the prime subgroup. Using
-        [unsafe_signature_of_bytes] removes a verification performed twice when used
-        [signature_of_bytes_exn] or [signature_of_bytes_opt].
+        {!unsafe_signature_of_bytes} removes a verification performed twice when used
+        {!signature_of_bytes_exn} or {!signature_of_bytes_opt}.
 
         The expected bytes format are the compressed form of a point on G2.
-   *)
+    *)
     val unsafe_signature_of_bytes : Bytes.t -> signature
 
-    (** Build a value of type [signature] safely, i.e. the function checks the bytes
+    (** Build a value of type {!signature} safely, i.e. the function checks the bytes
         given in parameters represents a point on the curve and in the prime subgroup.
         Raise [Invalid_argument] if the bytes are not in the correct format or does
         not represent a point in the prime subgroup.
@@ -746,7 +765,7 @@ module Signature : sig
     *)
     val signature_of_bytes_exn : Bytes.t -> signature
 
-    (** Build a value of type [pk] safely, i.e. the function checks the bytes
+    (** Build a value of type {!signature} safely, i.e. the function checks the bytes
         given in parameters represents a point on the curve and in the prime subgroup.
         Return [None] if the bytes are not in the correct format or does
         not represent a point in the prime subgroup.
@@ -756,7 +775,7 @@ module Signature : sig
     val signature_of_bytes_opt : Bytes.t -> signature option
 
     (** Returns a bytes representation of a value of type [signature]. The output is the
-        compressed form a the point [G2.t] the [signature] represents.
+        compressed form a the point {!G2.t} the [signature] represents.
     *)
     val signature_to_bytes : signature -> Bytes.t
 
@@ -767,7 +786,9 @@ module Signature : sig
     *)
     val aggregate_signature_opt : signature list -> signature option
 
-    (** Follow https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1
+    (** Basic scheme described in {{:
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1
+        } section 3.1 }
 
         In a basic scheme, rogue key attacks are handled by requiring all
         messages signed by an aggregate signature to be distinct.  This
@@ -785,7 +806,9 @@ module Signature : sig
       val aggregate_verify : (pk * Bytes.t) list -> signature -> bool
     end
 
-    (** Follow https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2
+    (** Augmentation scheme described in {{:
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2
+        } section 3.2 }
 
         In a message augmentation scheme, signatures are generated over the
         concatenation of the public key and the message, ensuring that
@@ -799,11 +822,13 @@ module Signature : sig
       val aggregate_verify : (pk * Bytes.t) list -> signature -> bool
     end
 
-    (** Follow https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3
+    (** Proof of possession scheme described in {{:
+        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3
+        } section 3.3 }
 
         A proof of possession scheme uses a separate public key validation
         step, called a proof of possession, to defend against rogue key
-        attacks.  This enables an optimization to aggregate signature
+        attacks. This enables an optimization to aggregate signature
         verification for the case that all signatures are on the same
         message.
     *)
@@ -811,30 +836,39 @@ module Signature : sig
       type proof = Bytes.t
 
       (** Equivalent to [core_sign] with the DST given in the specification
-        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
+          {{:
+          https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
+          } in section 4.2.3 }.
       *)
       val sign : sk -> Bytes.t -> signature
 
       (** Equivalent to [core_verify] with the DST given in the specification
-        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
+          {{:
+          https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
+          } in section 4.2.3 }.
       *)
       val verify : pk -> Bytes.t -> signature -> bool
 
       (** [pop_proof sk] implements
-         https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.2
+           {{:
+           https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.2
+           } section 3.3.2 }.
       *)
       val pop_prove : sk -> proof
 
       (** [pop_verify pk signature] implements
-        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.3
+           {{:
+           https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.3
+           } section 3.3.3 }.
       *)
       val pop_verify : pk -> proof -> bool
 
-      (**
-        [aggregate_verify pks msg aggregated_signature] performs a aggregate
-        signature verification. It supposes the same message [msg] has been
-        signed. It implements the FastAggregateVerify algorithm specified in
-        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.4
+      (** [aggregate_verify pks msg aggregated_signature] performs a aggregate
+           signature verification. It supposes the same message [msg] has been
+           signed. It implements the FastAggregateVerify algorithm specified in
+           {{:
+           https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.4
+           } section 3.3.4 }.
       *)
       val aggregate_verify : (pk * proof) list -> Bytes.t -> signature -> bool
     end
@@ -853,8 +887,8 @@ module Signature : sig
     (** Build a value of type [pk] without performing any check on the input.
         It is safe to use this function when verifying a signature as the
         signature function verifies if the point is in the prime subgroup. Using
-        [unsafe_pk_of_bytes] removes a verification performed twice when used
-        [pk_of_bytes_exn] or [pk_of_bytes_opt].
+        {!unsafe_pk_of_bytes} removes a verification performed twice when used
+        {!pk_of_bytes_exn} or {!pk_of_bytes_opt}.
 
         The expected bytes format are the compressed form of a point on G2.
     *)
