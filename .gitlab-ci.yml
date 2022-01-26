@@ -78,33 +78,61 @@ lint-c:
   rules:
     - when: always
 
-build-ocaml-4.08-debian:
+build-ocaml-4.08-debian-10:
   <<: *build_definition_debian
-  image: ocaml/opam:debian-ocaml-4.08
+  image: ocaml/opam:debian-10-ocaml-4.08
 
-build-ocaml-4.09-debian:
+build-ocaml-4.09-debian-10:
   <<: *build_definition_debian
-  image: ocaml/opam:debian-ocaml-4.09
+  image: ocaml/opam:debian-10-ocaml-4.09
 
-build-ocaml-4.10-debian:
+build-ocaml-4.10-debian-10:
   <<: *build_definition_debian
-  image: ocaml/opam:debian-ocaml-4.10
+  image: ocaml/opam:debian-10-ocaml-4.10
 
-build-ocaml-4.11-debian:
+build-ocaml-4.11-debian-10:
   <<: *build_definition_debian
-  image: ocaml/opam:debian-ocaml-4.11
+  image: ocaml/opam:debian-10-ocaml-4.11
 
-build-ocaml-4.12-debian:
+build-ocaml-4.12-debian-10:
   <<: *build_definition_debian
-  image: ocaml/opam:debian-ocaml-4.12
+  image: ocaml/opam:debian-10-ocaml-4.12
 
-build-ocaml-4.13-debian:
+build-ocaml-4.13-debian-10:
   <<: *build_definition_debian
-  image: ocaml/opam:debian-ocaml-4.13
+  image: ocaml/opam:debian-10-ocaml-4.13
 
-build-ocaml-4.14-debian:
+build-ocaml-4.14-debian-10:
   <<: *build_definition_debian
-  image: ocaml/opam:debian-ocaml-4.14
+  image: ocaml/opam:debian-10-ocaml-4.14
+
+build-ocaml-4.08-debian-11:
+  <<: *build_definition_debian
+  image: ocaml/opam:debian-11-ocaml-4.08
+
+build-ocaml-4.09-debian-11:
+  <<: *build_definition_debian
+  image: ocaml/opam:debian-11-ocaml-4.09
+
+build-ocaml-4.10-debian-11:
+  <<: *build_definition_debian
+  image: ocaml/opam:debian-11-ocaml-4.10
+
+build-ocaml-4.11-debian-11:
+  <<: *build_definition_debian
+  image: ocaml/opam:debian-11-ocaml-4.11
+
+build-ocaml-4.12-debian-11:
+  <<: *build_definition_debian
+  image: ocaml/opam:debian-11-ocaml-4.12
+
+build-ocaml-4.13-debian-11:
+  <<: *build_definition_debian
+  image: ocaml/opam:debian-11-ocaml-4.13
+
+build-ocaml-4.14-debian-11:
+  <<: *build_definition_debian
+  image: ocaml/opam:debian-11-ocaml-4.14
 
 # Build pipeline for alpine
 # Keep it close to the one for other distributions
