@@ -1066,9 +1066,9 @@ CAMLprim value caml_blst_g1_pippenger_stubs(value buffer, value jacobian_list,
 
 // Hypothesis: jacobian_list and scalars are arrays of size *at least* start +
 // npoints
-CAMLprim value caml_blst_g2_pippenger(value buffer, value jacobian_list,
-                                      value scalars, value start,
-                                      value npoints) {
+CAMLprim value caml_blst_g2_pippenger_stubs(value buffer, value jacobian_list,
+                                            value scalars, value start,
+                                            value npoints) {
   CAMLparam5(buffer, jacobian_list, scalars, start, npoints);
   size_t npoints_c = ctypes_size_t_val(npoints);
   size_t start_c = ctypes_size_t_val(start);

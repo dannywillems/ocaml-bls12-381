@@ -98,7 +98,7 @@ module Stubs = struct
     Fr.t array ->
     Unsigned.Size_t.t ->
     Unsigned.Size_t.t ->
-    int = "caml_blst_g2_pippenger"
+    int = "caml_blst_g2_pippenger_stubs"
 
   external continuous_array_get : jacobian -> affine_array -> int -> int
     = "caml_blst_p2_affine_array_get_stubs"
