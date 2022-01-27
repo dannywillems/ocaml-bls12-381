@@ -21,7 +21,7 @@ depends: [
 ]
 build: [[ "dune" "build" "-j" jobs "-p" name "@install" ]]
 run-test: [[ "dune" "runtest" "-p" name "-j" jobs ]]
-available: arch != "ppc64"
+available: arch != "ppc64" & arch != "arm32" & arch != "x86_32"
 x-ci-accept-failures: [
   # because of -Werror
   "centos-7"
