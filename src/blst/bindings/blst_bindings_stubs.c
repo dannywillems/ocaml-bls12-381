@@ -136,6 +136,28 @@ void blst_lendian_from_fr(byte b[32], blst_fr *x) {
   free(s);
 }
 
+void set_fr_to_one(blst_fr *x) {
+  uint64_t x_uint_64[4];
+  x_uint_64[0] = 1lu;
+  x_uint_64[1] = 0lu;
+  x_uint_64[2] = 0lu;
+  x_uint_64[3] = 0lu;
+  blst_fr_from_uint64(x, x_uint_64);
+}
+
+void blst_fr_pow(blst_fr *out, blst_fr *x, byte *exp, int exp_nb_bits) {
+  // Set output buffer to Fr.one
+  memset(out, 0, sizeof(blst_scalar));
+  set_fr_to_one(out);
+
+  // Square and multiply
+  for (int i = exp_nb_bits - 1; i >= 0; i--) {
+    blst_fr_sqr(out, out);
+    if (exp[i / 8] & (1 << (i % 8)))
+      blst_fr_mul(out, out, x);
+  }
+}
+
 CAMLprim value caml_blst_fr_from_lendian_stubs(value x, value b) {
   CAMLparam2(x, b);
   blst_fr *x_c = Blst_fr_val(x);
@@ -149,7 +171,17 @@ CAMLprim value caml_blst_lendian_from_fr_stubs(value b, value x) {
   blst_fr *x_c = Blst_fr_val(x);
   byte *b_c = Bytes_val(b);
   blst_lendian_from_fr(b_c, x_c);
-  CAMLreturn(Val_unit);
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+CAMLprim value caml_blst_fr_pow_stubs(value out, value x, value exp,
+                                      value exp_nb_bits) {
+  CAMLparam4(out, x, exp, exp_nb_bits);
+  blst_fr *out_c = Blst_fr_val(out);
+  blst_fr *x_c = Blst_fr_val(x);
+  byte *exp_c = Bytes_val(exp);
+  blst_fr_pow(out_c, x_c, exp_c, Int_val(exp_nb_bits));
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
 CAMLprim value caml_blst_fr_is_equal_stubs(value x, value y) {

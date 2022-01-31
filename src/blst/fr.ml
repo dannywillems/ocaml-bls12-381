@@ -63,6 +63,8 @@ module Stubs = struct
 
   external mul : fr -> fr -> fr -> int = "caml_blst_fr_mul_stubs"
 
+  external pow : fr -> fr -> Bytes.t -> int -> int = "caml_blst_fr_pow_stubs"
+
   external sqr : fr -> fr -> int = "caml_blst_fr_sqr_stubs"
 
   external eucl_inverse : fr -> fr -> int = "caml_blst_fr_eucl_inverse_stubs"
@@ -251,16 +253,17 @@ module Fr = struct
 
   let two_z = Z.(one + one)
 
-  let rec pow x n =
+  let pow x n =
+    let n = Z.erem n (Z.pred order) in
     if Z.equal n Z.zero then one
     else if is_zero x then zero
     else if Z.equal n Z.one then x
     else
-      let n = Z.erem n (Z.pred order) in
-      let a, r = Z.ediv_rem n two_z in
-      let acc = pow x a in
-      let acc_square = mul acc acc in
-      if Z.equal r Z.zero then acc_square else mul acc_square x
+      let buffer = Stubs.mallocate_fr () in
+      let exp = Z.to_bits n |> Bytes.unsafe_of_string in
+      let exp_len = Z.numbits n in
+      ignore @@ Stubs.pow buffer x exp exp_len ;
+      buffer
 
   let ( ** ) = pow
 
