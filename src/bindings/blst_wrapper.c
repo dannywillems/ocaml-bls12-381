@@ -94,17 +94,23 @@ void set_fr_to_one(blst_fr *x) {
   blst_fr_from_uint64(x, x_uint_64);
 }
 
-void blst_fr_pow(blst_fr *out, blst_fr *x, byte *exp, int exp_nb_bits) {
-  // Set output buffer to Fr.one
-  memset(out, 0, sizeof(blst_scalar));
-  set_fr_to_one(out);
+int blst_fr_pow(blst_fr *out, blst_fr *x, byte *exp, int exp_nb_bits) {
+  // Assert that the most significant bit of exp is 1, otherwise
+  // fail with error value 2 (Invalid_Argument).
+  if (!(exp[(exp_nb_bits - 1) / 8] & (1 << (exp_nb_bits - 1) % 8)))
+    return 2;
+
+  // Given that the msb of exp is 1, we set our accumulator to x and
+  // start the square and multiply algorithm from the second msb.
+  memcpy(out, x, sizeof(blst_fr));
 
   // Square and multiply
-  for (int i = exp_nb_bits - 1; i >= 0; i--) {
+  for (int i = exp_nb_bits - 2; i >= 0; i--) {
     blst_fr_sqr(out, out);
     if (exp[i / 8] & (1 << (i % 8)))
       blst_fr_mul(out, out, x);
   }
+  return 0;
 }
 
 size_t blst_fp_sizeof() { return sizeof(blst_fp); }

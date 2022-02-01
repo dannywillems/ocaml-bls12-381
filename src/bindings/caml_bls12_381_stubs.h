@@ -7,6 +7,8 @@
 
 #define CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY Val_int(1)
 
+#define CAML_BLS12_381_OUTPUT_INVALID_ARGUMENT Val_int(2)
+
 #define Blst_fr_val(v) ((blst_fr *)Data_custom_val(v))
 
 #define Blst_scalar_val(v) ((blst_scalar *)Data_custom_val(v))

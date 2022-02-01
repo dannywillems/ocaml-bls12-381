@@ -21,7 +21,7 @@ bool blst_fr_from_lendian(blst_fr *x, byte b[32]);
 
 void blst_lendian_from_fr(byte b[32], blst_fr *x);
 
-void blst_fr_pow(blst_fr *out, blst_fr *x, byte *exp, int exp_nb_bits);
+int blst_fr_pow(blst_fr *out, blst_fr *x, byte *exp, int exp_nb_bits);
 
 size_t blst_fp_sizeof();
 
