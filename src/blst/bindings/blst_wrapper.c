@@ -118,6 +118,10 @@ void blst_fp2_to_bytes(byte *out, blst_fp2 *p_c) {
 size_t blst_fp12_sizeof() { return sizeof(blst_fp12); }
 
 void blst_fp12_set_one(blst_fp12 *buffer_c) {
+  // Set all coordinates to 0. If allocated with allocate_fp12_stubs it's
+  // normally fine, but doing it just in case...
+  memset(buffer_c, 0, sizeof(blst_fp12));
+  // And override for 1.
   byte out[48] = {0};
   out[0] = 1;
   blst_fp_from_lendian(&(buffer_c->fp6[0].fp2[0].fp[0]), out);
