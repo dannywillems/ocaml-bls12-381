@@ -45,6 +45,8 @@ void blst_fp12_to_bytes(byte *buffer, blst_fp12 *p_c);
 
 void blst_fp12_of_bytes(blst_fp12 *buffer_c, byte *p);
 
+int blst_fp12_pow(blst_fp12 *out, blst_fp12 *x, byte *exp, int exp_nb_bits);
+
 size_t blst_p1_sizeof();
 
 size_t blst_p1_affine_sizeof();

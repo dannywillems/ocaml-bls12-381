@@ -196,6 +196,25 @@ void blst_fp12_of_bytes(blst_fp12 *buffer_c, byte *p) {
   blst_fp_from_lendian(&(buffer_c->fp6[1].fp2[2].fp[1]), p + 11 * 48);
 }
 
+int blst_fp12_pow(blst_fp12 *out, blst_fp12 *x, byte *exp, int exp_nb_bits) {
+  // Assert that the most significant bit of exp is 1, otherwise
+  // fail with error value 2 (Invalid_Argument).
+  if (!(exp[(exp_nb_bits - 1) / 8] & (1 << (exp_nb_bits - 1) % 8)))
+    return 2;
+
+  // Given that the msb of exp is 1, we set our accumulator to x and
+  // start the square and multiply algorithm from the second msb.
+  memcpy(out, x, sizeof(blst_fp12));
+
+  // Square and multiply
+  for (int i = exp_nb_bits - 2; i >= 0; i--) {
+    blst_fp12_sqr(out, out);
+    if (exp[i / 8] & (1 << (i % 8)))
+      blst_fp12_mul(out, out, x);
+  }
+  return 0;
+}
+
 size_t blst_p1_sizeof() { return sizeof(blst_p1); }
 
 size_t blst_p1_affine_sizeof() { return sizeof(blst_p1_affine); }

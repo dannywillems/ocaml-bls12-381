@@ -89,6 +89,18 @@ CAMLprim value caml_blst_fr_pow_stubs(value out, value x, value exp,
     CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
+CAMLprim value caml_blst_fp12_pow_stubs(value out, value x, value exp,
+                                        value exp_nb_bits) {
+  CAMLparam4(out, x, exp, exp_nb_bits);
+  blst_fp12 *out_c = Blst_fp12_val(out);
+  blst_fp12 *x_c = Blst_fp12_val(x);
+  byte *exp_c = Bytes_val(exp);
+  if (blst_fp12_pow(out_c, x_c, exp_c, Int_val(exp_nb_bits)))
+    CAMLreturn(CAML_BLS12_381_OUTPUT_INVALID_ARGUMENT);
+  else
+    CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
 CAMLprim value caml_blst_fr_is_equal_stubs(value x, value y) {
   CAMLparam2(x, y);
   blst_fr *x_c = Blst_fr_val(x);

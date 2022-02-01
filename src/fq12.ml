@@ -39,6 +39,9 @@ module Stubs = struct
 
   external sqr : fp12 -> fp12 -> int = "caml_blst_fp12_sqr_stubs"
 
+  external pow : fp12 -> fp12 -> Bytes.t -> int -> int
+    = "caml_blst_fp12_pow_stubs"
+
   external to_bytes : Bytes.t -> fp12 -> int = "caml_blst_fp12_to_bytes_stubs"
 
   external of_bytes : fp12 -> Bytes.t -> int = "caml_blst_fp12_of_bytes_stubs"
@@ -144,18 +147,17 @@ module Fq12 = struct
     let x11 = Z.of_string x11 in
     of_z x0 x1 x2 x3 x4 x5 x6 x7 x8 x9 x10 x11
 
-  let two_z = Z.(one + one)
-
-  let rec pow x n =
+  let pow x n =
+    let n = Z.erem n (Z.pred order) in
     if Z.equal n Z.zero then one
     else if is_zero x then zero
     else if Z.equal n Z.one then x
     else
-      let n = Z.erem n (Z.pred order) in
-      let a, r = Z.ediv_rem n two_z in
-      let acc = pow x a in
-      let acc_square = mul acc acc in
-      if Z.equal r Z.zero then acc_square else mul acc_square x
+      let buffer = Stubs.allocate_fq12 () in
+      let exp = Z.to_bits n |> Bytes.unsafe_of_string in
+      let exp_len = Z.numbits n in
+      ignore @@ Stubs.pow buffer x exp exp_len ;
+      buffer
 end
 
 include Fq12
