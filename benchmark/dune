@@ -44,6 +44,11 @@
  (libraries bls12-381-unix core core_bench))
 
 (executable
+ (name bench_pairing_slow)
+ (modules bench_pairing_slow)
+ (libraries bls12-381-unix))
+
+(executable
  (name bench_signature)
  (modules bench_signature)
  (libraries bls12-381-unix core core_bench))
