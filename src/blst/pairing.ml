@@ -28,6 +28,9 @@ module Stubs = struct
   external miller_loop : Fq12.t -> G2.Stubs.affine -> G1.Stubs.affine -> int
     = "caml_blst_miller_loop_stubs"
 
+  external miller_loop_list : Fq12.t -> (G1.t * G2.t) array -> int -> int
+    = "caml_blst_miller_loop_list_stubs"
+
   external final_exponentiation : Fq12.t -> Fq12.t -> int
     = "caml_blst_final_exponentiation_stubs"
 end
@@ -42,14 +45,11 @@ let miller_loop_simple g1 g2 =
   buffer
 
 let miller_loop l =
-  let rec aux acc ps =
-    match ps with
-    | [] -> acc
-    | (g1, g2) :: ps ->
-        let acc = Fq12.(mul acc (miller_loop_simple g1 g2)) in
-        aux acc ps
-  in
-  aux Fq12.one l
+  let out = Fq12.Stubs.allocate_fq12 () in
+  let l = Array.of_list l in
+  let length = Array.length l in
+  ignore @@ Stubs.miller_loop_list out l length ;
+  out
 
 let final_exponentiation_opt x =
   if Fq12.is_zero x then None
