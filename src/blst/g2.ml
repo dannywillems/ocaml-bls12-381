@@ -228,8 +228,7 @@ module G2 = struct
 
   let add x y =
     (* dadd must be used to be complete. add does not work when it is the same
-       point
-    *)
+       point *)
     let buffer = Stubs.allocate_g2 () in
     ignore @@ Stubs.dadd buffer x y ;
     buffer

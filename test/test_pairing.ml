@@ -203,8 +203,7 @@ let test_vectors_one_one () =
 
 let test_vectors_one_one_two_miller_loop () =
   (* Compute P(1, 1) * P(1, 1) using miller loop and check it is equal to the
-     product of the result
-  *)
+     product of the result *)
   let expected_result =
     Fq12.mul result_pairing_one_one result_pairing_one_one
   in
@@ -216,8 +215,7 @@ let test_vectors_one_one_two_miller_loop () =
 
 let test_vectors_one_one_random_times_miller_loop () =
   (* Compute P(1, 1) n times using miller loop and check it is equal to the
-     product.
-  *)
+     product. *)
   let n = 1 + Random.int 1000 in
   let expected_result =
     List.fold_left
@@ -234,10 +232,9 @@ let test_vectors_one_one_random_times_miller_loop () =
 let test_miller_loop_pairing_random_number_of_points () =
   (* Check miller_loop followed by final exponentiation equals the product of
      the individual pairings, using a random number of random points *)
-  (* NB: may fail if one point is null (because of
-     final_exponentiation_exn), but happens with very low probability.
-     Prefer to have a clean test code than verifying if one point is null. If it
-     does happen, restart the test *)
+  (* NB: may fail if one point is null (because of final_exponentiation_exn),
+     but happens with very low probability. Prefer to have a clean test code
+     than verifying if one point is null. If it does happen, restart the test *)
   let number_of_points = 1 + Random.int 50 in
   (* Generate random points *)
   let points =
@@ -253,7 +250,8 @@ let test_miller_loop_pairing_random_number_of_points () =
       (fun ((g1, g2), (a, b)) -> (G1.mul g1 a, G2.mul g2 b))
       (List.combine points scalars)
   in
-  (* Compute the result using miller loop followed by the final exponentiation *)
+  (* Compute the result using miller loop followed by the final
+     exponentiation *)
   let res_miller_loop =
     Pairing.final_exponentiation_exn (Pairing.miller_loop points)
   in

@@ -24,7 +24,8 @@
 
 let () = Random.self_init ()
 
-(** The test vectors are generated using https://github.com/dannywillems/ocaml-ff *)
+(** The test vectors are generated using
+    https://github.com/dannywillems/ocaml-ff *)
 let test_vectors =
   [ "5241434266765085153989819426158356963249585137477420674959011812945457865191";
     "10839440052692226066497714164180551800338639216929046788248680350103009908352";
@@ -230,8 +231,7 @@ module ZRepresentation = struct
 
   let test_random_of_z_higher_than_modulo () =
     (* Verify of_z uses the modulo of the parameter (and therefore accepts value
-       higher than the order)
-    *)
+       higher than the order) *)
     let x = random_z () in
     let x_plus_order = Z.(add x Bls12_381.Fr.order) in
     assert (Bls12_381.Fr.(eq (of_z x) (of_z x_plus_order)))
@@ -294,10 +294,9 @@ module BytesRepresentation = struct
     let e = Bls12_381.Fr.of_bytes_exn z_bytes in
     (* Should not be an option *)
     assert (Option.is_some (Bls12_381.Fr.of_bytes_opt z_bytes)) ;
-    (* Equality in Fr should be fine (require to check to verify the
-       internal representation is the same). In the current implementation, we
-       verify the internal representation is the padded version.
-    *)
+    (* Equality in Fr should be fine (require to check to verify the internal
+       representation is the same). In the current implementation, we verify the
+       internal representation is the padded version. *)
     assert (Bls12_381.Fr.(eq (of_z z) e)) ;
     (* And as zarith elements, we also have the equality *)
     assert (Z.equal (Bls12_381.Fr.to_z e) z)
@@ -538,44 +537,24 @@ module TestVector = struct
 end
 
 module FFT = struct
-  (*
-    Generated using https://github.com/dannywillems/ocaml-polynomial, commit
-    8351c266c4eae185823ab87d74ecb34c0ce70afe with the following program:
-    ```
-    module Fr = Ff.MakeFp (struct
-    let prime_order =
-      Z.of_string
-        "52435875175126190479447740508185965837690552500527637822603658699938581184513"
-    end)
+  (* Generated using https://github.com/dannywillems/ocaml-polynomial, commit
+     8351c266c4eae185823ab87d74ecb34c0ce70afe with the following program: ```
+     module Fr = Ff.MakeFp (struct let prime_order = Z.of_string
+     "52435875175126190479447740508185965837690552500527637822603658699938581184513"
+     end)
 
-    module Poly = Polynomial.MakeUnivariate (Fr)
+     module Poly = Polynomial.MakeUnivariate (Fr)
 
-    let () =
-      Random.self_init () ;
-      let n = 16 in
-      let root =
-        Fr.of_string
-          "16624801632831727463500847948913128838752380757508923660793891075002624508302"
-      in
-      let domain = Polynomial.generate_evaluation_domain (module Fr) n root in
-      let coefficients = List.init n (fun i -> (Fr.random (), i)) in
-      let result_fft =
-        Poly.evaluation_fft ~domain (Poly.of_coefficients coefficients)
-      in
-      Printf.printf
-        "Random generated points: [%s]\n"
-        (String.concat
-           "; "
-           (List.map
-              (fun s -> Printf.sprintf "\"%s\"" (Fr.to_string s))
-              (List.map fst coefficients))) ;
-      Printf.printf
-        "Results FFT: [%s]\n"
-        (String.concat
-           "; "
-           (List.map (fun s -> Printf.sprintf "\"%s\"" (Fr.to_string s)) result_fft))
-    ```
-  *)
+     let () = Random.self_init () ; let n = 16 in let root = Fr.of_string
+     "16624801632831727463500847948913128838752380757508923660793891075002624508302"
+     in let domain = Polynomial.generate_evaluation_domain (module Fr) n root in
+     let coefficients = List.init n (fun i -> (Fr.random (), i)) in let
+     result_fft = Poly.evaluation_fft ~domain (Poly.of_coefficients
+     coefficients) in Printf.printf "Random generated points: [%s]\n"
+     (String.concat "; " (List.map (fun s -> Printf.sprintf "\"%s\""
+     (Fr.to_string s)) (List.map fst coefficients))) ; Printf.printf "Results
+     FFT: [%s]\n" (String.concat "; " (List.map (fun s -> Printf.sprintf
+     "\"%s\"" (Fr.to_string s)) result_fft)) ``` *)
   let test_fft_vectors () =
     let vectors =
       [ ( [| "27368034540955591518185075247638312229509481411752400387472688330662143761856";
@@ -700,38 +679,19 @@ module FFT = struct
       vectors
 
   let test_fft_with_greater_domain_vectors () =
-    (* Vectors generated with the following program:
-       ```
-       module Poly = Polynomial.MakeUnivariate (Bls12_381.Fr)
-       let fft_polynomial () =
-         Random.self_init () ;
-         let n = 16 in
-         let root =
-           Bls12_381.Fr.of_string
-             "16624801632831727463500847948913128838752380757508923660793891075002624508302"
-         in
-         let domain = Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int i)) in
-         let pts =
-           List.init (1 + Random.int (n - 1)) (fun _ -> Bls12_381.Fr.random ())
-         in
-         let polynomial = Poly.of_coefficients (List.mapi (fun i a -> (a, i)) pts) in
-         let result_fft = Poly.evaluation_fft ~domain polynomial in
-         Printf.printf
-           "Random generated points: [%s]\n"
-           (String.concat
-              "; "
-              (List.map
-                 (fun s -> Printf.sprintf "\"%s\"" (Bls12_381.Fr.to_string s))
-                 pts)) ;
-         Printf.printf
-           "Results FFT: [%s]\n"
-           (String.concat
-              "; "
-              (List.map
-                 (fun s -> Printf.sprintf "\"%s\"" (Bls12_381.Fr.to_string s))
-                 result_fft))
-       ```
-    *)
+    (* Vectors generated with the following program: ``` module Poly =
+       Polynomial.MakeUnivariate (Bls12_381.Fr) let fft_polynomial () =
+       Random.self_init () ; let n = 16 in let root = Bls12_381.Fr.of_string
+       "16624801632831727463500847948913128838752380757508923660793891075002624508302"
+       in let domain = Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int
+       i)) in let pts = List.init (1 + Random.int (n - 1)) (fun _ ->
+       Bls12_381.Fr.random ()) in let polynomial = Poly.of_coefficients
+       (List.mapi (fun i a -> (a, i)) pts) in let result_fft =
+       Poly.evaluation_fft ~domain polynomial in Printf.printf "Random generated
+       points: [%s]\n" (String.concat "; " (List.map (fun s -> Printf.sprintf
+       "\"%s\"" (Bls12_381.Fr.to_string s)) pts)) ; Printf.printf "Results FFT:
+       [%s]\n" (String.concat "; " (List.map (fun s -> Printf.sprintf "\"%s\""
+       (Bls12_381.Fr.to_string s)) result_fft)) ``` *)
     let vectors_for_fft_with_greater_domain =
       [ ( [| "9094991653442636551690401718409437467203667404120465574859260125376376539450";
              "36784955550505906583992321485589046801627651823699631865063763788121474956423";

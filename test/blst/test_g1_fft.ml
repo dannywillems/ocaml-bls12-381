@@ -87,41 +87,21 @@ module FFT = struct
       expected_result
 
   let test_fft_with_greater_domain () =
-    (* Vectors generated with the following program:
-       ```
-       let eval_g1 p x =
-         (* evaluation of polynomial p at point x *)
-         let h_list = List.rev (Array.to_list p) in
-         let aux acc a = G1.(add (mul acc x) a) in
-         List.fold_left aux G1.zero h_list
-       in
-       let g1_to_string x = Hex.show (Hex.of_bytes (G1.to_bytes x)) in
-       Random.self_init () ;
-       let n = 16 in
-       let root =
-         Bls12_381.Fr.of_string
-           "16624801632831727463500847948913128838752380757508923660793891075002624508302"
-       in
-       let domain = Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int i)) in
-       let pts = Array.init (1 + Random.int (n - 1)) (fun _ -> G1.random ()) in
-       let result_fft = Array.map (eval_g1 pts) domain in
-       Printf.printf
-         "Random generated points: [|\n%s\n|]\n"
-         (String.concat
-            "; "
-            Array.(
-              to_list (map (fun s -> Printf.sprintf "\"%s\"" (g1_to_string s)) pts))) ;
-       Printf.printf
-         "Results FFT: [|\n%s\n|]\n"
-         (String.concat
-            "; "
-            Array.(
-              to_list
-                (map
-                   (fun s -> Printf.sprintf "\"%s\"" (g1_to_string s))
-                   result_fft)))
-       ```
-    *)
+    (* Vectors generated with the following program: ``` let eval_g1 p x = (*
+       evaluation of polynomial p at point x *) let h_list = List.rev
+       (Array.to_list p) in let aux acc a = G1.(add (mul acc x) a) in
+       List.fold_left aux G1.zero h_list in let g1_to_string x = Hex.show
+       (Hex.of_bytes (G1.to_bytes x)) in Random.self_init () ; let n = 16 in let
+       root = Bls12_381.Fr.of_string
+       "16624801632831727463500847948913128838752380757508923660793891075002624508302"
+       in let domain = Array.init n (fun i -> Bls12_381.Fr.pow root (Z.of_int
+       i)) in let pts = Array.init (1 + Random.int (n - 1)) (fun _ -> G1.random
+       ()) in let result_fft = Array.map (eval_g1 pts) domain in Printf.printf
+       "Random generated points: [|\n%s\n|]\n" (String.concat "; " Array.(
+       to_list (map (fun s -> Printf.sprintf "\"%s\"" (g1_to_string s)) pts))) ;
+       Printf.printf "Results FFT: [|\n%s\n|]\n" (String.concat "; " Array.(
+       to_list (map (fun s -> Printf.sprintf "\"%s\"" (g1_to_string s))
+       result_fft))) ``` *)
     let vectors_for_fft_with_greater_domain =
       [ ( [| "11e24ecf7db8b87d8225933d371fd190bfb75532750b0048ff54ebf3da11ed5cfcc2f07441578a64222bf4067817c14a19483158637fcb3dc48a45929d98ed09a4b1cb6e8a27d713449b83aeddb39188f633aea5a099ceead94e563b5ca4cad0";
              "0461ea7440144da988e089841b56ecc6ce89f6a4f1c922f3b0819b71235af74c5b7461c9b0c44621ebba09962be9359502f2ee5c571ee17df5d84e6b549d289fcaec674cdfb53c1619e0a5c2baeb384f2e42c92f211d8a3d27bab0ed79049a86";

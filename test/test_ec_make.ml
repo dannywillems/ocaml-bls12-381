@@ -30,9 +30,7 @@ let rec repeat n f =
     f () ;
     repeat (n - 1) f)
 
-(* copied from G_SIG to remove the dependency on
-   bls12-381-gen
-*)
+(* copied from G_SIG to remove the dependency on bls12-381-gen *)
 module type G_SIG = sig
   exception Not_on_curve of Bytes.t
 
@@ -42,10 +40,9 @@ module type G_SIG = sig
   (** Contiguous C array containing points in affine coordinates *)
   type affine_array
 
-  (** [to_affine_array pts] builds a contiguous C array and
-      populate it with the points [pts] in affine coordinates.
-      Use it with [pippenger_with_affine_array] to get better performance.
-  *)
+  (** [to_affine_array pts] builds a contiguous C array and populate it with the
+      points [pts] in affine coordinates. Use it with
+      [pippenger_with_affine_array] to get better performance. *)
   val to_affine_array : t array -> affine_array
 
   (** Build a OCaml array of [t] values from the contiguous C array *)
@@ -73,19 +70,16 @@ module type G_SIG = sig
   val of_bytes_opt : Bytes.t -> t option
 
   (** Attempt to construct a point from a byte array of length [size_in_bytes].
-      Raise [Not_on_curve] if the point is not on the curve
-  *)
+      Raise [Not_on_curve] if the point is not on the curve *)
   val of_bytes_exn : Bytes.t -> t
 
   (** Allocates a new point from a byte of length [size_in_bytes / 2] array
-      representing a point in compressed form.
-  *)
+      representing a point in compressed form. *)
   val of_compressed_bytes_opt : Bytes.t -> t option
 
   (** Allocates a new point from a byte array of length [size_in_bytes / 2]
-      representing a point in compressed form.
-      Raise [Not_on_curve] if the point is not on the curve.
-  *)
+      representing a point in compressed form. Raise [Not_on_curve] if the point
+      is not on the curve. *)
   val of_compressed_bytes_exn : Bytes.t -> t
 
   (** Return a representation in bytes *)
@@ -107,8 +101,7 @@ module type G_SIG = sig
   val copy : t -> t
 
   (** Generate a random element. The element is on the curve and in the prime
-      subgroup.
-  *)
+      subgroup. *)
   val random : ?state:Random.State.t -> unit -> t
 
   (** Return the addition of two element *)
@@ -132,40 +125,31 @@ module type G_SIG = sig
 
   val mul_inplace : t -> Scalar.t -> unit
 
-  (** [fft ~domain ~points] performs a Fourier transform on [points] using [domain]
-      The domain should be of the form [w^{i}] where [w] is a principal root of
-      unity. If the domain is of size [n], [w] must be a [n]-th principal root
-      of unity.
-      The number of points can be smaller than the domain size, but not larger. The
-      complexity is in [O(n log(m))] where [n] is the domain size and [m] the
-      number of points.
-      A new array of size [n] is allocated and is returned. The parameters are
-      not modified.
-   *)
+  (** [fft ~domain ~points] performs a Fourier transform on [points] using
+      [domain] The domain should be of the form [w^{i}] where [w] is a principal
+      root of unity. If the domain is of size [n], [w] must be a [n]-th
+      principal root of unity. The number of points can be smaller than the
+      domain size, but not larger. The complexity is in [O(n log(m))] where [n]
+      is the domain size and [m] the number of points. A new array of size [n]
+      is allocated and is returned. The parameters are not modified. *)
   val fft : domain:Scalar.t array -> points:t array -> t array
 
-  (** [fft_inplace ~domain ~points] performs a Fourier transform on [points] using [domain]
-      The domain should be of the form [w^{i}] where [w] is a principal root of
-      unity. If the domain is of size [n], [w] must be a [n]-th principal root
-      of unity.
-      The number of points must be in the same size than the domain.
-      It does not return anything but modified the points directly. It does only
-      perform one allocation of a scalar for the FFT.
-      It is recommended to use this function if side-effect is acceptable.
-  *)
+  (** [fft_inplace ~domain ~points] performs a Fourier transform on [points]
+      using [domain] The domain should be of the form [w^{i}] where [w] is a
+      principal root of unity. If the domain is of size [n], [w] must be a
+      [n]-th principal root of unity. The number of points must be in the same
+      size than the domain. It does not return anything but modified the points
+      directly. It does only perform one allocation of a scalar for the FFT. It
+      is recommended to use this function if side-effect is acceptable. *)
   val fft_inplace : domain:Scalar.t array -> points:t array -> unit
 
   (** [ifft ~domain ~points] performs an inverse Fourier transform on [points]
-      using [domain].
-      The domain should be of the form [w^{-i}] (i.e the "inverse domain") where
-      [w] is a principal root of
-      unity. If the domain is of size [n], [w] must be a [n]-th principal root
-      of unity.
-      The domain size must be exactly the same than the number of points. The
-      complexity is O(n log(n)) where [n] is the domain size.
-      A new array of size [n] is allocated and is returned. The parameters are
-      not modified.
-  *)
+      using [domain]. The domain should be of the form [w^{-i}] (i.e the
+      "inverse domain") where [w] is a principal root of unity. If the domain is
+      of size [n], [w] must be a [n]-th principal root of unity. The domain size
+      must be exactly the same than the number of points. The complexity is O(n
+      log(n)) where [n] is the domain size. A new array of size [n] is allocated
+      and is returned. The parameters are not modified. *)
   val ifft : domain:Scalar.t array -> points:t array -> t array
 
   val ifft_inplace : domain:Scalar.t array -> points:t array -> unit
@@ -528,18 +512,18 @@ module MakeECProperties (G : G_SIG) = struct
     assert (G.(check_bytes @@ to_bytes @@ mul (random ()) (Scalar.random ())))
 
   (** Verify 0_S * g_EC = 0_EC where 0_S is the zero of the scalar field, 0_EC
-  is the point at infinity and g_EC is an element of the EC *)
+      is the point at infinity and g_EC is an element of the EC *)
   let zero_scalar_nullifier_random () =
     let random = G.random () in
     assert (G.is_zero (G.mul random G.Scalar.zero))
 
   (** Verify 0_S * 0_EC = 0_EC where 0_S is the zero of the scalar field and
-  0_EC is the point at infinity of the EC *)
+      0_EC is the point at infinity of the EC *)
   let zero_scalar_nullifier_zero () =
     assert (G.is_zero (G.mul G.zero G.Scalar.zero))
 
   (** Verify 0_S * 1_EC = 0_EC where 0_S is the 0 of the scalar field, 1_EC is a
-  fixed generator and 0_EC is the point at infinity of the EC *)
+      fixed generator and 0_EC is the point at infinity of the EC *)
   let zero_scalar_nullifier_one () =
     assert (G.is_zero (G.mul G.one G.Scalar.zero))
 
@@ -567,7 +551,8 @@ module MakeECProperties (G : G_SIG) = struct
   let opposite_of_opposite_of_one_is_one () =
     assert (G.eq (G.negate (G.negate G.one)) G.one)
 
-  (** Verify g1 + (g2 + g3) = (g1 + g2) + g3 where g1, g2 and g3 are elements of the EC *)
+  (** Verify g1 + (g2 + g3) = (g1 + g2) + g3 where g1, g2 and g3 are elements of
+      the EC *)
   let additive_associativity () =
     let g1 = G.random () in
     let g2 = G.random () in
@@ -580,7 +565,7 @@ module MakeECProperties (G : G_SIG) = struct
     assert (G.(eq (add g (negate g)) zero))
 
   (** Verify a (g1 + g2) = a * g1 + a * g2 where a is a scalar, g1, g2 two
-  elements of the EC *)
+      elements of the EC *)
   let distributivity () =
     let s = G.Scalar.random () in
     let g1 = G.random () in
@@ -752,14 +737,12 @@ module MakeCompressedRepresentation (G : G_SIG) = struct
 
   let test_compressed_version_x_in_big_endian () =
     (* The compressed version fully carries the x coordinate. For G1, the
-       compressed
-       version is 384 bits with the 3 most significant bits being used to carry
-       information to compute the y coordinate.
-       For G2, as it is built on Fp2, the compressed version is (384 * 2) bits
-       and the most significant 3 bits carries the same information. The bits
-       385, 386 and 387 (i.e. the last 3 bits of the constant coefficient of the
-       x coordinate) are set to zero/unused.
-    *)
+       compressed version is 384 bits with the 3 most significant bits being
+       used to carry information to compute the y coordinate. For G2, as it is
+       built on Fp2, the compressed version is (384 * 2) bits and the most
+       significant 3 bits carries the same information. The bits 385, 386 and
+       387 (i.e. the last 3 bits of the constant coefficient of the x
+       coordinate) are set to zero/unused. *)
     let g = G.random () in
     let g_bytes = G.to_bytes g in
     let x_bytes_be = Bytes.sub g_bytes 0 (G.size_in_bytes / 2) in

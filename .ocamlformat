@@ -9,3 +9,5 @@ parens-tuple=always
 break-separators=after
 space-around-lists=false
 dock-collection-brackets=false
+# Align on new lines
+wrap-comments=true

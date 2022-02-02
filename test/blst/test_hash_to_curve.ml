@@ -84,7 +84,8 @@ let test_vectors_g2_from_bls_sigs_ref_files () =
   aux "g2_fips_186_3_P521" ;
   aux "g2_rfc6979"
 
-(** These values have been generated using utils/generate_hash_to_curve_vectors using commit b23c84a69187f81302d173f67fc65470fe90f810 *)
+(** These values have been generated using utils/generate_hash_to_curve_vectors
+    using commit b23c84a69187f81302d173f67fc65470fe90f810 *)
 let regression_test () =
   let v =
     [ ( "70b66877f3150ab25211757142a8a31f7572846af9c4107890b00c6e00ba1c900be38f08b3275482f5c607d202ee5840a49dffc29f89c9056b7ddae3bf33445af7037707ccf79d5935913aedc85ba12a56ff39b433ca8f6b666eec7c7089eaf3de90c7dce1e1acee1127b55ade7f43d277079af2f3d4be5e8c637f346f75360c2df6c5ac2c582c6107f210075ddc3ae0858565576faf4851f14ffa6667d80345167ff6f0d27f2d7a10a2f0599fec2106e9d080db136a6c1849d41b961c24b61765f9031959686e9c375fad0494725ee0146d577645",
