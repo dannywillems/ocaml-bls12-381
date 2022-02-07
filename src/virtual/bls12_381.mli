@@ -933,15 +933,50 @@ module Signature : sig
   end
 end
 
+(** Implementation of an instantiation of
+    {{:https://eprint.iacr.org/2019/458.pdf} Poseidon} over the scalar field of
+    BLS12-381 for a security of 128 bits and with the permutation [x^5]. The
+    parameters of the instantiation are:
+    - state size = 3
+    - number of full rounds = 8
+    - number partial rounds = 56
+    - the partial rounds run the sbox on the last element of the state
+
+    These parameters have been generated using {{:
+    https://gitlab.com/dannywillems/ocaml-ec/-/tree/master/utils/poseidon-hash }
+    security_parameters.ml from Mec }.
+
+    The linear layer constants and the round keys can be generated using
+    {{:
+    https://gitlab.com/dannywillems/ocaml-ec/-/tree/master/utils/poseidon-hash }
+    generate_ark.ml and generate_mds.sage from Mec }. The constants must be
+    loaded at the top level using {!Poseidon128.constants_init}.
+
+    {b The current implementation only provides the functions to run a
+       permutation. The user is responsible to build a hash function on top of
+       it. } *)
 module Poseidon128 : sig
+  (** Context of the permutation *)
   type ctxt
 
+  (** [constants_init ark mds] initializes the constants for Poseidon.
+
+      {b Warnings: }
+         - The function does not verify the parameters are secured
+         - This function must be called before calling to {!init},
+           {!apply_permutation} and {!get} *)
   val constants_init : Fr.t array -> Fr.t array array -> unit
 
+  (** [init a b c] returns a new context with an initialised state with the
+      value [[a, b, c]].
+  *)
   val init : Fr.t -> Fr.t -> Fr.t -> ctxt
 
+  (** [apply_permutation ctxt] applies a permutation on the state. The context
+      is modified. *)
   val apply_permutation : ctxt -> unit
 
+  (** [get ctxt] returns the state of the permutation *)
   val get : ctxt -> Fr.t * Fr.t * Fr.t
 end
 
