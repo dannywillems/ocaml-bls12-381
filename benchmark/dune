@@ -60,6 +60,13 @@
  (modules bench_poseidon128 poseidon128_ark poseidon128_mds)
  (libraries bls12-381-unix core core_bench))
 
+(copy_files ../test/blst/{rescue_ark.ml,rescue_mds.ml})
+
+(executable
+ (name bench_rescue)
+ (modules bench_rescue rescue_ark rescue_mds)
+ (libraries bls12-381-unix core core_bench))
+
 (executable
  (name bench_fft)
  (modules bench_fft)

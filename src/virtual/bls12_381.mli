@@ -948,6 +948,18 @@ module Poseidon128 : sig
   val get : ctxt -> Fr.t array
 end
 
+module Rescue : sig
+  type ctxt
+
+  val constants_init : Fr.t array -> Fr.t array array -> unit
+
+  val init : Fr.t array -> ctxt
+
+  val apply_perm : ctxt -> unit
+
+  val get : ctxt -> Fr.t array
+end
+
 (** Return [true] if the environment variable `BLST_PORTABLE` was set when
     building the library, otherwise [false]. Can be used to detect if the
     backend blst has been optimised with ADX on ADX-supported platforms. *)

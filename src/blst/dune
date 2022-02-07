@@ -3,6 +3,8 @@
 (copy_files
   primitives/poseidon128/{caml_poseidon128_stubs.c,poseidon128.h,poseidon128.c})
 
+(copy_files primitives/rescue/{caml_rescue_stubs.c,rescue.h,rescue.c})
+
 (copy_files primitives/fft/{fft.c,fft.h,caml_fft_stubs.c})
 
 (copy_files bindings/blst_bindings_stubs.c)
@@ -53,7 +55,8 @@
   fq
   fq2
   fft
-  poseidon128)
+  poseidon128
+  rescue)
  (implements bls12-381)
  (instrumentation
   (backend bisect_ppx))
@@ -66,7 +69,7 @@
   ;; For pippenger binding, avoid warnings related to const usage
   (flags -Wno-incompatible-pointer-types)
   (names blst_wrapper blst_bindings_stubs caml_poseidon128_stubs poseidon128
-    fft caml_fft_stubs)))
+    rescue caml_rescue_stubs fft caml_fft_stubs)))
 
 (install
  (files libblst/bindings/blst.h libblst/bindings/blst_aux.h
