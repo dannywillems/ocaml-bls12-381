@@ -22,7 +22,9 @@ lint:
   stage: lint
   image: ocaml/opam:debian-ocaml-4.12
   before_script:
-    - opam install ocamlformat.0.20.0
+    # Pin temporary to get the fix for https://github.com/ocaml-ppx/ocamlformat/issues/1984
+    - opam pin add ocamlformat.0.20.1 git+https://github.com/ocaml-ppx/ocamlformat\#fb005d5abc34bad8b7c39b9da04a16d997932a0d --no-action
+    - opam install ocamlformat.0.20.1
   script:
     - dune build @fmt
   rules:
