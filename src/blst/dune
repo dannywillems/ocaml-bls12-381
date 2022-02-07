@@ -7,7 +7,13 @@
 
 (copy_files bindings/blst_bindings_stubs.c)
 
-(copy_files bindings/*.h)
+(copy_files bindings/blst_wrapper.c)
+
+(copy_files bindings/blst.c)
+
+(copy_files bindings/blst_misc.h)
+
+(copy_files bindings/caml_bls12_381_stubs.h)
 
 (copy_files libblst/bindings/blst.h)
 
@@ -59,11 +65,11 @@
   (language c)
   ;; For pippenger binding, avoid warnings related to const usage
   (flags -Wno-incompatible-pointer-types)
-  (names blst_bindings_stubs caml_poseidon128_stubs poseidon128 fft
-    caml_fft_stubs)))
+  (names blst_wrapper blst_bindings_stubs caml_poseidon128_stubs poseidon128
+    fft caml_fft_stubs)))
 
 (install
- (files libblst/bindings/blst.h libblst/bindings/blst_aux.h blst_fr_misc.h
-   caml_bls12_381_stubs.h)
+ (files libblst/bindings/blst.h libblst/bindings/blst_aux.h
+   bindings/blst_misc.h)
  (section lib)
  (package bls12-381-unix))

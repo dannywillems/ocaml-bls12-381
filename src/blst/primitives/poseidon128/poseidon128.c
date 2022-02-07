@@ -7,6 +7,8 @@ blst_fr MDS[WIDTH][WIDTH];
 
 uint64_t ZERO[4] = {0, 0, 0, 0};
 
+size_t poseidon128_ctxt_sizeof() { return sizeof(poseidon128_ctxt_t); }
+
 int poseidon128_constants_init(blst_fr *ark, blst_fr **mds, int ark_len,
                                int mds_nb_rows, int mds_nb_cols) {
   if (NB_CONSTANTS != ark_len || mds_nb_rows != WIDTH || mds_nb_cols != WIDTH) {
