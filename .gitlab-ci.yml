@@ -39,6 +39,8 @@ lint-c:
     - clang-format-11 src/blst/primitives/fft/*.h -i
     - clang-format-11 src/blst/primitives/poseidon128/*.c -i
     - clang-format-11 src/blst/primitives/poseidon128/*.h -i
+    - clang-format-11 src/blst/primitives/rescue/*.c -i
+    - clang-format-11 src/blst/primitives/rescue/*.h -i
     - clang-format-11 src/blst/bindings/*.c -i
     - clang-format-11 src/blst/bindings/*.h -i
     # Check if a file has been modified and uncommited
