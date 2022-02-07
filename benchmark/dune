@@ -53,11 +53,11 @@
  (modules bench_signature)
  (libraries bls12-381-unix core core_bench))
 
-(copy_files ../test/blst/{*128*.ml})
+(copy_files ../test/blst/{poseidon128_ark.ml,poseidon128_mds.ml})
 
 (executable
  (name bench_poseidon128)
- (modules bench_poseidon128 ark128 mds128)
+ (modules bench_poseidon128 poseidon128_ark poseidon128_mds)
  (libraries bls12-381-unix core core_bench))
 
 (executable
