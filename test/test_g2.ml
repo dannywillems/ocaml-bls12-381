@@ -38,7 +38,10 @@ module Memory = struct
     let y = Bls12_381.G2.copy x in
     assert (Bls12_381.G2.eq x y)
 
-  let test_size_in_memory () = assert (Bls12_381.G2.size_in_memory = 304)
+  let test_size_in_memory () =
+    match Sys.backend_type with
+    | Native | Bytecode -> assert (Bls12_381.G2.size_in_memory = 304)
+    | Other _ -> ()
 
   let get_tests () =
     let txt = "Memory" in

@@ -29,6 +29,7 @@
    test_poseidon128 poseidon128_ark poseidon128_mds test_aggregated_signature
    test_rescue rescue_ark rescue_mds)
  (package bls12-381)
+ (modes native js)
  (deps
   fft_test_vector_g1_2
   fft_test_vector_g2_2
@@ -161,3 +162,264 @@
   pop_g2_fips_186_3_P521_blst
   pop_g2_rfc6979_blst)
  (libraries bls12-381 alcotest ff-pbt hex))
+
+(rule
+ (alias runtest-js)
+ (deps
+  fft_test_vector_g1_2
+  fft_test_vector_g2_2
+  ifft_test_vector_g1_2
+  ifft_test_vector_g2_2
+  test_vector_g1_2
+  test_vector_g2_2
+  ;; These files come from https://github.com/algorand/bls_sigs_ref/pull/7.
+  ;; hash_to_curve
+  g1_fips_186_3_B233
+  g1_fips_186_3_B283
+  g1_fips_186_3_B409
+  g1_fips_186_3_B571
+  g1_fips_186_3_K233
+  g1_fips_186_3_K409
+  g1_fips_186_3_K571
+  g1_fips_186_3_P224
+  g1_fips_186_3_P256
+  g1_fips_186_3_P384
+  g1_fips_186_3_P521
+  g1_rfc6979
+  g2_fips_186_3_B233
+  g2_fips_186_3_B283
+  g2_fips_186_3_B409
+  g2_fips_186_3_B571
+  g2_fips_186_3_K233
+  g2_fips_186_3_K409
+  g2_fips_186_3_K571
+  g2_fips_186_3_P224
+  g2_fips_186_3_P256
+  g2_fips_186_3_P384
+  g2_fips_186_3_P521
+  g2_rfc6979
+  ;; signature
+  sig_g1_basic_fips_186_3_B233_blst
+  sig_g1_basic_fips_186_3_B283_blst
+  sig_g1_basic_fips_186_3_B409_blst
+  sig_g1_basic_fips_186_3_B571_blst
+  sig_g1_basic_fips_186_3_K233_blst
+  sig_g1_basic_fips_186_3_K409_blst
+  sig_g1_basic_fips_186_3_K571_blst
+  sig_g1_basic_fips_186_3_P224_blst
+  sig_g1_basic_fips_186_3_P256_blst
+  sig_g1_basic_fips_186_3_P384_blst
+  sig_g1_basic_fips_186_3_P521_blst
+  sig_g1_basic_rfc6979_blst
+  sig_g1_aug_fips_186_3_B233_blst
+  sig_g1_aug_fips_186_3_B283_blst
+  sig_g1_aug_fips_186_3_B409_blst
+  sig_g1_aug_fips_186_3_B571_blst
+  sig_g1_aug_fips_186_3_K233_blst
+  sig_g1_aug_fips_186_3_K409_blst
+  sig_g1_aug_fips_186_3_K571_blst
+  sig_g1_aug_fips_186_3_P224_blst
+  sig_g1_aug_fips_186_3_P256_blst
+  sig_g1_aug_fips_186_3_P384_blst
+  sig_g1_aug_fips_186_3_P521_blst
+  sig_g1_aug_rfc6979_blst
+  sig_g1_pop_fips_186_3_B233_blst
+  sig_g1_pop_fips_186_3_B283_blst
+  sig_g1_pop_fips_186_3_B409_blst
+  sig_g1_pop_fips_186_3_B571_blst
+  sig_g1_pop_fips_186_3_K233_blst
+  sig_g1_pop_fips_186_3_K409_blst
+  sig_g1_pop_fips_186_3_K571_blst
+  sig_g1_pop_fips_186_3_P224_blst
+  sig_g1_pop_fips_186_3_P256_blst
+  sig_g1_pop_fips_186_3_P384_blst
+  sig_g1_pop_fips_186_3_P521_blst
+  sig_g1_pop_rfc6979_blst
+  sig_g2_basic_fips_186_3_B233_blst
+  sig_g2_basic_fips_186_3_B283_blst
+  sig_g2_basic_fips_186_3_B409_blst
+  sig_g2_basic_fips_186_3_B571_blst
+  sig_g2_basic_fips_186_3_K233_blst
+  sig_g2_basic_fips_186_3_K409_blst
+  sig_g2_basic_fips_186_3_K571_blst
+  sig_g2_basic_fips_186_3_P224_blst
+  sig_g2_basic_fips_186_3_P256_blst
+  sig_g2_basic_fips_186_3_P384_blst
+  sig_g2_basic_fips_186_3_P521_blst
+  sig_g2_basic_rfc6979_blst
+  sig_g2_aug_fips_186_3_B233_blst
+  sig_g2_aug_fips_186_3_B283_blst
+  sig_g2_aug_fips_186_3_B409_blst
+  sig_g2_aug_fips_186_3_B571_blst
+  sig_g2_aug_fips_186_3_K233_blst
+  sig_g2_aug_fips_186_3_K409_blst
+  sig_g2_aug_fips_186_3_K571_blst
+  sig_g2_aug_fips_186_3_P224_blst
+  sig_g2_aug_fips_186_3_P256_blst
+  sig_g2_aug_fips_186_3_P384_blst
+  sig_g2_aug_fips_186_3_P521_blst
+  sig_g2_aug_rfc6979_blst
+  sig_g2_pop_fips_186_3_B233_blst
+  sig_g2_pop_fips_186_3_B283_blst
+  sig_g2_pop_fips_186_3_B409_blst
+  sig_g2_pop_fips_186_3_B571_blst
+  sig_g2_pop_fips_186_3_K233_blst
+  sig_g2_pop_fips_186_3_K409_blst
+  sig_g2_pop_fips_186_3_K571_blst
+  sig_g2_pop_fips_186_3_P224_blst
+  sig_g2_pop_fips_186_3_P256_blst
+  sig_g2_pop_fips_186_3_P384_blst
+  sig_g2_pop_fips_186_3_P521_blst
+  sig_g2_pop_rfc6979_blst
+  ;; pop
+  pop_g1_fips_186_3_B233_blst
+  pop_g1_fips_186_3_B283_blst
+  pop_g1_fips_186_3_B409_blst
+  pop_g1_fips_186_3_B571_blst
+  pop_g1_fips_186_3_K233_blst
+  pop_g1_fips_186_3_K409_blst
+  pop_g1_fips_186_3_K571_blst
+  pop_g1_fips_186_3_P224_blst
+  pop_g1_fips_186_3_P256_blst
+  pop_g1_fips_186_3_P384_blst
+  pop_g1_fips_186_3_P521_blst
+  pop_g1_rfc6979_blst
+  pop_g2_fips_186_3_B233_blst
+  pop_g2_fips_186_3_B283_blst
+  pop_g2_fips_186_3_B409_blst
+  pop_g2_fips_186_3_B571_blst
+  pop_g2_fips_186_3_K233_blst
+  pop_g2_fips_186_3_K409_blst
+  pop_g2_fips_186_3_K571_blst
+  pop_g2_fips_186_3_P224_blst
+  pop_g2_fips_186_3_P256_blst
+  pop_g2_fips_186_3_P384_blst
+  pop_g2_fips_186_3_P521_blst
+  pop_g2_rfc6979_blst)
+ (action (progn)))
+
+(copy_files ../src/blst.js)
+
+(copy_files ../src/blst.wasm)
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_fr.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_g1.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_g1_fft.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_g2.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_g2_fft.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_pairing.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_random_state.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_hash_to_curve.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+;; needs dep
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_signature.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_aggregated_signature.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_poseidon128.bc.js))
+ (action
+  (run node -- preload.js %{test})))
+
+(rule
+ (alias runtest-js)
+ (deps
+  preload.js
+  blst.js
+  blst.wasm
+  (:test test_rescue.bc.js))
+ (action
+  (run node -- preload.js %{test})))

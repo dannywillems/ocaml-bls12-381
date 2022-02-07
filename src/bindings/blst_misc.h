@@ -7,6 +7,8 @@ size_t blst_scalar_sizeof();
 
 size_t blst_fr_sizeof();
 
+int blst_fr_compare(blst_fr *s_c, blst_fr *t_c);
+
 bool blst_fr_is_equal(blst_fr *x, blst_fr *y);
 
 int blst_fr_compare(blst_fr *x_c, blst_fr *y_c);
