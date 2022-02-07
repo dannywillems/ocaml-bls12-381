@@ -13,6 +13,8 @@ typedef struct rescue_ctxt_s {
   int i_round_key;
 } rescue_ctxt_t;
 
+size_t rescue_ctxt_sizeof();
+
 int rescue_constants_init(blst_fr *akr, blst_fr **mds, int ark_len,
                           int mds_nb_rows, int mds_nb_cols);
 void rescue_init(rescue_ctxt_t *ctxt, blst_fr *a, blst_fr *b, blst_fr *c);

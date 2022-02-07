@@ -11,6 +11,8 @@ byte ALPHA_INV_BYTES[32] = {
 
 int ALPHA_INV_NB_BITS = 254;
 
+size_t rescue_ctxt_sizeof() { return sizeof(rescue_ctxt_t); }
+
 int rescue_constants_init(blst_fr *ark, blst_fr **mds, int ark_len,
                           int mds_nb_rows, int mds_nb_cols) {
   if (NB_CONSTANTS != ark_len || mds_nb_rows != WIDTH || mds_nb_cols != WIDTH) {
