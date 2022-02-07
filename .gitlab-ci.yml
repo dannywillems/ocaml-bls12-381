@@ -331,6 +331,7 @@ check-blst-headers-are-installed:
     - opam install bls12-381-unix.dev -y
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381-unix/blst.h
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381-unix/blst_aux.h
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381-unix/blst_misc.h
   rules:
     - when: always
 
