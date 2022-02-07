@@ -46,9 +46,10 @@ let test_consistent_with_mec () =
       let inputs = Array.map Bls12_381.Fr.of_string inputs in
       let expected_output = Array.map Bls12_381.Fr.of_string expected_output in
       Bls12_381.Poseidon128.constants_init Poseidon128_ark.v Poseidon128_mds.v ;
-      let ctxt = Bls12_381.Poseidon128.init inputs in
-      let () = Bls12_381.Poseidon128.apply_perm ctxt in
-      let output = Bls12_381.Poseidon128.get ctxt in
+      let ctxt = Bls12_381.Poseidon128.init inputs.(0) inputs.(1) inputs.(2) in
+      let () = Bls12_381.Poseidon128.apply_permutation ctxt in
+      let a, b, c = Bls12_381.Poseidon128.get ctxt in
+      let output = [| a; b; c |] in
       Array.iter2
         (fun a b ->
           if not (Bls12_381.Fr.eq a b) then

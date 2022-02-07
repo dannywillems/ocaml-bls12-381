@@ -248,8 +248,7 @@ module G1 : sig
   (** Check if a point, represented as a byte array, is on the curve **)
   val check_bytes : Bytes.t -> bool
 
-  (** Attempt to construct a point from a byte array of length
-      {!size_in_bytes}. *)
+  (** Attempt to construct a point from a byte array of length {!size_in_bytes}. *)
   val of_bytes_opt : Bytes.t -> t option
 
   (** Attempt to construct a point from a byte array of length {!size_in_bytes}.
@@ -600,8 +599,8 @@ module Pairing : sig
   val final_exponentiation_exn : Fq12.t -> Fq12.t
 end
 
-(** Follow {{: https://tools.ietf.org/pdf/draft-irtf-cfrg-bls-signature-04.pdf }
-    the BLS signature draft of CFRG, version 4 } *)
+(** Follow {{:https://tools.ietf.org/pdf/draft-irtf-cfrg-bls-signature-04.pdf}
+    the BLS signature draft of CFRG, version 4} *)
 module Signature : sig
   (** Type of the secret keys. *)
   type sk
@@ -710,9 +709,9 @@ module Signature : sig
         Return [None] if [INVALID] is expected in the specification *)
     val aggregate_signature_opt : signature list -> signature option
 
-    (** Basic scheme described in {{:
-        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1
-        } section 3.1 }
+    (** Basic scheme described in
+        {{:https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.1}
+        section 3.1}
 
         In a basic scheme, rogue key attacks are handled by requiring all
         messages signed by an aggregate signature to be distinct. This
@@ -729,9 +728,9 @@ module Signature : sig
       val aggregate_verify : (pk * Bytes.t) list -> signature -> bool
     end
 
-    (** Augmentation scheme described in {{:
-        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2
-        } section 3.2 }
+    (** Augmentation scheme described in
+        {{:https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.2}
+        section 3.2}
 
         In a message augmentation scheme, signatures are generated over the
         concatenation of the public key and the message, ensuring that messages
@@ -744,9 +743,9 @@ module Signature : sig
       val aggregate_verify : (pk * Bytes.t) list -> signature -> bool
     end
 
-    (** Proof of possession scheme described in {{:
-        https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3
-        } section 3.3 }
+    (** Proof of possession scheme described in
+        {{:https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3}
+        section 3.3}
 
         A proof of possession scheme uses a separate public key validation step,
         called a proof of possession, to defend against rogue key attacks. This
@@ -755,33 +754,31 @@ module Signature : sig
     module Pop : sig
       type proof = Bytes.t
 
-      (** Equivalent to [core_sign] with the DST given in the specification {{:
-          https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
-          } in section 4.2.3 }. *)
+      (** Equivalent to [core_sign] with the DST given in the specification
+          {{:https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3}
+          in section 4.2.3}. *)
       val sign : sk -> Bytes.t -> signature
 
       (** Equivalent to [core_verify] with the DST given in the specification
-          {{:
-          https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3
-          } in section 4.2.3 }. *)
+          {{:https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-4.2.3}
+          in section 4.2.3}. *)
       val verify : pk -> Bytes.t -> signature -> bool
 
-      (** [pop_proof sk] implements {{:
-          https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.2
-          } section 3.3.2 }. *)
+      (** [pop_proof sk] implements
+          {{:https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.2}
+          section 3.3.2}. *)
       val pop_prove : sk -> proof
 
-      (** [pop_verify pk signature] implements {{:
-          https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.3
-          } section 3.3.3 }. *)
+      (** [pop_verify pk signature] implements
+          {{:https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.3}
+          section 3.3.3}. *)
       val pop_verify : pk -> proof -> bool
 
       (** [aggregate_verify pks msg aggregated_signature] performs a aggregate
           signature verification. It supposes the same message [msg] has been
           signed. It implements the FastAggregateVerify algorithm specified in
-          {{:
-          https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.4
-          } section 3.3.4 }. *)
+          {{:https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-bls-signature-04#section-3.3.4}
+          section 3.3.4}. *)
       val aggregate_verify : (pk * proof) list -> Bytes.t -> signature -> bool
     end
   end
@@ -941,11 +938,11 @@ module Poseidon128 : sig
 
   val constants_init : Fr.t array -> Fr.t array array -> unit
 
-  val init : Fr.t array -> ctxt
+  val init : Fr.t -> Fr.t -> Fr.t -> ctxt
 
-  val apply_perm : ctxt -> unit
+  val apply_permutation : ctxt -> unit
 
-  val get : ctxt -> Fr.t array
+  val get : ctxt -> Fr.t * Fr.t * Fr.t
 end
 
 module Rescue : sig
@@ -953,11 +950,11 @@ module Rescue : sig
 
   val constants_init : Fr.t array -> Fr.t array array -> unit
 
-  val init : Fr.t array -> ctxt
+  val init : Fr.t -> Fr.t -> Fr.t -> ctxt
 
-  val apply_perm : ctxt -> unit
+  val apply_permutation : ctxt -> unit
 
-  val get : ctxt -> Fr.t array
+  val get : ctxt -> Fr.t * Fr.t * Fr.t
 end
 
 (** Return [true] if the environment variable `BLST_PORTABLE` was set when
