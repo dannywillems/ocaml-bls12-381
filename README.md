@@ -1,5 +1,29 @@
 # OCaml implementation of BLS12-381
 
+This library provides a fast UNIX implementation of:
+- operations over the scalar field, including (i)FFT.
+- operations over the groups G1 and G2, including EC-FFT, hash_to_curve as
+  described [in this
+  specification](https://datatracker.ietf.org/doc/draft-irtf-cfrg-hash-to-curve/)
+  and the pippenger algorithm for fast multi scalar exponentiation.
+- pairing from G1 x G2 to GT (internally called Fq12 at the moment, written as a
+  multiplicative group)
+- operations over the target group of the pairing (Fq12).
+- BLS signatures described in [this
+  specification](https://tools.ietf.org/pdf/draft-irtf-cfrg-bls-signature-04.pdf).
+  Both instantiations, i.e. the one minimizing the public key size and the one
+  minimizing the signature size, are provided.
+- a fast implementation of an instantiation of
+  [Poseidon](https://eprint.iacr.org/2019/458.pdf) providing a security of
+  128 bits. See [the
+  documentation](https://dannywillems.gitlab.io/ocaml-bls12-381/bls12-381/Bls12_381/Poseidon128/index.html)
+  for more information on the used parameters.
+- a fast implementation of an instantiation of
+  [Rescue](https://eprint.iacr.org/2019/426.pdf) providing a security of
+  128 bits. See [the
+  documentation](https://dannywillems.gitlab.io/ocaml-bls12-381/bls12-381/Bls12_381/Rescue/index.html)
+  for more information on the used parameters.
+
 ## Encoding
 
 ### Scalar
