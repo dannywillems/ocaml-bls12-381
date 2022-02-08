@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-blst_fr ARK[NB_CONSTANTS];
-blst_fr MDS[WIDTH][WIDTH];
+blst_fr RESCUE_ARK[NB_CONSTANTS];
+blst_fr RESCUE_MDS[WIDTH][WIDTH];
 
 byte ALPHA_INV_BYTES[32] = {
     205, 204, 204, 204, 50,  51, 51, 51,  153, 241, 152, 153, 103, 14, 127, 33,
@@ -18,12 +18,12 @@ int rescue_constants_init(blst_fr *ark, blst_fr **mds, int ark_len,
   }
 
   for (int i = 0; i < NB_CONSTANTS; i++) {
-    memcpy(ARK + i, ark + i, sizeof(blst_fr));
+    memcpy(RESCUE_ARK + i, ark + i, sizeof(blst_fr));
   }
 
   for (int i = 0; i < WIDTH; i++) {
     for (int j = 0; j < WIDTH; j++) {
-      memcpy(&MDS[i][j], &mds[i][j], sizeof(blst_fr));
+      memcpy(&RESCUE_MDS[i][j], &mds[i][j], sizeof(blst_fr));
     }
   }
   return 0;
@@ -60,7 +60,7 @@ void marvellous_apply_linear(rescue_ctxt_t *ctxt) {
   for (int i = 0; i < WIDTH; i++) {
     blst_fr_from_uint64(res + i, zero);
     for (int j = 0; j < WIDTH; j++) {
-      blst_fr_mul(&buffer, &MDS[i][j], &ctxt->s[j]);
+      blst_fr_mul(&buffer, &RESCUE_MDS[i][j], &ctxt->s[j]);
       blst_fr_add(res + i, res + i, &buffer);
     }
   }
@@ -71,7 +71,7 @@ void marvellous_apply_linear(rescue_ctxt_t *ctxt) {
 
 void marvellous_apply_cst(rescue_ctxt_t *ctxt) {
   for (int i = 0; i < WIDTH; i++) {
-    blst_fr_add(&ctxt->s[i], &ctxt->s[i], ARK + ctxt->i_round_key);
+    blst_fr_add(&ctxt->s[i], &ctxt->s[i], RESCUE_ARK + ctxt->i_round_key);
     ctxt->i_round_key++;
   }
 }

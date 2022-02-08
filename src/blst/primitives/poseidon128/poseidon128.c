@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-blst_fr ARK[NB_CONSTANTS];
-blst_fr MDS[WIDTH][WIDTH];
+blst_fr POSEIDON128_ARK[NB_CONSTANTS];
+blst_fr POSEIDON128_MDS[WIDTH][WIDTH];
 
 uint64_t ZERO[4] = {0, 0, 0, 0};
 
@@ -16,12 +16,12 @@ int poseidon128_constants_init(blst_fr *ark, blst_fr **mds, int ark_len,
   }
 
   for (int i = 0; i < NB_CONSTANTS; i++) {
-    memcpy(ARK + i, ark + i, sizeof(blst_fr));
+    memcpy(POSEIDON128_ARK + i, ark + i, sizeof(blst_fr));
   }
 
   for (int i = 0; i < WIDTH; i++) {
     for (int j = 0; j < WIDTH; j++) {
-      memcpy(&MDS[i][j], &mds[i][j], sizeof(blst_fr));
+      memcpy(&POSEIDON128_MDS[i][j], &mds[i][j], sizeof(blst_fr));
     }
   }
   return 0;
@@ -52,7 +52,7 @@ void apply_matrix_multiplication(poseidon128_ctxt_t *ctxt) {
   for (int i = 0; i < WIDTH; i++) {
     blst_fr_from_uint64(res + i, ZERO);
     for (int j = 0; j < WIDTH; j++) {
-      blst_fr_mul(&buffer, &MDS[i][j], &ctxt->s[j]);
+      blst_fr_mul(&buffer, &POSEIDON128_MDS[i][j], &ctxt->s[j]);
       blst_fr_add(res + i, res + i, &buffer);
     }
   }
@@ -63,7 +63,7 @@ void apply_matrix_multiplication(poseidon128_ctxt_t *ctxt) {
 
 void apply_cst(poseidon128_ctxt_t *ctxt) {
   for (int i = 0; i < WIDTH; i++) {
-    blst_fr_add(&ctxt->s[i], &ctxt->s[i], ARK + ctxt->i_round_key);
+    blst_fr_add(&ctxt->s[i], &ctxt->s[i], POSEIDON128_ARK + ctxt->i_round_key);
     ctxt->i_round_key++;
   }
 }
