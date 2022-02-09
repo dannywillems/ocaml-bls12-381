@@ -1,5 +1,5 @@
 stages:
-  - dependencies-check
+  # - dependencies-check
   - lint
   - build
   - benchmark
@@ -7,16 +7,17 @@ stages:
   - doc
   - deploy
 
-check-blst-version:
-  stage: dependencies-check
-  image: alpine:3.14
-  before_script:
-    - apk add --no-cache wget diffutils
-    - diff --version
-  script:
-    - .ci/check_blst_version.sh
-  rules:
-    - when: always
+# FIXME: Works locally but not in the CI since virtual library has been removed
+# check-blst-version:
+#   stage: dependencies-check
+#   image: alpine:3.14
+#   before_script:
+#     - apk add --no-cache wget diffutils
+#     - diff --version
+#   script:
+#     - .ci/check_blst_version.sh
+#   rules:
+#     - when: always
 
 lint:
   stage: lint
