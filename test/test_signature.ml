@@ -50,8 +50,8 @@ module MakeTestsForInstantiation (MISC : sig
 
   val signature_not_in_subgroup : string list
 end)
-(PkGroup : Test_ec_make.G_SIG)
-(SigGroup : Test_ec_make.G_SIG)
+(PkGroup : Bls12_381.CURVE)
+(SigGroup : Bls12_381.CURVE)
 (SignatureM : SIGNATURE_INSTANTIATION) =
 struct
   let test_pk_size_in_bytes () =

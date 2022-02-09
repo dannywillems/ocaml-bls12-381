@@ -27,139 +27,7 @@ let rec repeat n f () =
     f () ;
     repeat (n - 1) f ())
 
-(* copied from G_SIG to remove the dependency on bls12-381-gen *)
-module type G_SIG = sig
-  exception Not_on_curve of Bytes.t
-
-  (** The type of the element in the elliptic curve *)
-  type t
-
-  (** Contiguous C array containing points in affine coordinates *)
-  type affine_array
-
-  (** [to_affine_array pts] builds a contiguous C array and populate it with the
-      points [pts] in affine coordinates. Use it with
-      [pippenger_with_affine_array] to get better performance. *)
-  val to_affine_array : t array -> affine_array
-
-  (** Build a OCaml array of [t] values from the contiguous C array *)
-  val of_affine_array : affine_array -> t array
-
-  (** Return the number of elements in the array *)
-  val size_of_affine_array : affine_array -> int
-
-  (** Actual number of bytes allocated for a value of type t *)
-  val size_in_memory : int
-
-  (** The size of a point representation, in bytes *)
-  val size_in_bytes : int
-
-  module Scalar : Ff_sig.PRIME
-
-  (** Create an empty value to store an element of the curve. DO NOT USE THIS TO
-      DO COMPUTATIONS WITH, UNDEFINED BEHAVIORS MAY HAPPEN *)
-  val empty : unit -> t
-
-  (** Check if a point, represented as a byte array, is on the curve **)
-  val check_bytes : Bytes.t -> bool
-
-  (** Attempt to construct a point from a byte array of length [size_in_bytes]. *)
-  val of_bytes_opt : Bytes.t -> t option
-
-  (** Attempt to construct a point from a byte array of length [size_in_bytes].
-      Raise [Not_on_curve] if the point is not on the curve *)
-  val of_bytes_exn : Bytes.t -> t
-
-  (** Allocates a new point from a byte of length [size_in_bytes / 2] array
-      representing a point in compressed form. *)
-  val of_compressed_bytes_opt : Bytes.t -> t option
-
-  (** Allocates a new point from a byte array of length [size_in_bytes / 2]
-      representing a point in compressed form. Raise [Not_on_curve] if the point
-      is not on the curve. *)
-  val of_compressed_bytes_exn : Bytes.t -> t
-
-  (** Return a representation in bytes *)
-  val to_bytes : t -> Bytes.t
-
-  (** Return a compressed bytes representation *)
-  val to_compressed_bytes : t -> Bytes.t
-
-  (** Zero of the elliptic curve *)
-  val zero : t
-
-  (** A fixed generator of the elliptic curve *)
-  val one : t
-
-  (** Return [true] if the given element is zero *)
-  val is_zero : t -> bool
-
-  (** [copy x] return a fresh copy of [x] *)
-  val copy : t -> t
-
-  (** Generate a random element. The element is on the curve and in the prime
-      subgroup. *)
-  val random : ?state:Random.State.t -> unit -> t
-
-  (** Return the addition of two element *)
-  val add : t -> t -> t
-
-  val add_inplace : t -> t -> unit
-
-  val add_bulk : t list -> t
-
-  (** [double g] returns [2g] *)
-  val double : t -> t
-
-  (** Return the opposite of the element *)
-  val negate : t -> t
-
-  (** Return [true] if the two elements are algebraically the same *)
-  val eq : t -> t -> bool
-
-  (** Multiply an element by a scalar *)
-  val mul : t -> Scalar.t -> t
-
-  val mul_inplace : t -> Scalar.t -> unit
-
-  (** [fft ~domain ~points] performs a Fourier transform on [points] using
-      [domain] The domain should be of the form [w^{i}] where [w] is a principal
-      root of unity. If the domain is of size [n], [w] must be a [n]-th
-      principal root of unity. The number of points can be smaller than the
-      domain size, but not larger. The complexity is in [O(n log(m))] where [n]
-      is the domain size and [m] the number of points. A new array of size [n]
-      is allocated and is returned. The parameters are not modified. *)
-  val fft : domain:Scalar.t array -> points:t array -> t array
-
-  (** [fft_inplace ~domain ~points] performs a Fourier transform on [points]
-      using [domain] The domain should be of the form [w^{i}] where [w] is a
-      principal root of unity. If the domain is of size [n], [w] must be a
-      [n]-th principal root of unity. The number of points must be in the same
-      size than the domain. It does not return anything but modified the points
-      directly. It does only perform one allocation of a scalar for the FFT. It
-      is recommended to use this function if side-effect is acceptable. *)
-  val fft_inplace : domain:Scalar.t array -> points:t array -> unit
-
-  (** [ifft ~domain ~points] performs an inverse Fourier transform on [points]
-      using [domain]. The domain should be of the form [w^{-i}] (i.e the
-      "inverse domain") where [w] is a principal root of unity. If the domain is
-      of size [n], [w] must be a [n]-th principal root of unity. The domain size
-      must be exactly the same than the number of points. The complexity is O(n
-      log(n)) where [n] is the domain size. A new array of size [n] is allocated
-      and is returned. The parameters are not modified. *)
-  val ifft : domain:Scalar.t array -> points:t array -> t array
-
-  val ifft_inplace : domain:Scalar.t array -> points:t array -> unit
-
-  val hash_to_curve : Bytes.t -> Bytes.t -> t
-
-  val pippenger : ?start:int -> ?len:int -> t array -> Scalar.t array -> t
-
-  val pippenger_with_affine_array :
-    ?start:int -> ?len:int -> affine_array -> Scalar.t array -> t
-end
-
-module MakeBulkOperations (G : G_SIG) = struct
+module MakeBulkOperations (G : Bls12_381.CURVE) = struct
   let test_bulk_add () =
     let n = 10 + Random.int 1_000 in
     let xs = List.init n (fun _ -> G.random ()) in
@@ -393,7 +261,7 @@ module MakeBulkOperations (G : G_SIG) = struct
           (repeat 10 test_pippenger_contiguous_with_len_argument) ] )
 end
 
-module MakeInplaceOperations (G : G_SIG) = struct
+module MakeInplaceOperations (G : Bls12_381.CURVE) = struct
   let test_mul_inplace () =
     let n = G.Scalar.random () in
     let g = G.random () in
@@ -416,7 +284,7 @@ module MakeInplaceOperations (G : G_SIG) = struct
         test_case "add inplace" `Quick (repeat 100 test_add_inplace) ] )
 end
 
-module MakeEquality (G : G_SIG) = struct
+module MakeEquality (G : Bls12_381.CURVE) = struct
   (** Verify the equality is correct with the value zero *)
   let zero () = assert (G.eq G.zero G.zero)
 
@@ -438,7 +306,7 @@ module MakeEquality (G : G_SIG) = struct
       ] )
 end
 
-module MakeValueGeneration (G : G_SIG) = struct
+module MakeValueGeneration (G : Bls12_381.CURVE) = struct
   let random () = ignore @@ G.random ()
 
   let negation_with_random () =
@@ -470,7 +338,7 @@ module MakeValueGeneration (G : G_SIG) = struct
         test_case "double_with_zero" `Quick (repeat 100 double_with_zero) ] )
 end
 
-module MakeIsZero (G : G_SIG) = struct
+module MakeIsZero (G : Bls12_381.CURVE) = struct
   let with_zero_value () = assert (G.is_zero G.zero = true)
 
   let with_one_value () = assert (G.is_zero G.one = false)
@@ -486,7 +354,7 @@ module MakeIsZero (G : G_SIG) = struct
         test_case "with random value" `Quick (repeat 100 with_random_value) ] )
 end
 
-module MakeECProperties (G : G_SIG) = struct
+module MakeECProperties (G : Bls12_381.CURVE) = struct
   (** Verify that a random point is valid *)
   let check_bytes_random () = assert (G.(check_bytes @@ to_bytes @@ random ()))
 
@@ -708,7 +576,7 @@ module MakeECProperties (G : G_SIG) = struct
           (repeat 100 additive_associativity) ] )
 end
 
-module MakeCompressedRepresentation (G : G_SIG) = struct
+module MakeCompressedRepresentation (G : Bls12_381.CURVE) = struct
   let test_recover_correct_point_uncompressed () =
     let g = G.random () in
     let compressed_bytes = G.to_compressed_bytes g in
