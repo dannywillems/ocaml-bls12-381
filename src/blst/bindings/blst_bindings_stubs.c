@@ -29,42 +29,15 @@
 #define Is_none(v) ((v) == Val_none)
 #define Is_some(v) Is_block(v)
 
-static int blst_fr_compare(value s, value t) {
-  uint64_t s_uint64[4];
-  uint64_t t_uint64[4];
-  blst_scalar *buffer = (blst_scalar *)(calloc(1, sizeof(blst_scalar)));
-
-  blst_fr *s_c = Blst_fr_val(s);
-  blst_scalar_from_fr(buffer, s_c);
-  blst_uint64_from_scalar(s_uint64, buffer);
-
-  blst_fr *t_c = Blst_fr_val(t);
-  blst_scalar_from_fr(buffer, t_c);
-  blst_uint64_from_scalar(t_uint64, buffer);
-
-  free(buffer);
-
-  // Check first it is equal. To get constant time, decomposing on individual
-  // lines
-  bool is_equal = 1;
-  is_equal = is_equal && (s_uint64[0] == t_uint64[0]);
-  is_equal = is_equal && (s_uint64[1] == t_uint64[1]);
-  is_equal = is_equal && (s_uint64[2] == t_uint64[2]);
-  is_equal = is_equal && (s_uint64[3] == t_uint64[3]);
-  if (is_equal == 1) {
-    return (0);
-  }
-  bool lt = 1;
-  lt = lt && (s_uint64[0] <= t_uint64[0]);
-  lt = lt && (s_uint64[1] <= t_uint64[1]);
-  lt = lt && (s_uint64[2] <= t_uint64[2]);
-  lt = lt && (s_uint64[3] <= t_uint64[3]);
-  return (lt ? -1 : 1);
+static int caml_blst_fr_compare(value x, value y) {
+  blst_fr *x_c = Blst_fr_val(x);
+  blst_fr *y_c = Blst_fr_val(y);
+  return (blst_fr_compare(x_c, y_c));
 }
 
 static struct custom_operations blst_fr_ops = {"blst_fr",
                                                custom_finalize_default,
-                                               blst_fr_compare,
+                                               caml_blst_fr_compare,
                                                custom_hash_default,
                                                custom_serialize_default,
                                                custom_deserialize_default,
@@ -736,11 +709,7 @@ CAMLprim value caml_blst_miller_loop_list_stubs(value out, value points_array,
   blst_fp12 *out_c = Blst_fp12_val(out);
   int length_c = Int_val(length);
 
-  /* // Set out_c to Fq12.one */
-  memset(out_c, 0, sizeof(blst_fp12));
-  byte one_bytes[48] = {0};
-  one_bytes[0] = 1;
-  blst_fp_from_lendian(&(out_c->fp6[0].fp2[0].fp[0]), one_bytes);
+  blst_fp12_set_one(out_c);
 
   blst_fp12 tmp;
   blst_p1_affine tmp_p1;

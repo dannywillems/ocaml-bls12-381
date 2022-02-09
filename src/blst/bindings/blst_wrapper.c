@@ -7,6 +7,37 @@ size_t blst_scalar_sizeof() { return sizeof(blst_scalar); }
 
 size_t blst_fr_sizeof() { return sizeof(blst_fr); }
 
+int blst_fr_compare(blst_fr *s_c, blst_fr *t_c) {
+  uint64_t s_uint64[4];
+  uint64_t t_uint64[4];
+  blst_scalar *buffer = (blst_scalar *)(calloc(1, sizeof(blst_scalar)));
+
+  blst_scalar_from_fr(buffer, s_c);
+  blst_uint64_from_scalar(s_uint64, buffer);
+
+  blst_scalar_from_fr(buffer, t_c);
+  blst_uint64_from_scalar(t_uint64, buffer);
+
+  free(buffer);
+
+  // Check first it is equal. To get constant time, decomposing on individual
+  // lines
+  bool is_equal = 1;
+  is_equal = is_equal && (s_uint64[0] == t_uint64[0]);
+  is_equal = is_equal && (s_uint64[1] == t_uint64[1]);
+  is_equal = is_equal && (s_uint64[2] == t_uint64[2]);
+  is_equal = is_equal && (s_uint64[3] == t_uint64[3]);
+  if (is_equal == 1) {
+    return (0);
+  }
+  bool lt = 1;
+  lt = lt && (s_uint64[0] <= t_uint64[0]);
+  lt = lt && (s_uint64[1] <= t_uint64[1]);
+  lt = lt && (s_uint64[2] <= t_uint64[2]);
+  lt = lt && (s_uint64[3] <= t_uint64[3]);
+  return (lt ? -1 : 1);
+}
+
 // Additional functions for Fr.eq, Fr.is_zero and Fr.is_one
 bool blst_fr_is_equal(blst_fr *x, blst_fr *y) {
   uint64_t x_uint_64[4];

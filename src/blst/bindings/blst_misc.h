@@ -9,6 +9,8 @@ size_t blst_fr_sizeof();
 
 bool blst_fr_is_equal(blst_fr *x, blst_fr *y);
 
+int blst_fr_compare(blst_fr *x_c, blst_fr *y_c);
+
 bool blst_fr_is_zero(blst_fr *x);
 
 bool blst_fr_is_one(blst_fr *x);
