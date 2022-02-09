@@ -22,13 +22,10 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-let rec repeat n f =
-  if n <= 0 then
-    let f () = () in
-    f
-  else (
+let rec repeat n f () =
+  if n > 0 then (
     f () ;
-    repeat (n - 1) f)
+    repeat (n - 1) f ())
 
 (* copied from G_SIG to remove the dependency on bls12-381-gen *)
 module type G_SIG = sig

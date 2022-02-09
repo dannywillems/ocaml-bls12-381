@@ -49,14 +49,6 @@ let random_z () =
   let r = Bytes.init size (fun _ -> char_of_int (Random.int 256)) in
   Z.erem (Z.of_bits (Bytes.to_string r)) Bls12_381.Fr.order
 
-let rec repeat n f =
-  if n <= 0 then
-    let f () = () in
-    f
-  else (
-    f () ;
-    repeat (n - 1) f)
-
 module Tests = Ff_pbt.MakeAll (Bls12_381.Fr)
 
 module Memory = struct
@@ -71,7 +63,7 @@ module Memory = struct
     let txt = "Memory" in
     let open Alcotest in
     ( txt,
-      [ test_case "copy" `Quick (repeat 100 test_copy);
+      [ test_case "copy" `Quick (Test_ec_make.repeat 100 test_copy);
         test_case "size in memory" `Quick test_size_in_memory ] )
 end
 
@@ -143,25 +135,28 @@ module InplaceOperations = struct
     let txt = "Inplace operations" in
     let open Alcotest in
     ( txt,
-      [ test_case "add" `Quick (repeat 100 test_add_inplace);
+      [ test_case "add" `Quick (Test_ec_make.repeat 100 test_add_inplace);
         test_case
           "add with same value"
           `Quick
-          (repeat 100 test_add_inplace_with_same_value);
-        test_case "square" `Quick (repeat 100 test_square_inplace);
-        test_case "negate" `Quick (repeat 100 test_negate_inplace);
-        test_case "double" `Quick (repeat 100 test_double_inplace);
-        test_case "inverse" `Quick (repeat 100 test_inverse_inplace);
+          (Test_ec_make.repeat 100 test_add_inplace_with_same_value);
+        test_case "square" `Quick (Test_ec_make.repeat 100 test_square_inplace);
+        test_case "negate" `Quick (Test_ec_make.repeat 100 test_negate_inplace);
+        test_case "double" `Quick (Test_ec_make.repeat 100 test_double_inplace);
+        test_case
+          "inverse"
+          `Quick
+          (Test_ec_make.repeat 100 test_inverse_inplace);
         test_case
           "sub with same value"
           `Quick
-          (repeat 100 test_sub_inplace_with_same_value);
+          (Test_ec_make.repeat 100 test_sub_inplace_with_same_value);
         test_case
           "mul with same value"
           `Quick
-          (repeat 100 test_mul_inplace_with_same_value);
-        test_case "sub" `Quick (repeat 100 test_sub_inplace);
-        test_case "mul" `Quick (repeat 100 test_mul_inplace) ] )
+          (Test_ec_make.repeat 100 test_mul_inplace_with_same_value);
+        test_case "sub" `Quick (Test_ec_make.repeat 100 test_sub_inplace);
+        test_case "mul" `Quick (Test_ec_make.repeat 100 test_mul_inplace) ] )
 end
 
 module StringRepresentation = struct
@@ -250,7 +245,7 @@ module ZRepresentation = struct
         test_case
           "of z and to z with random small numbers"
           `Quick
-          (repeat 100 test_random_of_z_and_to_z);
+          (Test_ec_make.repeat 100 test_random_of_z_and_to_z);
         test_case
           "to z and of z with test vectors"
           `Quick
@@ -258,11 +253,11 @@ module ZRepresentation = struct
         test_case
           "of z accepts value greater than the modulo"
           `Quick
-          (repeat 100 test_random_of_z_higher_than_modulo);
+          (Test_ec_make.repeat 100 test_random_of_z_higher_than_modulo);
         test_case
           "to z and of z with random small numbers"
           `Quick
-          (repeat 100 test_random_to_z_and_of_z) ] )
+          (Test_ec_make.repeat 100 test_random_to_z_and_of_z) ] )
 end
 
 module BytesRepresentation = struct
@@ -320,11 +315,14 @@ module BytesRepresentation = struct
       [ test_case
           "bytes representation is the same than zarith using Z.to_bits"
           `Quick
-          (repeat 10 test_bytes_repr_is_zarith_encoding_using_to_bits);
+          (Test_ec_make.repeat
+             10
+             test_bytes_repr_is_zarith_encoding_using_to_bits);
         (* test_case *)
         (*   "of_bytes_[exn/opt] accepts elements higher than the modulus" *)
         (*   `Quick *)
-        (*   (repeat 10 test_of_bytes_exn_accepts_elements_higher_than_the_modulus); *)
+        (* (Test_ec_make.repeat 10
+           test_of_bytes_exn_accepts_elements_higher_than_the_modulus); *)
         test_case
           "Padding is done automatically with of_bytes"
           `Quick
@@ -892,15 +890,17 @@ module OCamlComparisonOperators = struct
       [ test_case
           "(=) operator on random element"
           `Quick
-          (repeat 100 test_fr_equal_with_same_random_element);
+          (Test_ec_make.repeat 100 test_fr_equal_with_same_random_element);
         test_case
           "(=) operator on random element: failing test"
           `Quick
-          (repeat 100 test_fr_equality_failing_test_with_random);
+          (Test_ec_make.repeat 100 test_fr_equality_failing_test_with_random);
         test_case
           "(!=) operator on random element: failing test"
           `Quick
-          (repeat 100 test_fr_different_failing_test_with_same_random_element);
+          (Test_ec_make.repeat
+             100
+             test_fr_different_failing_test_with_same_random_element);
         test_case "(=) operator on zero" `Quick test_fr_equal_with_zero;
         test_case "(=) operator on one" `Quick test_fr_equal_with_one;
         test_case "(<) 0 < 1" `Quick test_fr_zero_is_smaller_than_one;
@@ -941,8 +941,10 @@ module InnerProduct = struct
   let get_tests () =
     let open Alcotest in
     ( "Inner product",
-      [test_case "with random elements" `Quick (repeat 100 test_random_elements)]
-    )
+      [ test_case
+          "with random elements"
+          `Quick
+          (Test_ec_make.repeat 100 test_random_elements) ] )
 end
 
 module AdditionalConstructors = struct
@@ -975,19 +977,23 @@ module AdditionalConstructors = struct
       [ test_case
           "with positive values as documented"
           `Quick
-          (repeat 100 test_positive_values_as_documented);
+          (Test_ec_make.repeat 100 test_positive_values_as_documented);
         test_case
           "with positive values use decimal represntation"
           `Quick
-          (repeat 100 test_positive_values_use_decimal_representation);
+          (Test_ec_make.repeat
+             100
+             test_positive_values_use_decimal_representation);
         test_case
           "with negative values as documented"
           `Quick
-          (repeat 100 test_negative_values_as_documented);
+          (Test_ec_make.repeat 100 test_negative_values_as_documented);
         test_case
           "with negeative values use decimal represntation"
           `Quick
-          (repeat 100 test_negative_values_use_decimal_representation) ] )
+          (Test_ec_make.repeat
+             100
+             test_negative_values_use_decimal_representation) ] )
 end
 
 let () =
