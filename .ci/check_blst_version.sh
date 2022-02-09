@@ -6,4 +6,4 @@ cd ${TMP_DIRECTORY}
 wget https://github.com/supranational/blst/archive/${COMMIT}.zip
 unzip ${COMMIT}.zip
 cd blst-${COMMIT}
-diff -qr . $SCRIPT_DIR/../src/blst/libblst
+diff -qr . $SCRIPT_DIR/../src/libblst

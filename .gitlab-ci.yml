@@ -37,14 +37,14 @@ lint-c:
     - apt-get update -y
     - apt-get install clang-format-11 git -y
     - clang-format-11 --version
-    - clang-format-11 src/blst/primitives/fft/*.c -i
-    - clang-format-11 src/blst/primitives/fft/*.h -i
-    - clang-format-11 src/blst/primitives/poseidon128/*.c -i
-    - clang-format-11 src/blst/primitives/poseidon128/*.h -i
-    - clang-format-11 src/blst/primitives/rescue/*.c -i
-    - clang-format-11 src/blst/primitives/rescue/*.h -i
-    - clang-format-11 src/blst/bindings/*.c -i
-    - clang-format-11 src/blst/bindings/*.h -i
+    - clang-format-11 src/primitives/fft/*.c -i
+    - clang-format-11 src/primitives/fft/*.h -i
+    - clang-format-11 src/primitives/poseidon128/*.c -i
+    - clang-format-11 src/primitives/poseidon128/*.h -i
+    - clang-format-11 src/primitives/rescue/*.c -i
+    - clang-format-11 src/primitives/rescue/*.h -i
+    - clang-format-11 src/bindings/*.c -i
+    - clang-format-11 src/bindings/*.h -i
     # Check if a file has been modified and uncommited
     - git diff --exit-code
   rules:
@@ -70,10 +70,8 @@ lint-c:
     - opam depext -i -y zarith
     # Pin for later installation
     - opam pin add bls12-381.dev . --no-action
-    - opam pin add bls12-381-unix.dev . --no-action
     # Install the dependencies
     - opam install bls12-381 -y --with-test --deps-only
-    - opam install bls12-381-unix -y --with-test --deps-only
     # For benchmark repository
     - opam install core_bench
     - dune build
@@ -160,10 +158,8 @@ build-ocaml-4.14-debian-11:
     - opam depext -i -y zarith
     # Pin for later installation
     - opam pin add bls12-381.dev . --no-action
-    - opam pin add bls12-381-unix.dev . --no-action
     # Install the dependencies
     - opam install bls12-381 -y --with-test --deps-only
-    - opam install bls12-381-unix -y --with-test --deps-only
     - dune build @install
     - dune runtest
   rules:
@@ -243,10 +239,8 @@ build-ocaml-4.14-alpine-3.15:
     - opam depext -i -y zarith conf-pkg-config conf-libffi
     # Pin for later installation
     - opam pin add bls12-381.dev . --no-action
-    - opam pin add bls12-381-unix.dev . --no-action
     # Install the packages
     - opam install bls12-381 -y --with-test
-    - opam install bls12-381-unix -y --with-test
   script:
     # Benchmark
     - opam install core_bench
@@ -263,9 +257,6 @@ benchmark-ocaml-4.09:
   image: ocaml/opam:debian-ocaml-4.09
 
 opam-install-and-remove:
-  parallel:
-    matrix:
-      - OPAM_PACKAGE: [bls12-381, bls12-381-unix]
   stage: install
   image: ocaml/opam:debian-ocaml-4.11
   before_script:
@@ -279,19 +270,15 @@ opam-install-and-remove:
   script:
   script:
     - opam pin add bls12-381.dev . --no-action
-    - opam pin add bls12-381-unix.dev . --no-action
 
-    - opam depext $OPAM_PACKAGE.dev -y -v
-    - opam install $OPAM_PACKAGE.dev -y -v --deps-only
-    - opam install $OPAM_PACKAGE.dev -y -v
-    - opam remove -a -y $OPAM_PACKAGE.dev
+    - opam depext bls12-381.dev -y -v
+    - opam install bls12-381.dev -y -v --deps-only
+    - opam install bls12-381.dev -y -v
+    - opam remove -a -y bls12-38.dev
   rules:
     - when: always
 
 opam-install-and-remove-local-switch:
-  parallel:
-    matrix:
-      - OPAM_PACKAGE: [bls12-381, bls12-381-unix]
   stage: install
   image: ocaml/opam:debian-ocaml-4.09
   before_script:
@@ -307,12 +294,11 @@ opam-install-and-remove-local-switch:
     - opam update
   script:
     - opam pin add bls12-381.dev . --no-action
-    - opam pin add bls12-381-unix.dev . --no-action
 
-    - opam depext $OPAM_PACKAGE.dev -y -v
-    - opam install $OPAM_PACKAGE.dev -y -v --deps-only
-    - opam install $OPAM_PACKAGE.dev -y -v
-    - opam remove -a -y $OPAM_PACKAGE.dev
+    - opam depext bls12-381.dev -y -v
+    - opam install bls12-381.dev -y -v --deps-only
+    - opam install bls12-381.dev -y -v
+    - opam remove -a -y bls12-381.dev
   rules:
     - when: always
 
@@ -329,13 +315,12 @@ check-blst-headers-are-installed:
     - opam update
   script:
     - opam pin add bls12-381.dev . --no-action
-    - opam pin add bls12-381-unix.dev . --no-action
-
-    - opam depext bls12-381-unix.dev -y -v
-    - opam install bls12-381-unix.dev -y
-    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381-unix/blst.h
-    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381-unix/blst_aux.h
-    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381-unix/blst_misc.h
+    - opam depext bls12-381.dev -y -v
+    - opam install bls12-381.dev -y -v --deps-only
+    - opam install bls12-381.dev -y -v
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst.h
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst_aux.h
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst_misc.h
   rules:
     - when: always
 
@@ -351,7 +336,6 @@ doc:
     - sudo apt-get install m4 -y
     # Pin dev versions. Avoid clash with public opam-repository
     - opam pin add bls12-381.dev . --no-action
-    - opam pin add bls12-381-unix.dev . --no-action
     - opam install odoc -y
     - opam install . -y --deps-only
   script:

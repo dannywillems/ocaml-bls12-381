@@ -1,88 +1,88 @@
 (executable
  (name bench_g1)
  (modules bench_g1)
- (libraries bls12-381-unix core core_bench))
+ (libraries bls12-381 core core_bench))
 
 (executable
  (name bench_g1_bulk)
  (modules bench_g1_bulk)
- (libraries bls12-381-unix))
+ (libraries bls12-381))
 
 ; (executable
 ;  (name bench_g1_pippenger)
 ;  (modules bench_g1_pippenger)
-;  (libraries bls12-381-unix domainslib))
+;  (libraries bls12-381 domainslib))
 
 (executable
  (name bench_g2_bulk)
  (modules bench_g2_bulk)
- (libraries bls12-381-unix))
+ (libraries bls12-381))
 
 (executable
  (name bench_fq12)
  (modules bench_fq12)
- (libraries core_bench bls12-381-unix))
+ (libraries core_bench bls12-381))
 
 (executable
  (name bench_fr_bulk)
  (modules bench_fr_bulk)
- (libraries bls12-381-unix))
+ (libraries bls12-381))
 
 (executable
  (name bench_g2)
  (modules bench_g2)
- (libraries bls12-381-unix core core_bench))
+ (libraries bls12-381 core core_bench))
 
 (executable
  (name bench_fr)
  (modules bench_fr)
- (libraries bls12-381-unix core core_bench))
+ (libraries bls12-381 core core_bench))
 
 (executable
  (name bench_pairing)
  (modules bench_pairing)
- (libraries bls12-381-unix core core_bench))
+ (libraries bls12-381 core core_bench))
 
 (executable
  (name bench_pairing_slow)
  (modules bench_pairing_slow)
- (libraries bls12-381-unix))
+ (libraries bls12-381))
 
 (executable
  (name bench_signature)
  (modules bench_signature)
- (libraries bls12-381-unix core core_bench))
+ (libraries bls12-381 core core_bench))
 
-(copy_files ../test/blst/{poseidon128_ark.ml,poseidon128_mds.ml})
+(copy_files ../test/{poseidon128_ark.ml,poseidon128_mds.ml})
 
 (executable
  (name bench_poseidon128)
  (modules bench_poseidon128 poseidon128_ark poseidon128_mds)
- (libraries bls12-381-unix core core_bench))
+ (libraries bls12-381 core core_bench))
 
-(copy_files ../test/blst/{rescue_ark.ml,rescue_mds.ml})
+(copy_files ../test/{rescue_ark.ml,rescue_mds.ml})
 
 (executable
  (name bench_rescue)
  (modules bench_rescue rescue_ark rescue_mds)
- (libraries bls12-381-unix core core_bench))
+ (libraries bls12-381 core core_bench))
 
 (executable
  (name bench_fft)
  (modules bench_fft)
- (libraries bls12-381-unix core core_bench))
+ (libraries bls12-381 core core_bench))
 
 (executable
  (name bench_fft_g1)
  (modules bench_fft_g1)
- (libraries bls12-381-unix core core_bench))
+ (libraries bls12-381 core core_bench))
 
 (executable
  (name bench_fft_g2)
  (modules bench_fft_g2)
- (libraries bls12-381-unix core core_bench))
+ (libraries bls12-381 core core_bench))
 
 (executable
  (name bench_fft_great_domain)
  (modules bench_fft_great_domain)
- (libraries bls12-381-unix))
+ (libraries bls12-381))

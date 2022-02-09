@@ -9,42 +9,42 @@
 (executable
  (name generate_pairing_vectors)
  (modules generate_pairing_vectors)
- (libraries hex bls12-381-unix))
+ (libraries hex bls12-381))
 
 (executable
  (name generate_miller_loop_vectors)
  (modules generate_miller_loop_vectors)
- (libraries hex bls12-381-unix))
+ (libraries hex bls12-381))
 
 (executable
  (name generate_final_exponentiation_vectors)
  (modules generate_final_exponentiation_vectors)
- (libraries hex bls12-381-unix))
+ (libraries hex bls12-381))
 
 (executable
  (name generate_g1_test_vectors)
  (modules generate_g1_test_vectors)
- (libraries hex bls12-381-unix))
+ (libraries hex bls12-381))
 
 (executable
  (name generate_fr_test_vectors)
  (modules generate_fr_test_vectors)
- (libraries hex bls12-381-unix))
+ (libraries hex bls12-381))
 
 (executable
  (name generate_g2_test_vectors)
  (modules generate_g2_test_vectors)
- (libraries hex bls12-381-unix))
+ (libraries hex bls12-381))
 
 (executable
  (name generate_hash_to_curve_vectors)
  (modules generate_hash_to_curve_vectors)
- (libraries hex bls12-381-unix))
+ (libraries hex bls12-381))
 
 (executable
  (name generate_test_vectors_from_bls_sigs_ref_for_blst)
  (modules generate_test_vectors_from_bls_sigs_ref_for_blst)
- (libraries hex bls12-381-unix core))
+ (libraries hex bls12-381 core))
 
 (rule
  (alias generate_test_vectors_for_bls_sig_g2_basic)

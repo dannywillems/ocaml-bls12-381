@@ -1,4 +1,4 @@
-(copy_files ../../common/{fft.ml,fft.mli})
+(copy_files ../common/{fft.ml,fft.mli})
 
 (copy_files
   primitives/poseidon128/{caml_poseidon128_stubs.c,poseidon128.h,poseidon128.c})
@@ -41,8 +41,8 @@
      (run cp libblst/libblst.dylib dllblst.so))))))
 
 (library
- (public_name bls12-381-unix)
- (name bls12_381_unix)
+ (public_name bls12-381)
+ (name bls12_381)
  (modules
   bls12_381
   fr
@@ -57,11 +57,10 @@
   fft
   poseidon128
   rescue)
- (implements bls12-381)
  (instrumentation
   (backend bisect_ppx))
  (private_modules fq fq2 fft)
- (libraries hex integers zarith)
+ (libraries hex integers zarith ff-sig)
  (library_flags :standard -linkall -ccopt -lpthread)
  (foreign_archives blst)
  (foreign_stubs
@@ -75,4 +74,4 @@
  (files libblst/bindings/blst.h libblst/bindings/blst_aux.h
    bindings/blst_misc.h)
  (section lib)
- (package bls12-381-unix))
+ (package bls12-381))

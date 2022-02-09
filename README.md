@@ -1,6 +1,6 @@
 # OCaml implementation of BLS12-381
 
-This library provides a fast UNIX implementation of:
+This library provides a fast implementation of:
 - operations over the scalar field, including (i)FFT.
 - operations over the groups G1 and G2, including EC-FFT, hash_to_curve as
   described [in this
@@ -56,25 +56,22 @@ is the compressed encoding of a point.
 
 
 ```shell
-# if you implement a library and you don't need an actual implementation
 opam install bls12-381
-# to target UNIX
-opam install bls12-381-unix
 ```
 
-By default, if the architecture supports ADX, `bls12-381-unix` with be compiled using ADX
+By default, if the architecture supports ADX, `bls12-381` with be compiled using ADX
 opcodes (giving optimisations up to 20% for some arithmetic operations). If you
 don't want to build using ADX, you can add the environment variable
 `BLST_PORTABLE` and set it to any value.
 For instance,
 ```
-BLST_PORTABLE=y opam install bls12-381-unix
+BLST_PORTABLE=y opam install bls12-381
 ```
-will instruct to build bls12-381-unix without ADX. This might be useful if you
+will instruct to build bls12-381 without ADX. This might be useful if you
 build docker images on ADX machines but you need the image to be portable on
 architecture not supporting ADX.
 
-If the architecture does not support ADX, `bls12-381-unix` will be compiled without ADX opcodes.
+If the architecture does not support ADX, `bls12-381` will be compiled without ADX opcodes.
 
 ## Run tests
 
@@ -87,12 +84,6 @@ To get the coverage:
 dune runtest --instrument-with bisect_ppx --force
 bisect-ppx-report html
 ```
-
-## How to use in my project
-
-If you are developing a library using `bls12-381`, you only need to add `bls12-381` in the dependency list.
-However, if you are writing a binary, three packages are relevant:
-- `bls12-381-unix`: to be used for UNIX
 
 ## Run the benchmarks
 
