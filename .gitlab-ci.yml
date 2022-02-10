@@ -275,7 +275,7 @@ opam-install-and-remove:
     - opam depext bls12-381.dev -y -v
     - opam install bls12-381.dev -y -v --deps-only
     - opam install bls12-381.dev -y -v
-    - opam remove -a -y bls12-38.dev
+    - opam remove -a -y bls12-381.dev
   rules:
     - when: always
 
