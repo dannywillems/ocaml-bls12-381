@@ -26,6 +26,6 @@ let () =
   match Array.to_list Sys.argv with
   | [] | [_] -> exit 1
   | _ :: rest ->
-      let call_wasm = List.concat_map process_file rest in
+      let call_wasm = List.concat (List.map process_file rest) in
       let all = "_malloc" :: "_free" :: call_wasm in
       all |> List.sort_uniq (fun a b -> compare a b) |> List.iter print_endline
