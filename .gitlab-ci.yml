@@ -166,7 +166,8 @@ build-ocaml-4.14-debian-11:
     - eval $(opam env)
     - opam update
     - opam depext -i -y conf-pkg-config conf-libffi
-    - sudo apk add build-base emscripten nodejs
+    - sudo apk add build-base
+    # - sudo apk add emscripten-fastcomp nodejs
     # List versions and environments
     - ocaml --version
     - opam --version
@@ -181,7 +182,7 @@ build-ocaml-4.14-debian-11:
     - opam install bls12-381 -y --with-test --deps-only
     - dune build @install
     - dune build @runtest
-    - dune build @runtest-js
+    # - dune build @runtest-js
   rules:
     - when: always
 
