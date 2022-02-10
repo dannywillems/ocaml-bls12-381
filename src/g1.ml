@@ -267,16 +267,20 @@ module G1 = struct
   let b = Fq.(one + one + one + one)
 
   let rec random ?state () =
-    (match state with None -> () | Some state -> Random.set_state state) ;
-    let x = Fq.random () in
+    let x = Fq.random ?state () in
     let xx = Fq.(x * x) in
     let xxx = Fq.(x * xx) in
     let xxx_plus_b = Fq.(xxx + b) in
     let y_opt = Fq.sqrt_opt xxx_plus_b in
     match y_opt with
-    | None -> random ()
+    | None -> random ?state ()
     | Some y ->
-        let y = if Random.bool () then y else Fq.negate y in
+        let random_bool =
+          match state with
+          | None -> Random.bool ()
+          | Some state -> Random.State.bool state
+        in
+        let y = if random_bool then y else Fq.negate y in
         let p_affine = Stubs.allocate_g1_affine () in
         ignore @@ Stubs.set_affine_coordinates p_affine x y ;
         let p = Stubs.allocate_g1 () in

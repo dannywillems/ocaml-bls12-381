@@ -88,9 +88,13 @@ module Fq = struct
     buffer_bytes
 
   let rec random ?state () =
-    (match state with None -> () | Some state -> Random.set_state state) ;
+    let random_int =
+      match state with
+      | None -> Random.int
+      | Some state -> Random.State.int state
+    in
     let random_bytes =
-      Bytes.init size_in_bytes (fun _ -> char_of_int @@ Random.int 256)
+      Bytes.init size_in_bytes (fun _ -> char_of_int @@ random_int 256)
     in
     let res = of_bytes_opt random_bytes in
     match res with None -> random ?state () | Some res -> res

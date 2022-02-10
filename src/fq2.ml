@@ -83,9 +83,8 @@ module Fq2 = struct
     buffer
 
   let random ?state () =
-    (match state with None -> () | Some state -> Random.set_state state) ;
-    let x = Fq.random () in
-    let y = Fq.random () in
+    let x = Fq.random ?state () in
+    let y = Fq.random ?state () in
     let buffer = Stubs.allocate_fp2 () in
     let x_bytes = Fq.to_bytes x in
     let y_bytes = Fq.to_bytes y in

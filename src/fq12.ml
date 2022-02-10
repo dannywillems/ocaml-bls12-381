@@ -71,12 +71,11 @@ module Fq12 = struct
       Some buffer
 
   let random ?state () =
-    (match state with None -> () | Some state -> Random.set_state state) ;
     let buffer = Stubs.allocate_fq12 () in
     let bs =
       Bytes.concat
         Bytes.empty
-        (List.init 12 (fun _ -> Fq.(to_bytes (random ()))))
+        (List.init 12 (fun _ -> Fq.(to_bytes (random ?state ()))))
     in
     ignore @@ Stubs.of_bytes buffer bs ;
     buffer

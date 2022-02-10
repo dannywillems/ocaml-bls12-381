@@ -153,12 +153,16 @@ module Fr = struct
   let is_one s = Stubs.is_one s
 
   let rec random ?state () =
-    (match state with None -> () | Some state -> Random.set_state state) ;
+    let random_int =
+      match state with
+      | None -> Random.int
+      | Some state -> Random.State.int state
+    in
     let random_bytes =
-      Bytes.init size_in_bytes (fun _ -> char_of_int @@ Random.int 256)
+      Bytes.init size_in_bytes (fun _ -> char_of_int @@ random_int 256)
     in
     let res = of_bytes_opt random_bytes in
-    match res with None -> random ?state:None () | Some res -> res
+    match res with None -> random ?state () | Some res -> res
 
   let rec non_null_random ?state () =
     let r = random ?state () in
@@ -300,7 +304,7 @@ module Fr = struct
     if is_zero x then true else Z.equal (legendre_symbol x) Z.one
 
   let rec pick_non_square () =
-    let z = random () in
+    let z = random ?state:None () in
     if Z.equal (legendre_symbol z) (Z.of_int (-1)) then z
     else pick_non_square ()
 
