@@ -19,6 +19,21 @@ stages:
 #   rules:
 #     - when: always
 
+lint-js:
+  image: node:lts
+  stage: lint
+  before_script:
+    - cd .ci/js
+    - npm install -d
+  script:
+    - ./node_modules/eslint/bin/eslint.js -c .eslintrc.js ../../src/runtime_helper.js
+    - ./node_modules/eslint/bin/eslint.js -c .eslintrc.js ../../src/bindings/blst_bindings_stubs.js
+    - ./node_modules/eslint/bin/eslint.js -c .eslintrc.js ../../src/primitives/poseidon128/caml_poseidon128_stubs.js
+    - ./node_modules/eslint/bin/eslint.js -c .eslintrc.js ../../src/primitives/rescue/caml_rescue_stubs.js
+  rules:
+    - when: always
+  allow_failure: true
+
 lint:
   stage: lint
   image: ocaml/opam:debian-ocaml-4.12
@@ -60,11 +75,13 @@ lint-c:
     - sudo apt-get update
     - eval $(opam env)
     - opam update
+    - sudo apt-get install emscripten nodejs -y
     - opam depext -i -y conf-pkg-config conf-libffi
     # List versions and environments
     - ocaml --version
     - opam --version
     - cc --version
+    - emcc --version
     - echo $OPAM_SWITCH_PREFIX
   script:
     # Install external dependencies
@@ -77,7 +94,8 @@ lint-c:
     - opam install core_bench
     - dune build
     - dune build @install
-    - dune runtest
+    - dune build @runtest
+    - dune build @runtest-js
   rules:
     - when: always
 
@@ -148,7 +166,7 @@ build-ocaml-4.14-debian-11:
     - eval $(opam env)
     - opam update
     - opam depext -i -y conf-pkg-config conf-libffi
-    - sudo apk add build-base
+    - sudo apk add build-base emscripten nodejs
     # List versions and environments
     - ocaml --version
     - opam --version
@@ -162,7 +180,8 @@ build-ocaml-4.14-debian-11:
     # Install the dependencies
     - opam install bls12-381 -y --with-test --deps-only
     - dune build @install
-    - dune runtest
+    - dune build @runtest
+    - dune build @runtest-js
   rules:
     - when: always
 
