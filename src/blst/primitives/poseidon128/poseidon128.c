@@ -52,8 +52,12 @@ void apply_matrix_multiplication(poseidon128_ctxt_t *ctxt) {
   for (int i = 0; i < WIDTH; i++) {
     blst_fr_from_uint64(res + i, ZERO);
     for (int j = 0; j < WIDTH; j++) {
-      blst_fr_mul(&buffer, &POSEIDON128_MDS[i][j], &ctxt->s[j]);
-      blst_fr_add(res + i, res + i, &buffer);
+      if (j == 0) {
+        blst_fr_mul(res + i, &POSEIDON128_MDS[i][j], &ctxt->s[j]);
+      } else {
+        blst_fr_mul(&buffer, &POSEIDON128_MDS[i][j], &ctxt->s[j]);
+        blst_fr_add(res + i, res + i, &buffer);
+      }
     }
   }
   for (int i = 0; i < WIDTH; i++) {
