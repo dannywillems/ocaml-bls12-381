@@ -56,12 +56,14 @@ void marvellous_apply_nonlinear_alphainv(rescue_ctxt_t *ctxt) {
 void marvellous_apply_linear(rescue_ctxt_t *ctxt) {
   blst_fr buffer;
   blst_fr res[WIDTH];
-  uint64_t zero[4] = {0, 0, 0, 0};
   for (int i = 0; i < WIDTH; i++) {
-    blst_fr_from_uint64(res + i, zero);
     for (int j = 0; j < WIDTH; j++) {
-      blst_fr_mul(&buffer, &RESCUE_MDS[i][j], &ctxt->s[j]);
-      blst_fr_add(res + i, res + i, &buffer);
+      if (j == 0) {
+        blst_fr_mul(res + i, &RESCUE_MDS[i][j], &ctxt->s[j]);
+      } else {
+        blst_fr_mul(&buffer, &RESCUE_MDS[i][j], &ctxt->s[j]);
+        blst_fr_add(res + i, res + i, &buffer);
+      }
     }
   }
   for (int i = 0; i < WIDTH; i++) {
