@@ -322,6 +322,7 @@ check-blst-headers-are-installed:
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst.h
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst_aux.h
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst_misc.h
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/caml_bls12_381_stubs.h
   rules:
     - when: always
 
