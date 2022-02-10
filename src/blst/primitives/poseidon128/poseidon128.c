@@ -5,8 +5,6 @@
 blst_fr POSEIDON128_ARK[NB_CONSTANTS];
 blst_fr POSEIDON128_MDS[WIDTH][WIDTH];
 
-uint64_t ZERO[4] = {0, 0, 0, 0};
-
 size_t poseidon128_ctxt_sizeof() { return sizeof(poseidon128_ctxt_t); }
 
 int poseidon128_constants_init(blst_fr *ark, blst_fr **mds, int ark_len,
@@ -50,7 +48,6 @@ void apply_matrix_multiplication(poseidon128_ctxt_t *ctxt) {
   blst_fr buffer;
   blst_fr res[WIDTH];
   for (int i = 0; i < WIDTH; i++) {
-    blst_fr_from_uint64(res + i, ZERO);
     for (int j = 0; j < WIDTH; j++) {
       if (j == 0) {
         blst_fr_mul(res + i, &POSEIDON128_MDS[i][j], &ctxt->s[j]);
