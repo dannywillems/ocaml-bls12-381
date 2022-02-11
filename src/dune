@@ -50,8 +50,8 @@
     %{dep:blst_wrapper.c} %{dep:poseidon128.c} %{dep:rescue.c}
     -DENABLE_EMSCRIPTEN_STUBS -DENABLE_MODULE_RECOVERY -s
     ALLOW_MEMORY_GROWTH=1 -s WASM=1 -s MALLOC=emmalloc -s EXPORT_ES6=0 -s
-    FILESYSTEM=0 -s MODULARIZE=1 -s "EXPORT_NAME='_BLS12381'" -s
-    "EXPORTED_FUNCTIONS=@needed-wasm-names" --no-entry)))
+    FILESYSTEM=0 -s MODULARIZE=1 -s EXPORT_NAME='_BLS12381' -s
+    EXPORTED_FUNCTIONS=@needed-wasm-names --no-entry)))
 
 (library
  (public_name bls12-381)
