@@ -1052,14 +1052,14 @@ function allocate_pairing_stubs(unit) {
 //Requires: wasm_call
 //Requires: Blst_pairing_val
 //Requires: integers_int32_of_uint32
-//Requires: Blst_pairing
+//Requires: Blst_pairing, Do_not_free
 function caml_blst_pairing_init_stubs(check, dst, dst_length) {
   var b = new Blst_pairing();
   wasm_call(
     "_blst_pairing_init",
     Blst_pairing_val(b),
     check,
-    dst,
+    new Do_not_free(dst),
     integers_int32_of_uint32(dst_length)
   );
   return b;
@@ -1200,7 +1200,7 @@ function caml_blst_pairing_chk_n_mul_n_aggr_pk_in_g1_stubs(
   aug_length
 ) {
   var signature_c;
-  if (!signature) {
+  if (signature == 0) {
     signature_c = null;
   } else {
     signature_c = Blst_p2_affine_val(signature[1]);
@@ -1345,7 +1345,7 @@ function caml_blst_pairing_chk_n_mul_n_aggr_pk_in_g2_stubs(
   aug_length
 ) {
   var signature_c = new Blst_p1_affine();
-  if (!signature) {
+  if (signature == 0) {
     signature_c = null;
   } else {
     signature_c = Blst_p1_affine_val(signature[1]);

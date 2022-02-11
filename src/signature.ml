@@ -301,6 +301,8 @@ module MinPk = struct
       | None -> false
       | Some aggregated_signature ->
           with_aggregation_ctxt ciphersuite (fun ctxt ->
+              Gc.full_major () ;
+              Gc.full_major () ;
               let signature_affine = G2.Stubs.allocate_g2_affine () in
               ignore @@ G2.Stubs.to_affine signature_affine aggregated_signature ;
               let res = aux (Some signature_affine) pks_with_msgs ctxt in

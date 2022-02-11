@@ -1,5 +1,6 @@
 //Provides: wasm_call
 //Requires: Ml_Bigarray, MlBytes, caml_failwith, caml_ml_bytes_length, caml_array_of_bytes
+//Requires: Do_not_free
 function wasm_call() {
   var g = globalThis;
   var M = g._BLS12381;
@@ -14,6 +15,11 @@ function wasm_call() {
   var argsu = new g.Map();
   for (var i = 0; i < args.length; i++) {
     var x = args[i];
+    var do_not_free = false;
+    if (x instanceof Do_not_free) {
+      do_not_free = true;
+      x = x.x
+    }
     if (typeof x == "number" || typeof x == "boolean" || x === null) {
       // Theses primitive types can be passed to wasm
       continue;
@@ -30,10 +36,10 @@ function wasm_call() {
       if (argsu.get(x)) {
         argsc[i] = argsu.get(x);
       } else {
-        var len = caml_ml_bytes_length(x);
-        var p = M._malloc(len);
-        M.HEAPU8.set(caml_array_of_bytes(x), p);
-        argsu.set(x, p);
+        var a = caml_array_of_bytes(x);
+        var p = M._malloc(a.length);
+        M.HEAPU8.set(a, p);
+        if(!do_not_free)argsu.set(x, p);
         argsc[i] = p;
       }
     } else if (
@@ -54,9 +60,8 @@ function wasm_call() {
         }
       }
       var p = M._malloc(ps.length * 4);
-      var a = new g.Uint8Array(ps.buffer);
-      M.HEAPU8.set(a, p);
-      argsu.set(a, p);
+      M.HEAPU32.set(ps, p / 4);
+      argsu.set(ps, p);
       argsc[i] = p;
     } else {
       // Other types of arguments are not handled yet
@@ -100,18 +105,18 @@ function wasm_call() {
     if (x instanceof g.Uint8Array) {
       x.set(new g.Uint8Array(M.HEAPU8.buffer, p, x.length));
       M._free(p);
+    } else if (x instanceof g.Uint32Array) {
+      M._free(p);
     } else if (x instanceof MlBytes) {
       var a = caml_array_of_bytes(x);
-      var b = new g.Uint8Array(M.HEAPU8.buffer, p, a.length);
       for (var i = 0; i < a.length; i++) {
-        a[i] = b[i];
+        a[i] = M.HEAPU8[p + i];
       }
       M._free(p);
     } else {
       caml_failwith("call_wasm: Impossible");
     }
   }
-
   return r;
 }
 
@@ -119,4 +124,9 @@ function wasm_call() {
 function caml_blst_memcpy(dest, src, size) {
   if (src.length != size) src = src.subarray(0, size);
   dest.set(src, 0);
+}
+
+//Provides: Do_not_free
+function Do_not_free(x) {
+  this.x = x;
 }
