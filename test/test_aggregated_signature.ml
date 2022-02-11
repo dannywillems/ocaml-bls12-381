@@ -105,21 +105,21 @@ struct
             "Sign and verify corret signature with correct pks and msgs"
             `Quick
             (Test_ec_make.repeat
-               100
+               10
                test_sign_and_verify_correct_signature_with_correct_pks_and_msgs);
           test_case
             "Sign and verify corret signature with correct pks and some \
              incorrect msgs"
             `Quick
             (Test_ec_make.repeat
-               100
+               10
                test_sign_and_verify_correct_signature_with_correct_pks_and_some_incorrect_msgs);
           test_case
             "Sign and verify corret signature with some incorrect pks and \
              correct msgs"
             `Quick
             (Test_ec_make.repeat
-               100
+               10
                test_sign_and_verify_correct_signature_with_some_incorrect_pks_and_correct_msgs)
         ] )
   end
@@ -397,41 +397,41 @@ struct
             "Sign and verify correct signature with correct pks, pops and msg"
             `Quick
             (Test_ec_make.repeat
-               100
+               10
                test_sign_and_verify_correct_signature_with_correct_pks_pops_and_msg);
           test_case
             "Sign and verify incorrect signature with correct pks, pops and msg"
             `Quick
             (Test_ec_make.repeat
-               100
+               10
                test_sign_and_verify_incorrect_signature_with_correct_pks_pops_msg);
           test_case
             "Sign and verify correct signature with correct pks, pops and \
              incorrect msg"
             `Quick
             (Test_ec_make.repeat
-               100
+               10
                test_sign_and_verify_correct_signature_with_correct_pks_pops_and_incorrect_msg);
           test_case
             "Sign and verify correct signature with some incorrect pks and \
              correct pops and msg"
             `Quick
             (Test_ec_make.repeat
-               100
+               10
                test_sign_and_verify_correct_signature_with_some_incorrect_pks_and_correct_pops_and_msg);
           test_case
             "Sign and verify correct signature with some incorrect pks and \
              pops and correct msg"
             `Quick
             (Test_ec_make.repeat
-               100
+               10
                test_sign_and_verify_correct_signature_with_some_incorrect_pks_pops_and_correct_msg);
           test_case
             "Sign and verify correct signature with correct pks and some \
              incorrect pops and correct msg"
             `Quick
             (Test_ec_make.repeat
-               100
+               10
                test_sign_and_verify_correct_signature_with_some_correct_pks_and_incorrect_pops_and_msg)
         ] )
   end
