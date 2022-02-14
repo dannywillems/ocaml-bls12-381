@@ -1,42 +1,45 @@
 
 //Provides: bls_allocate_mlbytes
 //Requires: MlBytes, caml_failwith, caml_array_of_bytes
-function bls_allocate_mlbytes(x){
+function bls_allocate_mlbytes(x) {
   var g = globalThis;
   var M = g._BLS12381;
-  if (!M) caml_failwith("bls12-381 was not initialized");
+  if (!M) caml_failwith('bls12-381 was not initialized');
   var a = caml_array_of_bytes(x);
   var p = M._malloc(a.length);
   M.HEAPU8.set(a, p);
-  return p
+  return p;
 }
 
 //Provides: bls_free
 //Requires: caml_failwith
-function bls_free(p){
+function bls_free(p) {
   var g = globalThis;
   var M = g._BLS12381;
-  if (!M) caml_failwith("bls12-381 was not initialized");
-  M._free(p)
+  if (!M) caml_failwith('bls12-381 was not initialized');
+  M._free(p);
 }
 
 //Provides: wasm_call
-//Requires: Ml_Bigarray, MlBytes, caml_failwith, caml_ml_bytes_length, caml_array_of_bytes
+//Requires: Ml_Bigarray, MlBytes
+//Requires: caml_failwith, caml_ml_bytes_length, caml_array_of_bytes
 function wasm_call() {
   var g = globalThis;
   var M = g._BLS12381;
   var f = arguments[0];
-  if (!M) caml_failwith("bls12-381 was not initialized");
-  if (!M[f]) caml_failwith(f + " is not implemented");
+  if (!M) caml_failwith('bls12-381 was not initialized');
+  if (!M[f]) caml_failwith(f + ' is not implemented');
   var args = Array.prototype.slice.call(arguments, 1);
-  // argsc is the array of argument that we will pass to wasm, it will be mutated before the call.
+  // argsc is the array of argument that we will pass to wasm,
+  // it will be mutated before the call.
   var argsc = args.slice();
-  // argsu is used to handle the case where multiple arguments are physically the same.
+  // argsu is used to handle the case where multiple arguments
+  // are physically the same.
   // We don't want to copy the piece of memory multiple time into wasm
   var argsu = new g.Map();
   for (var i = 0; i < args.length; i++) {
     var x = args[i];
-    if (typeof x == "number" || typeof x == "boolean" || x === null) {
+    if (typeof x == 'number' || typeof x == 'boolean' || x === null) {
       // Theses primitive types can be passed to wasm
       continue;
     } else if (x instanceof g.Uint8Array) {
@@ -60,7 +63,7 @@ function wasm_call() {
       }
     } else if (
       x instanceof Array &&
-      x.every(function (x) {
+      x.every(function(x) {
         return x instanceof g.Uint8Array;
       })
     ) {
@@ -82,28 +85,28 @@ function wasm_call() {
     } else {
       // Other types of arguments are not handled yet
       // Try to report and informative error
-      var r = "(";
+      var r = '(';
       for (i = 0; i < args.length; i++) {
-        if (i != 0) r += ", ";
-        var err = "*ERR*";
+        if (i != 0) r += ', ';
+        var err = '*ERR*';
         var x = args[i];
         var typeof_x = typeof x;
         // Valid argument type
-        if (typeof_x == "number" || typeof_x == "boolean") r += typeof_x;
-        else if (x instanceof g.Uint8Array) r += "uint8";
+        if (typeof_x == 'number' || typeof_x == 'boolean') r += typeof_x;
+        else if (x instanceof g.Uint8Array) r += 'uint8';
         // Invalid argument type
-        else if (x instanceof MlBytes) r += "bytes";
-        else if (x == null) r += err + "null";
-        else if (x == undefined) r += err + "undefined";
+        else if (x instanceof MlBytes) r += 'bytes';
+        else if (x == null) r += err + 'null';
+        else if (x == undefined) r += err + 'undefined';
         else r += err + typeof_x;
       }
-      r += ")";
+      r += ')';
       g.console.error(
-        "call_wasm: unsupported argument type: " + f + r,
-        new Error()
+          'call_wasm: unsupported argument type: ' + f + r,
+          new Error()
       );
       caml_failwith(
-        "call_wasm: " + f + " called with unsupported argument type: " + r
+          'call_wasm: ' + f + ' called with unsupported argument type: ' + r
       );
     }
   }
@@ -130,7 +133,7 @@ function wasm_call() {
       }
       M._free(p);
     } else {
-      caml_failwith("call_wasm: Impossible");
+      caml_failwith('call_wasm: Impossible');
     }
   }
   return r;

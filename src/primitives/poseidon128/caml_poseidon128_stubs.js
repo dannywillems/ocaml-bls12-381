@@ -6,7 +6,7 @@ function Poseidon128_ctxt_val(v) {
 //Provides: poseidon128_ctxt_sizeof
 //Requires: wasm_call
 function poseidon128_ctxt_sizeof() {
-  return wasm_call("_poseidon128_ctxt_sizeof");
+  return wasm_call('_poseidon128_ctxt_sizeof');
 }
 
 //Provides: Blst_poseidon128
@@ -25,11 +25,11 @@ function caml_poseidon128_allocate_ctxt_stubs(unit) {
 //Requires: blst_fr_sizeof, Blst_fr_val
 //Requires: wasm_call
 function caml_poseidon128_constants_init_stubs(
-  vark,
-  vmds,
-  ark_len,
-  mds_nb_rows,
-  mds_nb_cols
+    vark,
+    vmds,
+    ark_len,
+    mds_nb_rows,
+    mds_nb_cols
 ) {
   var fr_len = blst_fr_sizeof();
   var ark = new globalThis.Uint8Array(ark_len * fr_len);
@@ -46,12 +46,12 @@ function caml_poseidon128_constants_init_stubs(
   }
 
   var res /* int */ = wasm_call(
-    "_poseidon128_constants_init",
-    ark,
-    mds,
-    ark_len,
-    mds_nb_rows,
-    mds_nb_cols
+      '_poseidon128_constants_init',
+      ark,
+      mds,
+      ark_len,
+      mds_nb_rows,
+      mds_nb_cols
   );
   return res;
 }
@@ -60,11 +60,11 @@ function caml_poseidon128_constants_init_stubs(
 //Requires: wasm_call, Poseidon128_ctxt_val, Blst_fr_val
 function caml_poseidon128_init_stubs(ctxt, a, b, c) {
   wasm_call(
-    "_poseidon128_init",
-    Poseidon128_ctxt_val(ctxt),
-    Blst_fr_val(a),
-    Blst_fr_val(b),
-    Blst_fr_val(c)
+      '_poseidon128_init',
+      Poseidon128_ctxt_val(ctxt),
+      Blst_fr_val(a),
+      Blst_fr_val(b),
+      Blst_fr_val(c)
   );
   return 0;
 }
@@ -72,7 +72,7 @@ function caml_poseidon128_init_stubs(ctxt, a, b, c) {
 //Provides: caml_poseidon128_apply_perm_stubs
 //Requires: wasm_call, Poseidon128_ctxt_val
 function caml_poseidon128_apply_perm_stubs(ctxt) {
-  wasm_call("_poseidon128_apply_perm", Poseidon128_ctxt_val(ctxt));
+  wasm_call('_poseidon128_apply_perm', Poseidon128_ctxt_val(ctxt));
   return 0;
 }
 
@@ -80,11 +80,11 @@ function caml_poseidon128_apply_perm_stubs(ctxt) {
 //Requires: wasm_call, Poseidon128_ctxt_val, Blst_fr_val
 function caml_poseidon128_get_state_stubs(a, b, c, ctxt) {
   wasm_call(
-    "_poseidon128_get_state",
-    Blst_fr_val(a),
-    Blst_fr_val(b),
-    Blst_fr_val(c),
-    Poseidon128_ctxt_val(ctxt)
+      '_poseidon128_get_state',
+      Blst_fr_val(a),
+      Blst_fr_val(b),
+      Blst_fr_val(c),
+      Poseidon128_ctxt_val(ctxt)
   );
   return 0;
 }

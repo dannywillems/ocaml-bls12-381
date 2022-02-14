@@ -14,10 +14,10 @@ let process_file f =
              rep space;
              str "(";
              rep space;
-             str "\"";
+             str "'";
              group (rep1 wordc);
              rep space;
-             str "\"" ]))
+             str "'" ]))
   in
   let groups = Re.all re content in
   List.map (fun g -> Re.Group.get g 1) groups

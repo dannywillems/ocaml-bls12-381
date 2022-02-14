@@ -19,14 +19,14 @@ function reorg_fr_coefficients(n, logn, coefficients, buffer) {
     if (i < reverse_i) {
       caml_blst_memcpy(buffer, Blst_fr_val(coefficients[i + 1]), fr_len);
       caml_blst_memcpy(
-        Blst_fr_val(coefficients[i + 1]),
-        Blst_fr_val(coefficients[reverse_i + 1]),
-        fr_len
+          Blst_fr_val(coefficients[i + 1]),
+          Blst_fr_val(coefficients[reverse_i + 1]),
+          fr_len
       );
       caml_blst_memcpy(
-        Blst_fr_val(coefficients[reverse_i + 1]),
-        buffer,
-        fr_len
+          Blst_fr_val(coefficients[reverse_i + 1]),
+          buffer,
+          fr_len
       );
     }
   }
@@ -49,22 +49,22 @@ function caml_fft_fr_inplace_stubs(coefficients, domain, log_domain_size) {
     while (k < domain_size) {
       for (var j = 0; j < m; j++) {
         wasm_call(
-          "_blst_fr_mul",
-          buffer,
-          Blst_fr_val(coefficients[k + j + m + 1]),
-          Blst_fr_val(domain[exponent * j + 1])
+            '_blst_fr_mul',
+            buffer,
+            Blst_fr_val(coefficients[k + j + m + 1]),
+            Blst_fr_val(domain[exponent * j + 1])
         );
         wasm_call(
-          "_blst_fr_sub",
-          Blst_fr_val(coefficients[k + j + m + 1]),
-          Blst_fr_val(coefficients[k + j + 1]),
-          buffer
+            '_blst_fr_sub',
+            Blst_fr_val(coefficients[k + j + m + 1]),
+            Blst_fr_val(coefficients[k + j + 1]),
+            buffer
         );
         wasm_call(
-          "_blst_fr_add",
-          Blst_fr_val(coefficients[k + j + 1]),
-          Blst_fr_val(coefficients[k + j + 1]),
-          buffer
+            '_blst_fr_add',
+            Blst_fr_val(coefficients[k + j + 1]),
+            Blst_fr_val(coefficients[k + j + 1]),
+            buffer
         );
       }
       k = k + 2 * m;
@@ -79,10 +79,10 @@ function caml_fft_fr_inplace_stubs(coefficients, domain, log_domain_size) {
 function caml_mul_map_fr_inplace_stubs(coefficients, factor, domain_size) {
   for (var i = 0; i < domain_size; i++) {
     wasm_call(
-      "_blst_fr_mul",
-      Blst_fr_val(coefficients[i + 1]),
-      Blst_fr_val(coefficients[i + 1]),
-      Blst_fr_val(factor)
+        '_blst_fr_mul',
+        Blst_fr_val(coefficients[i + 1]),
+        Blst_fr_val(coefficients[i + 1]),
+        Blst_fr_val(factor)
     );
   }
 }
@@ -97,14 +97,14 @@ function reorg_g1_coefficients(n, logn, coefficients, buffer) {
     if (i < reverse_i) {
       caml_blst_memcpy(buffer, Blst_p1_val(coefficients[i + 1]), p1_len);
       caml_blst_memcpy(
-        Blst_p1_val(coefficients[i + 1]),
-        Blst_p1_val(coefficients[reverse_i + 1]),
-        p1_len
+          Blst_p1_val(coefficients[i + 1]),
+          Blst_p1_val(coefficients[reverse_i + 1]),
+          p1_len
       );
       caml_blst_memcpy(
-        Blst_p1_val(coefficients[reverse_i + 1]),
-        buffer,
-        p1_len
+          Blst_p1_val(coefficients[reverse_i + 1]),
+          buffer,
+          p1_len
       );
     }
   }
@@ -131,32 +131,32 @@ function caml_fft_g1_inplace_stubs(coefficients, domain, log_domain_size) {
     while (k < domain_size) {
       for (var j = 0; j < m; j++) {
         wasm_call(
-          "_blst_scalar_from_fr",
-          scalar,
-          Blst_fr_val(domain[exponent * j + 1])
+            '_blst_scalar_from_fr',
+            scalar,
+            Blst_fr_val(domain[exponent * j + 1])
         );
-        wasm_call("_blst_lendian_from_scalar", le_scalar, scalar);
+        wasm_call('_blst_lendian_from_scalar', le_scalar, scalar);
         wasm_call(
-          "_blst_p1_mult",
-          buffer,
-          Blst_p1_val(coefficients[k + j + m + 1]),
-          le_scalar,
-          256
+            '_blst_p1_mult',
+            buffer,
+            Blst_p1_val(coefficients[k + j + m + 1]),
+            le_scalar,
+            256
         );
         caml_blst_memcpy(buffer_neg, buffer, blst_p1_sizeof());
-        wasm_call("_blst_p1_cneg", buffer_neg, 1);
+        wasm_call('_blst_p1_cneg', buffer_neg, 1);
         wasm_call(
-          "_blst_p1_add_or_double",
-          Blst_p1_val(coefficients[k + j + m + 1]),
-          Blst_p1_val(coefficients[k + j + 1]),
-          buffer_neg
+            '_blst_p1_add_or_double',
+            Blst_p1_val(coefficients[k + j + m + 1]),
+            Blst_p1_val(coefficients[k + j + 1]),
+            buffer_neg
         );
 
         wasm_call(
-          "_blst_p1_add_or_double",
-          Blst_p1_val(coefficients[k + j + 1]),
-          Blst_p1_val(coefficients[k + j + 1]),
-          buffer
+            '_blst_p1_add_or_double',
+            Blst_p1_val(coefficients[k + j + 1]),
+            Blst_p1_val(coefficients[k + j + 1]),
+            buffer
         );
       }
       k = k + 2 * m;
@@ -171,16 +171,16 @@ function caml_fft_g1_inplace_stubs(coefficients, domain, log_domain_size) {
 function caml_mul_map_g1_inplace_stubs(coefficients, factor, domain_size) {
   var scalar = Blst_scalar_val(new Blst_scalar());
   var le_scalar = new globalThis.Uint8Array(32);
-  wasm_call("_blst_scalar_from_fr", scalar, Blst_fr_val(factor));
-  wasm_call("_blst_lendian_from_scalar", le_scalar, scalar);
+  wasm_call('_blst_scalar_from_fr', scalar, Blst_fr_val(factor));
+  wasm_call('_blst_lendian_from_scalar', le_scalar, scalar);
 
   for (var i = 0; i < domain_size; i++) {
     wasm_call(
-      "_blst_p1_mult",
-      Blst_p1_val(coefficients[i + 1]),
-      Blst_p1_val(coefficients[i + 1]),
-      le_scalar,
-      256
+        '_blst_p1_mult',
+        Blst_p1_val(coefficients[i + 1]),
+        Blst_p1_val(coefficients[i + 1]),
+        le_scalar,
+        256
     );
   }
 }
@@ -195,14 +195,14 @@ function reorg_g2_coefficients(n, logn, coefficients, buffer) {
     if (i < reverse_i) {
       caml_blst_memcpy(buffer, Blst_p2_val(coefficients[i + 1]), p2_len);
       caml_blst_memcpy(
-        Blst_p2_val(coefficients[i + 1]),
-        Blst_p2_val(coefficients[reverse_i + 1]),
-        p2_len
+          Blst_p2_val(coefficients[i + 1]),
+          Blst_p2_val(coefficients[reverse_i + 1]),
+          p2_len
       );
       caml_blst_memcpy(
-        Blst_p2_val(coefficients[reverse_i + 1]),
-        buffer,
-        p2_len
+          Blst_p2_val(coefficients[reverse_i + 1]),
+          buffer,
+          p2_len
       );
     }
   }
@@ -229,32 +229,32 @@ function caml_fft_g2_inplace_stubs(coefficients, domain, log_domain_size) {
     while (k < domain_size) {
       for (var j = 0; j < m; j++) {
         wasm_call(
-          "_blst_scalar_from_fr",
-          scalar,
-          Blst_fr_val(domain[exponent * j + 1])
+            '_blst_scalar_from_fr',
+            scalar,
+            Blst_fr_val(domain[exponent * j + 1])
         );
-        wasm_call("_blst_lendian_from_scalar", le_scalar, scalar);
+        wasm_call('_blst_lendian_from_scalar', le_scalar, scalar);
         wasm_call(
-          "_blst_p2_mult",
-          buffer,
-          Blst_p2_val(coefficients[k + j + m + 1]),
-          le_scalar,
-          256
+            '_blst_p2_mult',
+            buffer,
+            Blst_p2_val(coefficients[k + j + m + 1]),
+            le_scalar,
+            256
         );
         caml_blst_memcpy(buffer_neg, buffer, blst_p2_sizeof());
-        wasm_call("_blst_p2_cneg", buffer_neg, 1);
+        wasm_call('_blst_p2_cneg', buffer_neg, 1);
         wasm_call(
-          "_blst_p2_add_or_double",
-          Blst_p2_val(coefficients[k + j + m + 1]),
-          Blst_p2_val(coefficients[k + j + 1]),
-          buffer_neg
+            '_blst_p2_add_or_double',
+            Blst_p2_val(coefficients[k + j + m + 1]),
+            Blst_p2_val(coefficients[k + j + 1]),
+            buffer_neg
         );
 
         wasm_call(
-          "_blst_p2_add_or_double",
-          Blst_p2_val(coefficients[k + j + 1]),
-          Blst_p2_val(coefficients[k + j + 1]),
-          buffer
+            '_blst_p2_add_or_double',
+            Blst_p2_val(coefficients[k + j + 1]),
+            Blst_p2_val(coefficients[k + j + 1]),
+            buffer
         );
       }
       k = k + 2 * m;
@@ -269,16 +269,16 @@ function caml_fft_g2_inplace_stubs(coefficients, domain, log_domain_size) {
 function caml_mul_map_g2_inplace_stubs(coefficients, factor, domain_size) {
   var scalar = Blst_scalar_val(new Blst_scalar());
   var le_scalar = new globalThis.Uint8Array(32);
-  wasm_call("_blst_scalar_from_fr", scalar, Blst_fr_val(factor));
-  wasm_call("_blst_lendian_from_scalar", le_scalar, scalar);
+  wasm_call('_blst_scalar_from_fr', scalar, Blst_fr_val(factor));
+  wasm_call('_blst_lendian_from_scalar', le_scalar, scalar);
 
   for (var i = 0; i < domain_size; i++) {
     wasm_call(
-      "_blst_p2_mult",
-      Blst_p2_val(coefficients[i + 1]),
-      Blst_p2_val(coefficients[i + 1]),
-      le_scalar,
-      256
+        '_blst_p2_mult',
+        Blst_p2_val(coefficients[i + 1]),
+        Blst_p2_val(coefficients[i + 1]),
+        le_scalar,
+        256
     );
   }
 }
