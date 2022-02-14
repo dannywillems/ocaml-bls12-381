@@ -75,7 +75,16 @@ lint-c:
     - sudo apt-get update
     - eval $(opam env)
     - opam update
-    - sudo apt-get install emscripten nodejs -y
+    - sudo apt-get install nodejs python3 -y
+
+    # Install emsdk to install emcc
+    - git clone https://github.com/emscripten-core/emsdk.git
+    - cd emsdk
+    - ./emsdk install latest
+    - ./emsdk activate latest
+    - source "./emsdk_env.sh"
+    - cd ../
+
     - opam depext -i -y conf-pkg-config conf-libffi
     # List versions and environments
     - ocaml --version
