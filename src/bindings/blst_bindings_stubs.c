@@ -8,7 +8,6 @@
 #include <caml/fail.h>
 #include <caml/memory.h>
 #include <caml/mlvalues.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
