@@ -166,9 +166,16 @@ build-ocaml-4.14-debian-11:
     - eval $(opam env)
     - opam update
     - opam depext -i -y conf-pkg-config conf-libffi
-    - sudo apk add build-base
-    # - sudo apk add emscripten-fastcomp nodejs
+    - sudo apk add build-base python3
+    # Install emsdk to install emcc
+    - git clone https://github.com/emscripten-core/emsdk.git
+    - cd emsdk
+    - ./emsdk install latest
+    - ./emsdk activate latest
+    - source "./emsdk_env.sh"
+    - cd ../
     # List versions and environments
+    - emcc --version
     - ocaml --version
     - opam --version
     - cc --version
