@@ -730,7 +730,14 @@ CAMLprim value caml_blst_final_exponentiation_stubs(value buffer, value p) {
 }
 
 // For signatures
-static void finalize_free_pairing(value v) { free(Blst_pairing_val(v)); }
+static void finalize_free_pairing(value v) {
+  byte *dst = blst_pairing_get_dst(Blst_pairing_val(v));
+  // See libblst/src/aggregate.c
+  if ((uintptr_t)dst != (uintptr_t)42) {
+    free(dst);
+  }
+  free(Blst_pairing_val(v));
+}
 
 static struct custom_operations blst_pairing_ops = {
     "blst_pairing",
@@ -753,7 +760,15 @@ CAMLprim value caml_blst_pairing_init_stubs(value check, value dst,
     caml_raise_out_of_memory();
   blst_pairing **d = (blst_pairing **)Data_custom_val(block);
   *d = p;
-  blst_pairing_init(Blst_pairing_val(block), Bool_val(check), Bytes_val(dst),
+  // See https://gitlab.com/dannywillems/ocaml-bls12-381/-/issues/63
+  size_t dst_length_c = ctypes_size_t_val(dst_length);
+  byte *dst_copy = malloc(sizeof(byte) * dst_length_c);
+  if (dst_copy == NULL) {
+    free(p);
+    caml_raise_out_of_memory();
+  }
+  memcpy(dst_copy, Bytes_val(dst), dst_length_c * sizeof(byte));
+  blst_pairing_init(Blst_pairing_val(block), Bool_val(check), dst_copy,
                     ctypes_size_t_val(dst_length));
   CAMLreturn(block);
 }
