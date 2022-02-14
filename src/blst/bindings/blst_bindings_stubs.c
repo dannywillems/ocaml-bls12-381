@@ -831,7 +831,7 @@ CAMLprim value caml_blst_final_exponentiation_stubs(value buffer, value p) {
 
 // For signatures
 static void finalize_free_pairing(value v) {
-  byte *dst = blst_pairing_get_dst(Blst_pairing_val(v));
+  byte *dst = (byte *)blst_pairing_get_dst(Blst_pairing_val(v));
   // See libblst/src/aggregate.c
   if ((uintptr_t)dst != (uintptr_t)42) {
     free(dst);
