@@ -1,14 +1,4 @@
-let read_file filename =
-  let lines = ref [] in
-  let chan = open_in filename in
-  try
-    while true do
-      lines := input_line chan :: !lines
-    done ;
-    !lines
-  with End_of_file ->
-    close_in chan ;
-    List.rev !lines
+open Utils
 
 let test_vectors_g1_from_bls_sigs_ref_files () =
   let aux filename =
@@ -138,12 +128,8 @@ let regression_test () =
     v
 
 let test_hash_to_curve_accepts_dst_longer_than_255_characters () =
-  let dst =
-    Bytes.init (256 + Random.int 1000) (fun _ -> char_of_int (Random.int 256))
-  in
-  let msg =
-    Bytes.init (Random.int 10000) (fun _ -> char_of_int (Random.int 256))
-  in
+  let dst = generate_random_bytes (256 + Random.int 1000) in
+  let msg = generate_random_bytes (Random.int 10000) in
   ignore @@ Bls12_381.G1.hash_to_curve msg dst ;
   ignore @@ Bls12_381.G2.hash_to_curve msg dst
 

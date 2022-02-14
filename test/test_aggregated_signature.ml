@@ -1,9 +1,6 @@
+open Utils
+
 let () = Random.self_init ()
-
-let generate_random_byte () = char_of_int (Random.int 256)
-
-let generate_random_bytes size =
-  Bytes.init size (fun _ -> generate_random_byte ())
 
 module type SIGNATURE_INSTANTIATION = module type of Bls12_381.Signature.MinPk
 
@@ -262,9 +259,7 @@ struct
              aggregated_signatures))
 
     let test_sign_and_verify_incorrect_signature_with_correct_pks_pops_msg () =
-      let msg =
-        Bytes.init (1 + Random.int 512) (fun _ -> char_of_int (Random.int 256))
-      in
+      let msg = generate_random_bytes (1 + Random.int 512) in
       let random_values =
         List.init
           (2 + Random.int 10)

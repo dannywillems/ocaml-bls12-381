@@ -21,6 +21,7 @@
 (* DEALINGS IN THE SOFTWARE.                                                 *)
 (*                                                                           *)
 (*****************************************************************************)
+open Utils
 
 let () = Random.self_init ()
 
@@ -46,7 +47,7 @@ let test_vectors =
 
 let random_z () =
   let size = 1 + Random.int Bls12_381.Fr.size_in_bytes in
-  let r = Bytes.init size (fun _ -> char_of_int (Random.int 256)) in
+  let r = generate_random_bytes size in
   Z.erem (Z.of_bits (Bytes.to_string r)) Bls12_381.Fr.order
 
 module Tests = Ff_pbt.MakeAll (Bls12_381.Fr)

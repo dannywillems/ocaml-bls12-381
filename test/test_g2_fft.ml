@@ -21,7 +21,7 @@
 (* DEALINGS IN THE SOFTWARE.                                                 *)
 (*                                                                           *)
 (*****************************************************************************)
-
+open Utils
 module G2 = Bls12_381.G2
 
 module FFT = struct
@@ -42,7 +42,7 @@ module FFT = struct
     Array.init size (fun i -> Bls12_381.Fr.pow omega (Z.of_int i))
 
   let parse_group_elements_from_file n f =
-    let ic = open_in_bin f in
+    let ic = open_file f in
     let group_elements =
       Array.init n (fun _i ->
           let bytes_buf = Bytes.create G2.size_in_bytes in

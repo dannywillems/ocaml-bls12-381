@@ -1,20 +1,4 @@
-(* utils *)
-let read_file filename =
-  let lines = ref [] in
-  let chan = open_in filename in
-  try
-    while true do
-      lines := input_line chan :: !lines
-    done ;
-    !lines
-  with End_of_file ->
-    close_in chan ;
-    List.rev !lines
-
-let generate_random_byte () = char_of_int (Random.int 256)
-
-let generate_random_bytes size =
-  Bytes.init size (fun _ -> generate_random_byte ())
+open Utils
 
 (* Related to sk *)
 let test_sk_size_in_bytes () =
@@ -154,18 +138,14 @@ struct
         (SignatureM.pk_to_bytes (SignatureM.unsafe_pk_of_bytes pk_bytes)))
 
   let test_pk_to_bytes_unsafe_of_bytes_are_inverse_functions_on_any_input () =
-    let pk_bytes =
-      Bytes.init (Random.int 1000) (fun _ -> char_of_int (Random.int 256))
-    in
+    let pk_bytes = generate_random_bytes (Random.int 1000) in
     assert (
       Bytes.equal
         pk_bytes
         (SignatureM.pk_to_bytes (SignatureM.unsafe_pk_of_bytes pk_bytes)))
 
   let test_unsafe_pk_of_bytes_copies_the_input () =
-    let initial_pk_bytes =
-      Bytes.init (1 + Random.int 1000) (fun _ -> char_of_int (Random.int 256))
-    in
+    let initial_pk_bytes = generate_random_bytes (1 + Random.int 1000) in
     let pk_bytes =
       SignatureM.(pk_to_bytes (unsafe_pk_of_bytes initial_pk_bytes))
     in
