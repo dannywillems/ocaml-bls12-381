@@ -506,6 +506,15 @@ function caml_blst_fp12_pow_stubs(out, x, exp, exp_nb_bits) {
   return r ? 2 : 0;
 }
 
+//Provides: caml_blst_fp12_in_group_stubs
+//Requires: wasm_call
+//Requires: Blst_fp12_val
+function caml_blst_fp12_in_group_stubs(x) {
+  var x_c = Blst_fp12_val(x);
+  var r = wasm_call('_blst_fp12_in_group', x_c);
+  return r ? 1 : 0;
+}
+
 // P1
 //Provides: Blst_p1_val
 function Blst_p1_val(v) {

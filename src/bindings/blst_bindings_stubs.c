@@ -410,6 +410,13 @@ CAMLprim value caml_blst_fp12_of_bytes_stubs(value buffer, value p) {
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
+CAMLprim value caml_blst_fp12_in_group_stubs(value x) {
+  CAMLparam1(x);
+  blst_fp12 *x_c = Blst_fp12_val(x);
+  bool r = blst_fp12_in_group(x_c);
+  CAMLreturn(Bool_val(r));
+}
+
 static struct custom_operations blst_p1_ops = {"blst_p1",
                                                custom_finalize_default,
                                                custom_compare_default,
@@ -774,15 +781,7 @@ CAMLprim value caml_blst_pairing_init_stubs(value check, value dst,
     caml_raise_out_of_memory();
   blst_pairing **d = (blst_pairing **)Data_custom_val(block);
   *d = p;
-  // See https://gitlab.com/dannywillems/ocaml-bls12-381/-/issues/63
-  size_t dst_length_c = ctypes_size_t_val(dst_length);
-  byte *dst_copy = malloc(sizeof(byte) * dst_length_c);
-  if (dst_copy == NULL) {
-    free(p);
-    caml_raise_out_of_memory();
-  }
-  memcpy(dst_copy, Bytes_val(dst), dst_length_c * sizeof(byte));
-  blst_pairing_init(Blst_pairing_val(block), Bool_val(check), dst_copy,
+  blst_pairing_init(Blst_pairing_val(block), Bool_val(check), Bytes_val(dst),
                     ctypes_size_t_val(dst_length));
   CAMLreturn(block);
 }

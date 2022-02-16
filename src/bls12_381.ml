@@ -208,6 +208,7 @@ end
 module Fr = Fr
 module G1 = G1
 module G2 = G2
+module GT = Gt
 module Fq12 = Fq12
 module Pairing = Pairing
 module Signature = Signature
