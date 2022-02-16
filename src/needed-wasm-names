@@ -1,9 +1,11 @@
 _blst_final_exp
+_blst_fp12_in_group
 _blst_fp12_inverse
 _blst_fp12_is_equal
 _blst_fp12_is_one
 _blst_fp12_mul
 _blst_fp12_of_bytes
+_blst_fp12_pow
 _blst_fp12_set_one
 _blst_fp12_sizeof
 _blst_fp12_sqr

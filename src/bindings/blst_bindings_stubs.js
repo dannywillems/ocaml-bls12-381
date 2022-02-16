@@ -495,6 +495,17 @@ function caml_blst_fp12_of_bytes_stubs(buffer, p) {
   return 0;
 }
 
+//Provides: caml_blst_fp12_pow_stubs
+//Requires: wasm_call
+//Requires: Blst_fp12_val
+function caml_blst_fp12_pow_stubs(out, x, exp, exp_nb_bits) {
+  var out_c = Blst_fp12_val(out);
+  var x_c = Blst_fp12_val(x);
+  var exp_c = exp;
+  var r = wasm_call('_blst_fp12_pow', out_c, x_c, exp_c, exp_nb_bits);
+  return r ? 2 : 0;
+}
+
 // P1
 //Provides: Blst_p1_val
 function Blst_p1_val(v) {
