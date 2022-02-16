@@ -145,6 +145,6 @@ let () =
         [ test_case
             "DST can be longer than 255 characters"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                1000
                test_hash_to_curve_accepts_dst_longer_than_255_characters) ] ) ]

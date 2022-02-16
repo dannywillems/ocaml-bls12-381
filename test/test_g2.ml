@@ -47,7 +47,7 @@ module Memory = struct
     let txt = "Memory" in
     let open Alcotest in
     ( txt,
-      [ test_case "copy" `Quick (Test_ec_make.repeat 100 test_copy);
+      [ test_case "copy" `Quick (Utils.repeat 100 test_copy);
         test_case "size in memory" `Quick test_size_in_memory ] )
 end
 
@@ -150,13 +150,13 @@ module UncompressedRepresentation = struct
         test_case
           "of_bytes_opt/exn do not accept compressed bytes representation"
           `Quick
-          (Test_ec_make.repeat
+          (Utils.repeat
              1000
              test_of_bytes_exn_and_opt_do_not_accept_compressed_bytes_representation);
         test_case
           "random has first byte strictly lower than 64"
           `Quick
-          (Test_ec_make.repeat
+          (Utils.repeat
              1000
              test_uncompressed_random_has_first_byte_strictly_lower_than_64) ]
     )
@@ -269,7 +269,7 @@ module CompressedRepresentation = struct
            "of_compressed_bytes_opt/exn do not accept uncompressed bytes \
             representation"
            `Quick
-           (Test_ec_make.repeat
+           (Utils.repeat
               1000
               test_of_compressed_bytes_exn_and_opt_do_not_accept_uncompressed_bytes_representation)
       :: test_case "Regression tests" `Quick regression_tests

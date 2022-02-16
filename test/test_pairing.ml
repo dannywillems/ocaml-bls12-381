@@ -427,41 +427,39 @@ let () =
         [ test_case
             "with zero as first component"
             `Quick
-            (Test_ec_make.repeat 100 Properties.with_zero_as_first_component);
+            (Utils.repeat 100 Properties.with_zero_as_first_component);
           test_case
             "with zero as second component"
             `Quick
-            (Test_ec_make.repeat 100 Properties.with_zero_as_second_component);
+            (Utils.repeat 100 Properties.with_zero_as_second_component);
           test_case
             "linearity commutative scalar with only one scalar"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                Properties.linearity_commutativity_scalar_with_only_one_scalar);
           test_case
             "linearity scalar in scalar with only one scalar"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                Properties.linearity_scalar_in_scalar_with_only_one_scalar);
           test_case
             "full linearity"
             `Quick
-            (Test_ec_make.repeat 100 Properties.full_linearity);
+            (Utils.repeat 100 Properties.full_linearity);
           test_case
             "test vectors pairing of one and one"
             `Quick
-            (Test_ec_make.repeat 1 test_vectors_one_one);
+            (Utils.repeat 1 test_vectors_one_one);
           test_case
             "test pairing check with opposite"
             `Quick
-            (Test_ec_make.repeat 5 test_pairing_check_with_opposite);
+            (Utils.repeat 5 test_pairing_check_with_opposite);
           test_case
             "test pairing check with random points"
             `Quick
-            (Test_ec_make.repeat
-               5
-               test_pairing_check_on_random_points_return_false);
+            (Utils.repeat 5 test_pairing_check_on_random_points_return_false);
           test_case
             "test pairing check on empty list must return true"
             `Quick
@@ -469,27 +467,23 @@ let () =
           test_case
             "test miller loop only one and one two times"
             `Quick
-            (Test_ec_make.repeat 1 test_vectors_one_one_two_miller_loop);
+            (Utils.repeat 1 test_vectors_one_one_two_miller_loop);
           test_case
             "test miller loop only one and one random times"
             `Quick
-            (Test_ec_make.repeat
-               10
-               test_vectors_one_one_random_times_miller_loop);
+            (Utils.repeat 10 test_vectors_one_one_random_times_miller_loop);
           test_case
             "test result pairing with miller loop simple followed by final \
              exponentiation"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                Properties
                .result_pairing_with_miller_loop_followed_by_final_exponentiation);
           test_case
             "test result pairing with miller loop nb random points"
             `Quick
-            (Test_ec_make.repeat
-               10
-               test_miller_loop_pairing_random_number_of_points);
+            (Utils.repeat 10 test_miller_loop_pairing_random_number_of_points);
           test_case
             "test miller loop on empty list returns one"
             `Quick
@@ -497,5 +491,4 @@ let () =
           test_case
             "linearity commutativity scalar"
             `Quick
-            (Test_ec_make.repeat 100 Properties.linearity_commutativity_scalar)
-        ] ) ]
+            (Utils.repeat 100 Properties.linearity_commutativity_scalar) ] ) ]

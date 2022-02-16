@@ -72,34 +72,32 @@ let () =
         [ test_case
             "pow one on random element equals the same element"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                pow_one_on_random_element_equals_the_random_element);
           test_case
             "pow two on random element equals the square"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                pow_one_on_random_element_equals_the_random_element);
           test_case
             "pow element to the additive group order"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                pow_to_the_additive_group_order_equals_same_element);
           test_case
             "pow element to the multiplicative group order"
             `Quick
-            (Test_ec_make.repeat
-               100
-               pow_to_the_multiplicative_group_order_equals_one);
+            (Utils.repeat 100 pow_to_the_multiplicative_group_order_equals_one);
           test_case
             "pow element to a random power plus the additive group order"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                pow_add_multiplicative_group_order_to_a_random_power);
           test_case
             "pow to negative exponent"
             `Quick
-            (Test_ec_make.repeat 100 pow_to_negative_exponent) ] ) ]
+            (Utils.repeat 100 pow_to_negative_exponent) ] ) ]

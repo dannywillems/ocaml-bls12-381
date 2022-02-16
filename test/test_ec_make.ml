@@ -22,10 +22,7 @@
 (*                                                                           *)
 (*****************************************************************************)
 
-let rec repeat n f () =
-  if n > 0 then (
-    f () ;
-    repeat (n - 1) f ())
+open Utils
 
 module MakeBulkOperations (G : Bls12_381.CURVE) = struct
   let test_bulk_add () =

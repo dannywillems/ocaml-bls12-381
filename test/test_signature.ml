@@ -522,31 +522,31 @@ struct
         [ test_case
             "Sign and verify same message with correct keys"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                test_sign_and_verify_same_message_with_correct_keys);
           test_case
             "Sign and verify different message with correct keys"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                test_sign_and_verify_different_message_with_correct_keys);
           test_case
             "Sign and verify same message with different keys"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                test_sign_and_verify_same_message_with_different_keys);
           test_case
             "Sign and verify different message with different keys"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                test_sign_and_verify_different_message_with_different_keys);
           test_case
             "Test full sign and verify with different ikm sizes"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                100
                test_full_sign_and_verify_with_different_ikm_sizes);
           test_case
@@ -628,42 +628,42 @@ struct
             "pk_of_bytes_exn accepts points in the subgroup and in compressed \
              form"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_pk_of_bytes_exn_accepts_points_in_the_subgroup_and_in_compressed_form);
           test_case
             "pk_of_bytes_opt accepts points in the subgroup and in compressed \
              form"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_pk_of_bytes_opt_accepts_points_in_the_subgroup_and_in_compressed_form);
           test_case
             "pk_of_bytes_exn does not accept points in the subgroup and in \
              uncompressed form"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_pk_of_bytes_exn_does_not_accept_points_in_the_subgroup_and_in_uncompressed_form);
           test_case
             "pk_of_bytes_opt does not accept points in the subgroup and in \
              uncompressed form"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_pk_of_bytes_opt_does_not_accept_points_in_the_subgroup_and_in_uncompressed_form);
           test_case
             "unsafe_pk_of_bytes copies the input"
             `Quick
-            (Test_ec_make.repeat 10 test_unsafe_pk_of_bytes_copies_the_input);
+            (Utils.repeat 10 test_unsafe_pk_of_bytes_copies_the_input);
           test_case
             "pk_of_bytes_exn copies the input"
             `Quick
-            (Test_ec_make.repeat 10 test_pk_of_bytes_exn_copies_the_input);
+            (Utils.repeat 10 test_pk_of_bytes_exn_copies_the_input);
           test_case
             "pk_of_bytes_opt copies the input"
             `Quick
-            (Test_ec_make.repeat 10 test_pk_of_bytes_opt_copies_the_input);
+            (Utils.repeat 10 test_pk_of_bytes_opt_copies_the_input);
           test_case
             "unsafe_pk_of_bytes accepts points not in the subgroup"
             `Quick
@@ -676,28 +676,28 @@ struct
             "pk_of_bytes_opt and pk_to_bytes are inverse functions on valid \
              inputs"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_pk_to_bytes_of_bytes_opt_are_inverse_functions_on_valid_inputs);
           test_case
             "unsafe_pk_of_bytes and pk_to_bytes are inverse functions on valid \
              inputs"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_pk_to_bytes_unsafe_of_bytes_are_inverse_functions_on_valid_inputs);
           test_case
             "pk_of_bytes_exn and pk_to_bytes are inverse functions on valid \
              inputs"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_pk_to_bytes_of_bytes_exn_are_inverse_functions_on_valid_inputs);
           test_case
             "unsafe_pk_of_bytes and pk_to_bytes are inverse functions on any \
              valid input"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_pk_to_bytes_unsafe_of_bytes_are_inverse_functions_on_any_input);
           test_case
@@ -722,48 +722,42 @@ struct
             "signature_of_bytes_exn accepts points in the subgroup and in \
              compressed form"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_signature_of_bytes_exn_accepts_points_in_the_subgroup_and_in_compressed_form);
           test_case
             "signature_of_bytes_opt accepts points in the subgroup and in \
              compressed form"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_signature_of_bytes_opt_accepts_points_in_the_subgroup_and_in_compressed_form);
           test_case
             "signature_of_bytes_exn does not accept points in the subgroup and \
              in uncompressed form"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_signature_of_bytes_exn_does_not_accept_points_in_the_subgroup_and_in_uncompressed_form);
           test_case
             "signature_of_bytes_opt does not accept points in the subgroup and \
              in uncompressed form"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_signature_of_bytes_opt_does_not_accept_points_in_the_subgroup_and_in_uncompressed_form);
           test_case
             "unsafe_signature_of_bytes copies the input"
             `Quick
-            (Test_ec_make.repeat
-               10
-               test_unsafe_signature_of_bytes_copies_the_input);
+            (Utils.repeat 10 test_unsafe_signature_of_bytes_copies_the_input);
           test_case
             "signature_of_bytes_exn copies the input"
             `Quick
-            (Test_ec_make.repeat
-               10
-               test_signature_of_bytes_exn_copies_the_input);
+            (Utils.repeat 10 test_signature_of_bytes_exn_copies_the_input);
           test_case
             "signature_of_bytes_opt copies the input"
             `Quick
-            (Test_ec_make.repeat
-               10
-               test_signature_of_bytes_opt_copies_the_input);
+            (Utils.repeat 10 test_signature_of_bytes_opt_copies_the_input);
           test_case
             "unsafe_signature_of_bytes accepts points not in the subgroup"
             `Quick
@@ -776,28 +770,28 @@ struct
             "signature_of_bytes_opt and signature_to_bytes are inverse \
              functions on valid inputs"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_signature_to_bytes_of_bytes_opt_are_inverse_functions_on_valid_inputs);
           test_case
             "unsafe_signature_of_bytes and signature_to_bytes are inverse \
              functions on valid inputs"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_signature_to_bytes_unsafe_of_bytes_are_inverse_functions_on_valid_inputs);
           test_case
             "signature_of_bytes_exn and signature_to_bytes are inverse \
              functions on valid inputs"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_signature_to_bytes_of_bytes_exn_are_inverse_functions_on_valid_inputs);
           test_case
             "unsafe_signature_of_bytes and signature_to_bytes are inverse \
              functions on any valid input"
             `Quick
-            (Test_ec_make.repeat
+            (Utils.repeat
                10
                test_signature_to_bytes_unsafe_of_bytes_are_inverse_functions_on_any_input);
           test_case
@@ -825,17 +819,15 @@ struct
           test_case
             "Prove and verify with correct keys"
             `Quick
-            (Test_ec_make.repeat 10 test_pop_prove_verify_with_correct_keys);
+            (Utils.repeat 10 test_pop_prove_verify_with_correct_keys);
           test_case
             "Prove and verify with different pk for verify"
             `Quick
-            (Test_ec_make.repeat
-               10
-               test_pop_prove_verify_with_different_pk_for_verify);
+            (Utils.repeat 10 test_pop_prove_verify_with_different_pk_for_verify);
           test_case
             "Verify random proof"
             `Quick
-            (Test_ec_make.repeat 10 test_pop_verify_random_proof) ] ) ]
+            (Utils.repeat 10 test_pop_verify_random_proof) ] ) ]
 end
 
 let () =

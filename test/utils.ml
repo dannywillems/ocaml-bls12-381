@@ -41,3 +41,8 @@ let generate_random_byte () = char_of_int (Random.int 256)
 
 let generate_random_bytes size =
   Bytes.init size (fun _ -> generate_random_byte ())
+
+let rec repeat n f () =
+  if n > 0 then (
+    f () ;
+    repeat (n - 1) f ())
