@@ -301,7 +301,8 @@ module BytesRepresentation = struct
     (* And as zarith elements, we also have the equality *)
     assert (Z.equal (Bls12_381.Fr.to_z e) z)
 
-  let test_of_bytes_exn_accepts_elements_higher_than_the_modulus () =
+  let test_of_bytes_exn_and_opt_do_not_accept_elements_higher_than_the_modulus
+      () =
     (* last byte of Bls12_381.Fr.order is 115 *)
     let r =
       Bytes.init 32 (fun i ->
@@ -321,11 +322,12 @@ module BytesRepresentation = struct
           "bytes representation is the same than zarith using Z.to_bits"
           `Quick
           (Utils.repeat 10 test_bytes_repr_is_zarith_encoding_using_to_bits);
-        (* test_case *)
-        (*   "of_bytes_[exn/opt] accepts elements higher than the modulus" *)
-        (*   `Quick *)
-        (* (Utils.repeat 10
-           test_of_bytes_exn_accepts_elements_higher_than_the_modulus); *)
+        test_case
+          "of_bytes_[exn/opt] do not accept elements higher than the modulus"
+          `Quick
+          (Utils.repeat
+             10
+             test_of_bytes_exn_and_opt_do_not_accept_elements_higher_than_the_modulus);
         test_case
           "Padding is done automatically with of_bytes"
           `Quick
