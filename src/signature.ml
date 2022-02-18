@@ -43,15 +43,18 @@ let sk_size_in_bytes = Fr.size_in_bytes
 
 let sk_of_bytes_exn bytes =
   let buffer = Fr.Stubs.allocate_scalar () in
-  if Bytes.length bytes > 32 then
-    raise
-      (Invalid_argument
-         "Input should be maximum 32 bytes, encoded the secret key in little \
-          endian")
+  let exn =
+    Invalid_argument
+      "Input should be maximum 32 bytes, encoded the secret key in little \
+       endian and must be smaller than the order of Bls12_381.Fr"
+  in
+  if Bytes.length bytes > 32 then raise exn
   else
-    let sk = Fr.of_bytes_exn bytes in
-    ignore @@ Fr.Stubs.scalar_of_fr buffer sk ;
-    buffer
+    try
+      let sk = Fr.of_bytes_exn bytes in
+      ignore @@ Fr.Stubs.scalar_of_fr buffer sk ;
+      buffer
+    with Fr.Not_in_field _ -> raise exn
 
 let sk_of_bytes_opt bytes =
   try Some (sk_of_bytes_exn bytes) with Invalid_argument _ -> None
