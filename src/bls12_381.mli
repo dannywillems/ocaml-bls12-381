@@ -484,6 +484,10 @@ module Signature : sig
       @raise Invalid_argument if the bytes sequence is longer than 32 bytes *)
   val sk_of_bytes_exn : Bytes.t -> sk
 
+  (** [sk_of_bytes_opt bs] is the same than {!sk_of_bytes_exn} but returns an
+      option instead of an exception. *)
+  val sk_of_bytes_opt : Bytes.t -> sk option
+
   (** [sk_to_bytes sk] serialises the secret key into the little endian
       representation. *)
   val sk_to_bytes : sk -> Bytes.t

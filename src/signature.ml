@@ -53,6 +53,9 @@ let sk_of_bytes_exn bytes =
     ignore @@ Fr.Stubs.scalar_of_fr buffer sk ;
     buffer
 
+let sk_of_bytes_opt bytes =
+  try Some (sk_of_bytes_exn bytes) with Invalid_argument _ -> None
+
 let sk_to_bytes sk =
   let bytes = Bytes.make 32 '\000' in
   ignore @@ Fr.Stubs.scalar_to_bytes_le bytes sk ;
