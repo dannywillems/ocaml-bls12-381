@@ -8,6 +8,84 @@ let test_sk_size_in_bytes () =
     Bls12_381.Signature.sk_size_in_bytes
     = Bytes.length (Bls12_381.Signature.sk_to_bytes sk))
 
+let test_sk_of_bytes_exn_and_to_bytes_are_inverse_functions () =
+  let bytes = Bls12_381.Fr.(to_bytes (random ())) in
+  assert (
+    Bytes.equal Bls12_381.Signature.(sk_to_bytes (sk_of_bytes_exn bytes)) bytes) ;
+  let sk = Bls12_381.Signature.(generate_sk (generate_random_bytes 32)) in
+  let sk_bytes = Bls12_381.Signature.sk_to_bytes sk in
+  assert (
+    Bytes.equal
+      sk_bytes
+      Bls12_381.Signature.(sk_to_bytes (sk_of_bytes_exn sk_bytes)))
+
+let test_sk_of_bytes_opt_and_to_bytes_are_inverse_functions () =
+  let bytes = Bls12_381.Fr.(to_bytes (random ())) in
+  assert (
+    Bytes.equal
+      Bls12_381.Signature.(sk_to_bytes (Option.get @@ sk_of_bytes_opt bytes))
+      bytes) ;
+  let sk = Bls12_381.Signature.(generate_sk (generate_random_bytes 32)) in
+  let sk_bytes = Bls12_381.Signature.sk_to_bytes sk in
+  assert (
+    Bytes.equal
+      sk_bytes
+      Bls12_381.Signature.(sk_to_bytes (Option.get @@ sk_of_bytes_opt sk_bytes)))
+
+let test_sk_of_bytes_opt_valid_values () =
+  let bytes = Bytes.of_string @@ Z.to_bits Bls12_381.Fr.(to_z (random ())) in
+  assert (Option.is_some (Bls12_381.Signature.sk_of_bytes_opt bytes))
+
+let test_sk_of_bytes_exn_valid_values () =
+  let bytes = Bytes.of_string @@ Z.to_bits Bls12_381.Fr.(to_z (random ())) in
+  ignore @@ Bls12_381.Signature.sk_of_bytes_exn bytes
+
+let test_sk_of_bytes_opt_accepts_less_than_32_bytes () =
+  let bytes = generate_random_bytes (Random.int 32) in
+  assert (Option.is_some (Bls12_381.Signature.sk_of_bytes_opt bytes))
+
+let test_sk_of_bytes_exn_accepts_less_than_32_bytes () =
+  let bytes = generate_random_bytes (Random.int 32) in
+  ignore (Bls12_381.Signature.sk_of_bytes_exn bytes)
+
+let test_sk_of_bytes_exn_does_not_accept_more_than_32_bytes () =
+  let bytes = generate_random_bytes (32 + Random.int 1_000_000) in
+  let err_msg =
+    "Input should be maximum 32 bytes, encoded the secret key in little endian \
+     and must be smaller than the order of Bls12_381.Fr"
+  in
+  Alcotest.check_raises "" (Invalid_argument err_msg) (fun () ->
+      ignore @@ Bls12_381.Signature.sk_of_bytes_exn bytes)
+
+let test_sk_of_bytes_opt_does_not_accept_more_than_32_bytes () =
+  let bytes = generate_random_bytes (32 + Random.int 1_000_000) in
+  assert (Option.is_none (Bls12_381.Signature.sk_of_bytes_opt bytes))
+
+let test_sk_of_bytes_opt_does_not_accept_elements_higher_than_the_modulus_but_still_on_32_bytes
+    () =
+  (* last byte of Bls12_381.Fr.order is 115 *)
+  let r =
+    Bytes.init 32 (fun i ->
+        char_of_int
+        @@ if i = 31 then 116 + Random.int (256 - 116) else Random.int 256)
+  in
+  assert (Option.is_none (Bls12_381.Signature.sk_of_bytes_opt r))
+
+let test_sk_of_bytes_exn_does_not_accept_elements_higher_than_the_modulus_but_still_on_32_bytes
+    () =
+  (* last byte of Bls12_381.Fr.order is 115 *)
+  let bytes =
+    Bytes.init 32 (fun i ->
+        char_of_int
+        @@ if i = 31 then 116 + Random.int (256 - 116) else Random.int 256)
+  in
+  let err_msg =
+    "Input should be maximum 32 bytes, encoded the secret key in little endian \
+     and must be smaller than the order of Bls12_381.Fr"
+  in
+  Alcotest.check_raises "" (Invalid_argument err_msg) (fun () ->
+      ignore @@ Bls12_381.Signature.sk_of_bytes_exn bytes)
+
 let test_keygen_raise_invalid_argument_if_ikm_too_small () =
   ignore
   @@ Alcotest.check_raises
@@ -1027,6 +1105,40 @@ let () =
     "BLS Signature"
     (( "Common features to both instanciations",
        [ test_case "Size in bytes of sk" `Quick test_sk_size_in_bytes;
+         test_case
+           "sk_of_bytes_opt and sk_to_bytes are inverse functions"
+           `Quick
+           test_sk_of_bytes_opt_and_to_bytes_are_inverse_functions;
+         test_case
+           "sk_of_bytes_exn and sk_to_bytes are inverse functions"
+           `Quick
+           test_sk_of_bytes_exn_and_to_bytes_are_inverse_functions;
+         test_case
+           "sk_of_bytes_opt valid values"
+           `Quick
+           test_sk_of_bytes_opt_valid_values;
+         test_case
+           "sk_of_bytes_exn does not accept more than 32 bytes"
+           `Quick
+           test_sk_of_bytes_exn_does_not_accept_more_than_32_bytes;
+         test_case
+           "sk_of_bytes_opt does not accept more than 32 bytes"
+           `Quick
+           test_sk_of_bytes_opt_does_not_accept_more_than_32_bytes;
+         test_case
+           "sk_of_bytes_opt does not accept values higher than Fr modules but \
+            still on 32 bytes"
+           `Quick
+           test_sk_of_bytes_opt_does_not_accept_elements_higher_than_the_modulus_but_still_on_32_bytes;
+         test_case
+           "sk_of_bytes_exn does not accept values higher than Fr modules but \
+            still on 32 bytes"
+           `Quick
+           test_sk_of_bytes_exn_does_not_accept_elements_higher_than_the_modulus_but_still_on_32_bytes;
+         test_case
+           "sk_of_bytes_exn valid values"
+           `Quick
+           test_sk_of_bytes_exn_valid_values;
          test_case
            "generate_sk raises Invalid_argument is ikm is smaller than 32 bytes"
            `Quick
