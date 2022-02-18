@@ -10,6 +10,6 @@ break-separators=after
 space-around-lists=false
 dock-collection-brackets=false
 # Align on new lines
-wrap-comments=true
+# wrap-comments=true
 # Temporarily disabling it. Looks like there is a bug with lists inside docstrings
-parse-docstrings=false
+# parse-docstrings=false
