@@ -29,10 +29,10 @@ open Bls12_381
 module Properties = struct
   let with_zero_as_first_component () =
     let res = Pairing.pairing G1.zero (G2.random ()) in
-    assert (Fq12.eq res Fq12.one)
+    assert (GT.eq res GT.zero)
 
   let with_zero_as_second_component () =
-    assert (Fq12.eq (Pairing.pairing (G1.random ()) G2.zero) Fq12.one)
+    assert (GT.eq (Pairing.pairing (G1.random ()) G2.zero) GT.zero)
 
   let linearity_commutativity_scalar () =
     (* pairing(a * g_{1}, b * g_{2}) = pairing(b * g_{1}, a * g_{2})*)
@@ -41,17 +41,17 @@ module Properties = struct
     let g1 = G1.random () in
     let g2 = G2.random () in
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
         (Pairing.pairing (G1.mul g1 b) (G2.mul g2 a))) ;
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple (G1.mul g1 b) (G2.mul g2 a)))) ;
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)]))
         (Pairing.final_exponentiation_exn
@@ -63,17 +63,17 @@ module Properties = struct
     let g1 = G1.random () in
     let g2 = G2.random () in
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.pairing g1 (G2.mul g2 a))
         (Pairing.pairing (G1.mul g1 a) g2)) ;
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple g1 (G2.mul g2 a)))
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple (G1.mul g1 a) g2))) ;
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(g1, G2.mul g2 a)]))
         (Pairing.final_exponentiation_exn
@@ -85,19 +85,19 @@ module Properties = struct
     let g1 = G1.random () in
     let g2 = G2.random () in
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.pairing g1 (G2.mul g2 a))
-        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a))) ;
+        (GT.mul (Pairing.pairing g1 g2) a)) ;
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple g1 (G2.mul g2 a)))
-        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a))) ;
+        (GT.mul (Pairing.pairing g1 g2) a)) ;
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(g1, G2.mul g2 a)]))
-        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z a)))
+        (GT.mul (Pairing.pairing g1 g2) a))
 
   let full_linearity () =
     let a = Fr.random () in
@@ -105,41 +105,23 @@ module Properties = struct
     let g1 = G1.random () in
     let g2 = G2.random () in
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
-        (Fq12.pow (Pairing.pairing g1 g2) (Z.mul (Fr.to_z a) (Fr.to_z b)))) ;
+        (GT.mul (Pairing.pairing g1 g2) (Fr.mul a b))) ;
     assert (
-      Fq12.eq
-        (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
-        (Fq12.pow (Pairing.pairing g1 g2) (Fr.to_z (Fr.mul a b)))) ;
-    assert (
-      Fq12.eq
+      GT.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))
-        (Fq12.pow
+        (GT.mul
            (Pairing.final_exponentiation_exn (Pairing.miller_loop_simple g1 g2))
-           (Z.mul (Fr.to_z a) (Fr.to_z b)))) ;
+           (Fr.mul a b))) ;
     assert (
-      Fq12.eq
-        (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))
-        (Fq12.pow
-           (Pairing.final_exponentiation_exn (Pairing.miller_loop_simple g1 g2))
-           (Fr.to_z (Fr.mul a b)))) ;
-    assert (
-      Fq12.eq
+      GT.eq
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)]))
-        (Fq12.pow
+        (GT.mul
            (Pairing.final_exponentiation_exn (Pairing.miller_loop [(g1, g2)]))
-           (Z.mul (Fr.to_z a) (Fr.to_z b)))) ;
-    assert (
-      Fq12.eq
-        (Pairing.final_exponentiation_exn
-           (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)]))
-        (Fq12.pow
-           (Pairing.final_exponentiation_exn (Pairing.miller_loop [(g1, g2)]))
-           (Fr.to_z (Fr.mul a b))))
+           (Fr.mul a b)))
 
   let result_pairing_with_miller_loop_followed_by_final_exponentiation () =
     let a = Fr.random () in
@@ -147,12 +129,12 @@ module Properties = struct
     let g1 = G1.random () in
     let g2 = G2.random () in
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop_simple (G1.mul g1 a) (G2.mul g2 b)))) ;
     assert (
-      Fq12.eq
+      GT.eq
         (Pairing.pairing (G1.mul g1 a) (G2.mul g2 b))
         (Pairing.final_exponentiation_exn
            (Pairing.miller_loop [(G1.mul g1 a, G2.mul g2 b)])))
@@ -161,65 +143,24 @@ module Properties = struct
     assert (Fq12.is_one (Pairing.miller_loop []))
 end
 
-let result_pairing_one_one =
-  Fq12.of_string
-    "2819105605953691245277803056322684086884703000473961065716485506033588504203831029066448642358042597501014294104502"
-    "1323968232986996742571315206151405965104242542339680722164220900812303524334628370163366153839984196298685227734799"
-    "2987335049721312504428602988447616328830341722376962214011674875969052835043875658579425548512925634040144704192135"
-    "3879723582452552452538684314479081967502111497413076598816163759028842927668327542875108457755966417881797966271311"
-    "261508182517997003171385743374653339186059518494239543139839025878870012614975302676296704930880982238308326681253"
-    "231488992246460459663813598342448669854473942105054381511346786719005883340876032043606739070883099647773793170614"
-    "3993582095516422658773669068931361134188738159766715576187490305611759126554796569868053818105850661142222948198557"
-    "1074773511698422344502264006159859710502164045911412750831641680783012525555872467108249271286757399121183508900634"
-    "2727588299083545686739024317998512740561167011046940249988557419323068809019137624943703910267790601287073339193943"
-    "493643299814437640914745677854369670041080344349607504656543355799077485536288866009245028091988146107059514546594"
-    "734401332196641441839439105942623141234148957972407782257355060229193854324927417865401895596108124443575283868655"
-    "2348330098288556420918672502923664952620152483128593484301759394583320358354186482723629999370241674973832318248497"
-
-let test_vectors_one_one () =
-  assert (Fq12.eq (Pairing.pairing G1.one G2.one) result_pairing_one_one) ;
-  assert (
-    Fq12.eq
-      (Pairing.final_exponentiation_exn
-         (Pairing.miller_loop_simple G1.one G2.one))
-      result_pairing_one_one) ;
-  (* We check the final exponentiation is not done already *)
-  assert (
-    not
-      (Fq12.eq
-         (Pairing.miller_loop_simple G1.one G2.one)
-         result_pairing_one_one)) ;
-  assert (
-    not
-      (Fq12.eq (Pairing.miller_loop [(G1.one, G2.one)]) result_pairing_one_one))
-
-let test_vectors_one_one_two_miller_loop () =
-  (* Compute P(1, 1) * P(1, 1) using miller loop and check it is equal to the
-     product of the result *)
-  let expected_result =
-    Fq12.mul result_pairing_one_one result_pairing_one_one
+let test_check_gt_generator () =
+  let result_pairing_one_one =
+    Fq12.of_string
+      "2819105605953691245277803056322684086884703000473961065716485506033588504203831029066448642358042597501014294104502"
+      "1323968232986996742571315206151405965104242542339680722164220900812303524334628370163366153839984196298685227734799"
+      "2987335049721312504428602988447616328830341722376962214011674875969052835043875658579425548512925634040144704192135"
+      "3879723582452552452538684314479081967502111497413076598816163759028842927668327542875108457755966417881797966271311"
+      "261508182517997003171385743374653339186059518494239543139839025878870012614975302676296704930880982238308326681253"
+      "231488992246460459663813598342448669854473942105054381511346786719005883340876032043606739070883099647773793170614"
+      "3993582095516422658773669068931361134188738159766715576187490305611759126554796569868053818105850661142222948198557"
+      "1074773511698422344502264006159859710502164045911412750831641680783012525555872467108249271286757399121183508900634"
+      "2727588299083545686739024317998512740561167011046940249988557419323068809019137624943703910267790601287073339193943"
+      "493643299814437640914745677854369670041080344349607504656543355799077485536288866009245028091988146107059514546594"
+      "734401332196641441839439105942623141234148957972407782257355060229193854324927417865401895596108124443575283868655"
+      "2348330098288556420918672502923664952620152483128593484301759394583320358354186482723629999370241674973832318248497"
+    |> Fq12.to_bytes |> GT.of_bytes_exn
   in
-  assert (
-    Fq12.eq
-      (Pairing.final_exponentiation_exn
-         (Pairing.miller_loop [(G1.one, G2.one); (G1.one, G2.one)]))
-      expected_result)
-
-let test_vectors_one_one_random_times_miller_loop () =
-  (* Compute P(1, 1) n times using miller loop and check it is equal to the
-     product. *)
-  let n = 1 + Random.int 1000 in
-  let expected_result =
-    List.fold_left
-      (fun acc a -> Fq12.mul acc a)
-      Fq12.one
-      (List.init n (fun _i -> result_pairing_one_one))
-  in
-  let point_list = List.init n (fun _i -> (G1.one, G2.one)) in
-  assert (
-    Fq12.eq
-      (Pairing.final_exponentiation_exn (Pairing.miller_loop point_list))
-      expected_result)
+  assert (GT.eq GT.one result_pairing_one_one)
 
 let test_miller_loop_pairing_random_number_of_points () =
   (* Check miller_loop followed by final exponentiation equals the product of
@@ -250,11 +191,11 @@ let test_miller_loop_pairing_random_number_of_points () =
   (* Compute the product of pairings *)
   let res_pairing =
     List.fold_left
-      (fun acc b -> Fq12.mul acc b)
-      Fq12.one
+      (fun acc b -> GT.add acc b)
+      GT.zero
       (List.map (fun (g1, g2) -> Pairing.pairing g1 g2) points)
   in
-  assert (Fq12.eq res_pairing res_miller_loop)
+  assert (GT.eq res_pairing res_miller_loop)
 
 let test_pairing_check_with_opposite () =
   let x = Bls12_381.G1.random () in
@@ -312,14 +253,14 @@ module RegressionTests = struct
         let g1 = Bls12_381.G1.of_bytes_exn (Hex.to_bytes (`Hex g1)) in
         let g2 = Bls12_381.G2.of_bytes_exn (Hex.to_bytes (`Hex g2)) in
         let expected_res =
-          Bls12_381.Fq12.of_bytes_exn (Hex.to_bytes (`Hex res))
+          Bls12_381.GT.of_bytes_exn (Hex.to_bytes (`Hex res))
         in
         let res = Bls12_381.Pairing.pairing g1 g2 in
-        if not (Bls12_381.Fq12.eq res expected_res) then
+        if not (Bls12_381.GT.eq res expected_res) then
           Alcotest.failf
             "Expected result is %s, computed result is %s\n"
-            (Hex.show (Hex.of_bytes (Bls12_381.Fq12.to_bytes expected_res)))
-            (Hex.show (Hex.of_bytes (Bls12_381.Fq12.to_bytes res))))
+            (Hex.show (Hex.of_bytes (Bls12_381.GT.to_bytes expected_res)))
+            (Hex.show (Hex.of_bytes (Bls12_381.GT.to_bytes res))))
       vectors
 
   let test_miller_loop () =
@@ -399,11 +340,11 @@ module RegressionTests = struct
     List.iter
       (fun (p, expectes_result_s) ->
         let expectes_result =
-          Bls12_381.Fq12.of_bytes_exn (Hex.to_bytes (`Hex expectes_result_s))
+          Bls12_381.GT.of_bytes_exn (Hex.to_bytes (`Hex expectes_result_s))
         in
         let p = Bls12_381.Fq12.of_bytes_exn (Hex.to_bytes (`Hex p)) in
         let res = Bls12_381.Pairing.final_exponentiation_exn p in
-        if not (Bls12_381.Fq12.eq res expectes_result) then
+        if not (Bls12_381.GT.eq res expectes_result) then
           Alcotest.failf
             "Expected result: %s\nComputed result: %s\n"
             expectes_result_s
@@ -451,7 +392,7 @@ let () =
           test_case
             "test vectors pairing of one and one"
             `Quick
-            (Utils.repeat 1 test_vectors_one_one);
+            (Utils.repeat 1 test_check_gt_generator);
           test_case
             "test pairing check with opposite"
             `Quick
@@ -464,14 +405,6 @@ let () =
             "test pairing check on empty list must return true"
             `Quick
             test_pairing_check_on_empty_list_must_return_true;
-          test_case
-            "test miller loop only one and one two times"
-            `Quick
-            (Utils.repeat 1 test_vectors_one_one_two_miller_loop);
-          test_case
-            "test miller loop only one and one random times"
-            `Quick
-            (Utils.repeat 10 test_vectors_one_one_random_times_miller_loop);
           test_case
             "test result pairing with miller loop simple followed by final \
              exponentiation"

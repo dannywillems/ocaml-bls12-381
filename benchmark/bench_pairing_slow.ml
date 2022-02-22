@@ -12,8 +12,8 @@ let () =
   let _, time_pairing =
     with_time_ms (fun () ->
         List.fold_left
-          (fun acc (g1, g2) -> Fq12.mul acc (Pairing.pairing g1 g2))
-          Fq12.one
+          (fun acc (g1, g2) -> GT.add acc (Pairing.pairing g1 g2))
+          GT.zero
           points)
   in
   let _, time_miller_loop =

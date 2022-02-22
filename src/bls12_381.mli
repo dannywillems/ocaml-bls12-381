@@ -450,7 +450,7 @@ module Pairing : sig
   val miller_loop_simple : G1.t -> G2.t -> Fq12.t
 
   (** Compute a pairing result of a list of points *)
-  val pairing : G1.t -> G2.t -> Fq12.t
+  val pairing : G1.t -> G2.t -> GT.t
 
   (** [pairing_check points] returns [true] if [pairing points = GT.one]. Return
       [true] if the empty list is given *)
@@ -458,12 +458,11 @@ module Pairing : sig
 
   (** Compute the final exponentiation of the given point. Returns a [None] if
       the point is null *)
-  val final_exponentiation_opt : Fq12.t -> Fq12.t option
+  val final_exponentiation_opt : Fq12.t -> GT.t option
 
   (** Compute the final exponentiation of the given point.
-
       @raise FailToComputeFinalExponentiation if the point is null *)
-  val final_exponentiation_exn : Fq12.t -> Fq12.t
+  val final_exponentiation_exn : Fq12.t -> GT.t
 end
 
 (** Follow {{:https://tools.ietf.org/pdf/draft-irtf-cfrg-bls-signature-04.pdf}
