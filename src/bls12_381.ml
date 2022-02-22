@@ -62,12 +62,6 @@ module type CURVE = sig
 
   module Scalar : Ff_sig.PRIME with type t = Fr.t
 
-  (** Create an empty value to store an element of the curve.
-
-      {b Warning} Do not use this to do computations with, undefined behaviors
-      may happen *)
-  val empty : unit -> t
-
   (** Check if a point, represented as a byte array, is on the curve **)
   val check_bytes : Bytes.t -> bool
 

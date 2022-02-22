@@ -161,8 +161,6 @@ module G2 = struct
 
   module Scalar = Fr
 
-  let empty () = Stubs.allocate_g2 ()
-
   let check_bytes bs =
     let buffer = Stubs.allocate_g2_affine () in
     Stubs.deserialize buffer bs = 0

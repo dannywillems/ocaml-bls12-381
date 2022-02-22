@@ -164,8 +164,6 @@ module G1 = struct
 
   let cofactor_fr = Scalar.of_string "76329603384216526031706109802092473003"
 
-  let empty () = Stubs.allocate_g1 ()
-
   let check_bytes bs =
     let buffer = Stubs.allocate_g1_affine () in
     Stubs.deserialize buffer bs = 0

@@ -58,27 +58,49 @@ module Fr : sig
       and is returned. The parameters are not modified. *)
   val ifft : domain:t array -> points:t array -> t array
 
+  (** [ifft_inplace ~domain ~points] is the same than {!ifft} but modifies the
+      array [points] instead of returning a new array *)
   val ifft_inplace : domain:t array -> points:t array -> unit
 
+  (** [add_inplace a b] is the same than {!add} but writes the result in the first
+      argument, i.e. [a]. No allocation happens. *)
   val add_inplace : t -> t -> unit
 
+  (** [sub_inplace a b] is the same than {!sub} but writes the result in the first
+      argument, i.e. [a]. No allocation happens. *)
   val sub_inplace : t -> t -> unit
 
+  (** [mul_inplace a b] is the same than {!sub} but writes the result in the first
+      argument, i.e. [a]. No allocation happens. *)
   val mul_inplace : t -> t -> unit
 
+  (** [inverse_exn_inplace a] is the same than {!inverse_exn} but writes the
+      result in [a]. No allocation happens. *)
   val inverse_exn_inplace : t -> unit
 
+  (** [double_inplace a] is the same than {!double} but writes the
+      result in [a]. No allocation happens. *)
   val double_inplace : t -> unit
 
+  (** [square_inplace a] is the same than {!square} but writes the
+      result in [a]. No allocation happens. *)
   val square_inplace : t -> unit
 
+  (** [negate_inplace a] is the same than {!negate} but writes the
+      result in [a]. No allocation happens. *)
   val negate_inplace : t -> unit
 
   (** [copy x] return a fresh copy of [x] *)
   val copy : t -> t
 
+  (** [add_bulk xs] returns the sum of the elements of [xs] by performing only
+      one allocation for the output. This method is recommended to save the
+      allocation overhead of using [n] times {!add}. *)
   val add_bulk : t list -> t
 
+  (** [mul_bulk xs] returns the product of the elements of [xs] by performing
+      only one allocation for the output. This method is recommended to save the
+      allocation overhead of using [n] times {!mul}. *)
   val mul_bulk : t list -> t
 
   (** [compare a b] compares the elements [a] and [b] based on their bytes
@@ -86,12 +108,12 @@ module Fr : sig
   val compare : t -> t -> int
 
   (** [inner_product_exn a b] returns the inner product of [a] and [b], i.e.
-      sum(a_i * b_i). Raise [Invalid_argument] if the arguments are not of the
-      same length *)
+      [sum(a_i * b_i)]. Raise [Invalid_argument] if the arguments are not of the
+      same length. Only two allocations are used. *)
   val inner_product_exn : t array -> t array -> t
 
   (** Same than {!inner_product_exn} but returns an option instead of raising an
-      exception *)
+      exception. *)
   val inner_product_opt : t array -> t array -> t option
 
   (** [of_int x] is equivalent to [of_z (Z.of_int x)]. If [x] is is negative,
@@ -139,13 +161,10 @@ module type CURVE = sig
 
   module Scalar : Ff_sig.PRIME with type t = Fr.t
 
-  (** Create an empty value to store an element of the curve.
-
-      {b Warning} Do not use this to do computations with, undefined behaviors
-      may happen *)
-  val empty : unit -> t
-
-  (** Check if a point, represented as a byte array, is on the curve **)
+  (** Check if a point, represented as a byte array, is on the curve and in the
+      prime subgroup.
+      The bytes must be of length {!size_in_bytes}.
+  *)
   val check_bytes : Bytes.t -> bool
 
   (** Attempt to construct a point from a byte array of length {!size_in_bytes}. *)
@@ -182,15 +201,28 @@ module type CURVE = sig
   (** [copy x] return a fresh copy of [x] *)
   val copy : t -> t
 
-  (** Generate a random element. The element is on the curve and in the prime
-      subgroup. *)
+  (** Generate a random element. The function ensures the element is on the
+      curve and in the prime subgroup.
+
+      The routines in the module [Random.State] are used to generate the
+      elements. A state can be given to the function to be used. If no state is
+      given, [Random.get_state] is used.
+
+      To create a value of type [Random.State.t], you can use [Random.State.make
+      [|42|]].
+  *)
   val random : ?state:Random.State.t -> unit -> t
 
   (** Return the addition of two element *)
   val add : t -> t -> t
 
+  (** [add_inplace a b] is the same than {!add} but writes the output in [a]. No
+      allocation happens. *)
   val add_inplace : t -> t -> unit
 
+  (** [add_bulk xs] returns the sum of the elements of [xs] by performing only
+      one allocation for the output. This method is recommended to save the
+      allocation overhead of using [n] times {!add}. *)
   val add_bulk : t list -> t
 
   (** [double g] returns [2g] *)
@@ -205,6 +237,8 @@ module type CURVE = sig
   (** Multiply an element by a scalar *)
   val mul : t -> Scalar.t -> t
 
+  (** [mul_inplace g x] is the same than {!mul} but writes the output in [g]. No
+      allocation happens. *)
   val mul_inplace : t -> Scalar.t -> unit
 
   (** [fft ~domain ~points] performs a Fourier transform on [points] using
@@ -234,8 +268,13 @@ module type CURVE = sig
       and is returned. The parameters are not modified. *)
   val ifft : domain:Scalar.t array -> points:t array -> t array
 
+  (** [ifft_inplace ~domain ~points] is the same than {!ifft} but modifies the
+      array [points] instead of returning a new array *)
   val ifft_inplace : domain:Scalar.t array -> points:t array -> unit
 
+  (** [hash_to_curve msg dst] follows the standard {{:
+      https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-14.txt } Hashing
+      to Elliptic Curves} applied to BLS12-381 *)
   val hash_to_curve : Bytes.t -> Bytes.t -> t
 
   (** [pippenger ?start ?len pts scalars] computes the multi scalar
@@ -260,7 +299,7 @@ module type CURVE = sig
       scalar exponentiation/multiplication. The scalars are given in [scalars]
       and the points in [pts]. If [pts] and [scalars] are not of the same
       length, perform the computation on the first [n] points where [n] is the
-      smallest size. The differences with {!pippenger} are 1. the points are
+      smallest length. The differences with {!pippenger} are 1. the points are
       loaded in a contiguous C array to speed up the access to the elements by
       relying on the CPU cache 2. and the points are in affine coordinates, the
       form expected by the algorithm implementation, avoiding new allocations
@@ -282,13 +321,35 @@ module type CURVE = sig
     ?start:int -> ?len:int -> affine_array -> Scalar.t array -> t
 end
 
+(** Represents the field extension constructed as described {{:
+    https://github.com/zcash/librustzcash/blob/6e0364cd42a2b3d2b958a54771ef51a8db79dd29/pairing/src/bls12_381/README.md}
+    here}. The interface does not provide the full
+    requirements to be a field (like the addition).
+
+    In many applications, the field extension won't be used and {!GT} will be
+    used instead. However, this library exposes the field extension to allow the
+    user to use {!Pairing.miller_loop} and post-pone the call to
+    {!Pairing.final_exponentiation_exn} follwing its taste.
+*)
 module Fq12 : sig
+  exception Not_in_field of Bytes.t
+
+  (** An element of the field extension. It is {b not} ensured the element are
+      in the prime multiplicative subgroup. If you need inhabitants of the prime
+      subgroup, use the module {!GT} *)
   type t
+
+  (** The order of the field *)
+  val order : Z.t
 
   (** Minimal number of bytes required to encode a value of the group *)
   val size_in_bytes : int
 
-  exception Not_in_field of Bytes.t
+  (** Actual number of bytes allocated for a value of type t *)
+  val size_in_memory : int
+
+  (** The neutral element of the additive subgroup *)
+  val zero : t
 
   (** The neutral element of the multiplicative subgroup *)
   val one : t
@@ -301,45 +362,76 @@ module Fq12 : sig
       multiplication *)
   val is_one : t -> bool
 
+  (** [mul a b] returns the product of [a] and [b] *)
   val mul : t -> t -> t
 
-  val inverse_opt : t -> t option
-
+  (** [inverse_exn x] returns [x^-1 mod order] if [x] is not [0], else raise
+      [Division_by_zero]. Equivalently, [inverse_exn x] returns the unique [y]
+      such that [x * y mod order = 1] *)
   val inverse_exn : t -> t
 
+  (** [inverse_opt x] returns [x^-1 mod order] as an option if [x] is not [0],
+      else returns [None]. Equivalently, [inverse_opt x] returns the unique [y]
+      such that [x * y mod order = 1] *)
+  val inverse_opt : t -> t option
+
+  (** [eq a b] returns [true] if [a = b mod order], else [false] *)
   val eq : t -> t -> bool
 
+  (** Generates a random element.
+
+      The routines in the module [Random.State] are used to generate the
+      elements. A state can be given to the function to be used. If no state is
+      given, [Random.get_state] is used.
+
+      To create a value of type [Random.State.t], you can use [Random.State.make
+      [|42|]].
+  *)
   val random : ?state:Random.State.t -> unit -> t
 
   val pow : t -> Z.t -> t
 
+  (** [of_bytes_exn bs] builds a value of type t. Each coordinate is expected to
+      be in little endian and the constant monomial is always encoded first.
+      The size of [bs] is expected to be {!size_in_bytes}.
+      If the element is not in the field or if [bs] is not of size
+      {!size_in_bytes}, raises {!Not_in_field} with [bs] in parameter.
+  *)
   val of_bytes_exn : Bytes.t -> t
 
+  (** Same than {!of_bytes_exn} but returns an option instead of raising an
+      exception *)
   val of_bytes_opt : Bytes.t -> t option
 
+  (** [to_bytes p] encodes the point [p] following the encoding described by
+      {!of_bytes_exn} *)
   val to_bytes : t -> Bytes.t
 
-  (** Construct an element of Fq12 based on the following pattern: Fq12 = Fq6 (
-      Fq2(x: x0, y: x1)) Fq2(x: x2, y: x3)) Fq2(x: x4, y: x5)), Fq6 ( Fq2(x: x6,
-      y: x7)) Fq2(x: x8, y: x9)) Fq2(x: x10, y: x11)) x0, ..., x11 are the
-      parameters of the function. No check is applied.
+  (** Construct an element of Fq12 based on the following pattern:
+
+      Fq12 =
+        (Fq6 (Fq2(x: x0, y: x1)) Fq2(x: x2, y: x3)) Fq2(x: x4, y: x5)),
+         Fq6 ( Fq2(x: x6, y: x7)) Fq2(x: x8, y: x9)) Fq2(x: x10, y: x11))
+
+      [x0, ..., x11] are the parameters of the function. No check is applied.
 
       Example of usage (pairing result of the multiplicative neutre elements):
+      ```OCaml
       Fq12.of_string
-      "2819105605953691245277803056322684086884703000473961065716485506033588504203831029066448642358042597501014294104502"
-      "1323968232986996742571315206151405965104242542339680722164220900812303524334628370163366153839984196298685227734799"
-      "2987335049721312504428602988447616328830341722376962214011674875969052835043875658579425548512925634040144704192135"
-      "3879723582452552452538684314479081967502111497413076598816163759028842927668327542875108457755966417881797966271311"
-      "261508182517997003171385743374653339186059518494239543139839025878870012614975302676296704930880982238308326681253"
-      "231488992246460459663813598342448669854473942105054381511346786719005883340876032043606739070883099647773793170614"
-      "3993582095516422658773669068931361134188738159766715576187490305611759126554796569868053818105850661142222948198557"
-      "1074773511698422344502264006159859710502164045911412750831641680783012525555872467108249271286757399121183508900634"
-      "2727588299083545686739024317998512740561167011046940249988557419323068809019137624943703910267790601287073339193943"
-      "493643299814437640914745677854369670041080344349607504656543355799077485536288866009245028091988146107059514546594"
-      "734401332196641441839439105942623141234148957972407782257355060229193854324927417865401895596108124443575283868655"
-      "2348330098288556420918672502923664952620152483128593484301759394583320358354186482723629999370241674973832318248497"
-      (* source for the test vectors:
-      https://docs.rs/crate/pairing/0.16.0/source/src/bls12_381/tests/mod.rs *)
+        "2819105605953691245277803056322684086884703000473961065716485506033588504203831029066448642358042597501014294104502"
+        "1323968232986996742571315206151405965104242542339680722164220900812303524334628370163366153839984196298685227734799"
+        "2987335049721312504428602988447616328830341722376962214011674875969052835043875658579425548512925634040144704192135"
+        "3879723582452552452538684314479081967502111497413076598816163759028842927668327542875108457755966417881797966271311"
+        "261508182517997003171385743374653339186059518494239543139839025878870012614975302676296704930880982238308326681253"
+        "231488992246460459663813598342448669854473942105054381511346786719005883340876032043606739070883099647773793170614"
+        "3993582095516422658773669068931361134188738159766715576187490305611759126554796569868053818105850661142222948198557"
+        "1074773511698422344502264006159859710502164045911412750831641680783012525555872467108249271286757399121183508900634"
+        "2727588299083545686739024317998512740561167011046940249988557419323068809019137624943703910267790601287073339193943"
+        "493643299814437640914745677854369670041080344349607504656543355799077485536288866009245028091988146107059514546594"
+        "734401332196641441839439105942623141234148957972407782257355060229193854324927417865401895596108124443575283868655"
+        "2348330098288556420918672502923664952620152483128593484301759394583320358354186482723629999370241674973832318248497"
+      ```
+      {{: https://docs.rs/crate/pairing/0.16.0/source/src/bls12_381/tests/mod.rs} Source }.
 
       Undefined behaviours if the given elements are not in the field or any
       other representation than decimal is used. Use this function carefully.
@@ -348,7 +440,8 @@ module Fq12 : sig
       for more information on the instances used by the library.
 
       FIXME: the function is not memory efficient because the elements are
-      copied multiple times *)
+      copied multiple times.
+  *)
   val of_string :
     String.t ->
     String.t ->
@@ -364,8 +457,11 @@ module Fq12 : sig
     String.t ->
     t
 
-  (** Same than [of_string], using Z.t elements FIXME: the function is not
-      memory efficient because the elements are copied multiple times *)
+  (** Same than {!of_string}, using [Z.t] elements
+
+      FIXME: the function is not memory efficient because the elements are
+      copied multiple times.
+  *)
   val of_z :
     Z.t ->
     Z.t ->
@@ -382,86 +478,130 @@ module Fq12 : sig
     t
 end
 
+(** Elliptic curve built over the field [Fq] and the equation [y^2 = x^3 + 4] *)
 module G1 : sig
   include CURVE
 
-  (** Create a point from the coordinates. If the point is not on the curve,
-      [None] is return. The points must be given modulo the order of Fq. To
-      create the point at infinity, use [zero ()] *)
+  (** Create a point from the coordinates. If the point is not on the curve and
+      in the prime subgroup,returns [None].
+      The points must be given modulo the order of [Fq]. To
+      create the point at infinity, use {!zero}
+  *)
   val of_z_opt : x:Z.t -> y:Z.t -> t option
 end
 
+(** Elliptic curve built over the field [Fq^2] and the equation [y^2 = x^3 + 4(u
+    + 1)] *)
 module G2 : sig
   include CURVE
 
-  (** Create a point from the coordinates. If the point is not on the curve,
-      None is return. The points must be given modulo the order of Fq. The
-      points are in the form (c0, c1) where x = c1 * X + c0 and y = c1 * X + c0.
-      To create the point at infinity, use [zero ()] *)
+  (** Create a point from the coordinates. If the point is not on the curve and
+      in the prime subgroup, returns [None].
+      The points must be given modulo the order of [Fq]. The
+      points are in the form [(c0, c1)] where [x = c1 * X + c0] and [y = c1 * X
+      + c0].
+      To create the point at infinity, use {!zero}
+  *)
   val of_z_opt : x:Z.t * Z.t -> y:Z.t * Z.t -> t option
 end
 
+(** Prime subgroup of {!Fq12}, of order {!Fr.order}, represented additively *)
 module GT : sig
-  type t
-
   exception Not_in_group of Bytes.t
 
+  (** Represents an element in the prime subgroup *)
+  type t
+
+  (** The order of the group. It is the same than {!Fr.order} *)
   val order : Z.t
 
-  val size_in_memory : int
-
+  (** Minimal number of bytes required to encode a value of the group *)
   val size_in_bytes : int
 
+  (** Actual number of bytes allocated for a value of type t *)
+  val size_in_memory : int
+
+  (** Checks the bytes represent a point in the prime subgroup. The expected
+  encoding is the same than {!Fq12.of_bytes_exn}. *)
   val check_bytes : Bytes.t -> bool
 
+  (** Same than {!Fq12.of_bytes_exn} but also verifies the element is in the
+      prime subgroup. Raise {!Not_in_group} if the element is not in the prime
+      subgroup. *)
   val of_bytes_exn : Bytes.t -> t
 
+  (** Same than {!of_bytes_exn} but returns an option instead of an
+      exception. *)
   val of_bytes_opt : Bytes.t -> t option
 
+  (** Same than {!Fq12.to_bytes}. *)
   val to_bytes : t -> Bytes.t
 
+  val eq : t -> t -> bool
+
+  (** The neutral element of the subgroup. It is equal to {!Fq12.one}. *)
   val zero : t
 
+  (** [is_zero x] is equivalent to [eq x zero] *)
   val is_zero : t -> bool
 
+  (** A generator of the group. It is set to the result of [Pairing.pairing
+      G1.one G2.one]. *)
   val one : t
 
+  (** [is_one x] is equivalent to [eq x one] *)
   val is_one : t -> bool
 
+  (** Generate a random element. The function ensures the element is in the
+      prime subgroup.
+
+      The routines in the module [Random.State] are used to generate the
+      elements. A state can be given to the function to be used. If no state is
+      given, [Random.get_state] is used.
+
+      To create a value of type [Random.State.t], you can use [Random.State.make
+      [|42|]].
+  *)
   val random : ?state:Random.State.t -> unit -> t
 
+  (** [add x y] returns the sum of [x] and [y]. It is equivalent to [Fq12.mul x
+      y]. *)
   val add : t -> t -> t
 
+  (** [negate x] returns the opposite of [x]. It is equivalent to
+      [Fq12.inverse_exn x]. *)
   val negate : t -> t
 
+  (** [mul x n] returns [[n] x], i.e. the result of adding [x] n-times with
+      itself. It is equivalent to [Fq12.pow x (Fr.to_z n)] *)
   val mul : t -> Fr.t -> t
-
-  val eq : t -> t -> bool
 end
 
+(** Provides routines to compute the pairing over [G1 x G2 -> GT] *)
 module Pairing : sig
   exception FailToComputeFinalExponentiation of Fq12.t
 
   (** Compute the miller loop on a list of points. Return {!Fq12.one} if the list
-      is empty *)
+      is empty. *)
   val miller_loop : (G1.t * G2.t) list -> Fq12.t
 
-  (** Compute the miller loop on a single tuple of point *)
+  (** Compute the miller loop on a single tuple of point. *)
   val miller_loop_simple : G1.t -> G2.t -> Fq12.t
 
-  (** Compute a pairing result of a list of points *)
+  (** Compute a pairing result of a list of points. *)
   val pairing : G1.t -> G2.t -> GT.t
 
   (** [pairing_check points] returns [true] if [pairing points = GT.one]. Return
-      [true] if the empty list is given *)
+      [true] if the empty list is given. *)
   val pairing_check : (G1.t * G2.t) list -> bool
 
-  (** Compute the final exponentiation of the given point. Returns a [None] if
-      the point is null *)
+  (** Compute the final exponentiation of the given point. Returns [None] if
+      the point is equal to {!Fq12.zero} *)
   val final_exponentiation_opt : Fq12.t -> GT.t option
 
   (** Compute the final exponentiation of the given point.
-      @raise FailToComputeFinalExponentiation if the point is null *)
+      Raises {!FailToComputeFinalExponentiation} if the point is equal to
+      {!Fq12.zero} *)
   val final_exponentiation_exn : Fq12.t -> GT.t
 end
 
