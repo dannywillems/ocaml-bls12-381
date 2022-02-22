@@ -1,6 +1,18 @@
+let array_for_all2 p l1 l2 =
+  let n1 = Array.length l1 and n2 = Array.length l2 in
+  if n1 <> n2 then invalid_arg "Array.for_all2"
+  else
+    let rec loop i =
+      if i = n1 then true
+      else if p (Array.unsafe_get l1 i) (Array.unsafe_get l2 i) then
+        loop (succ i)
+      else false
+    in
+    loop 0
+
 (** Linear algebra module, copied from {{:
-    https://gitlab.com/nomadic-labs/privacy-team/-/blob/9e4050cb4a304848901c3434d61a8d7f0c7107c4/nuplompiler/linear_algebra.ml
-    } Nomadic Labs privacy team repository } *)
+      https://gitlab.com/nomadic-labs/privacy-team/-/blob/9e4050cb4a304848901c3434d61a8d7f0c7107c4/nuplompiler/linear_algebra.ml
+      } Nomadic Labs privacy team repository } *)
 module type Ring_sig = sig
   type t
 
@@ -24,7 +36,7 @@ module type Field_sig = sig
 end
 
 (** This refers to the mathematical generalization of vector space called
-    "module", where the field of scalars is replaced by a ring *)
+      "module", where the field of scalars is replaced by a ring *)
 module type Module_sig = sig
   type t
 
@@ -72,7 +84,7 @@ module type VectorSpace_sig = sig
 
   (** [inverse m] is the inverse matrix of m
 
-      @raise [Invalid_argument] if [m] is not invertible *)
+        @raise [Invalid_argument] if [m] is not invertible *)
   val inverse : matrix -> matrix
 end
 
@@ -86,7 +98,7 @@ module Make_Module (Ring : Ring_sig) : Module_sig with type t = Ring.t = struct
   let identity n =
     Array.(init n (fun i -> init n Ring.(fun j -> if i = j then one else zero)))
 
-  let equal = Array.(for_all2 (for_all2 Ring.eq))
+  let equal = array_for_all2 (array_for_all2 Ring.eq)
 
   let add = Array.(map2 (map2 Ring.add))
 
