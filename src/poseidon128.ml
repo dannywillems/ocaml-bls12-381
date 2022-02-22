@@ -132,9 +132,16 @@ module Make_Module (Ring : Ring_sig) : Module_sig with type t = Ring.t = struct
 
   let row_mul coeff i m = m.(i) <- Array.map (Ring.mul coeff) m.(i)
 
+  let list_filteri p l =
+    let rec aux i acc = function
+      | [] -> List.rev acc
+      | x :: l -> aux (i + 1) (if p i x then x :: acc else acc) l
+    in
+    aux 0 [] l
+
   let filter_cols f =
     Array.map (fun row ->
-        List.filteri (fun i _ -> f i) (Array.to_list row) |> Array.of_list)
+        list_filteri (fun i _ -> f i) (Array.to_list row) |> Array.of_list)
 
   let split_n n m =
     (filter_cols (fun i -> i < n) m, filter_cols (fun i -> i >= n) m)
