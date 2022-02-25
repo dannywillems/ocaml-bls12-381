@@ -5,6 +5,7 @@ stages:
   - benchmark
   - install
   - doc
+  - coverage
   - deploy
 
 # FIXME: Works locally but not in the CI since virtual library has been removed
@@ -384,6 +385,28 @@ doc:
       - _odoc
   rules:
     - when: always
+
+# Coverage
+coverage:
+  stage: coverage
+  image: ocaml/opam:debian-ocaml-4.12
+  rules:
+    - when: always
+  before_script:
+    - sudo apt-get update && sudo apt-get upgrade -y
+    - eval $(opam env)
+    - opam repository set-url default https://opam.ocaml.org
+    - opam update
+    - opam depext -i -y zarith conf-libffi conf-perl conf-pkg-config
+    - sudo apt-get install m4 -y
+    # Pin dev versions. Avoid clash with public opam-repository
+    - opam pin add bls12-381.dev . --no-action
+    - opam install . -y --with-test
+  script:
+    - dune runtest --instrument-with bisect_ppx --force
+    - bisect-ppx-report coveralls coverage-raw.json --coverage-path _build/default/
+    - ./_ci/coverage_metadata_glci.sh coverage-raw.json > coverage_glci.json
+    - curl --location --request POST 'https://coveralls.io/api/v1/jobs' --form 'json_file=@coverage_glci.json'
 
 pages:
   stage: deploy
