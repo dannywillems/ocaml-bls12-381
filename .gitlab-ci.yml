@@ -15,7 +15,7 @@ stages:
 #     - apk add --no-cache wget diffutils
 #     - diff --version
 #   script:
-#     - .ci/check_blst_version.sh
+#     - _ci/check_blst_version.sh
 #   rules:
 #     - when: always
 
@@ -23,7 +23,7 @@ lint-js:
   image: node:lts
   stage: lint
   before_script:
-    - cd .ci/js
+    - cd _ci/js
     - npm install -d
   script:
     - ./node_modules/eslint/bin/eslint.js -c .eslintrc.js ../../src/runtime_helper.js
