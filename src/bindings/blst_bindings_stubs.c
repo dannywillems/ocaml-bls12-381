@@ -414,7 +414,7 @@ CAMLprim value caml_blst_fp12_in_group_stubs(value x) {
   CAMLparam1(x);
   blst_fp12 *x_c = Blst_fp12_val(x);
   bool r = blst_fp12_in_group(x_c);
-  CAMLreturn(Bool_val(r));
+  CAMLreturn(Val_bool(r));
 }
 
 static struct custom_operations blst_p1_ops = {"blst_p1",
