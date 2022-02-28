@@ -291,6 +291,30 @@ module MakeGroupProperties (G : GROUP) = struct
           (repeat 100 additive_associativity) ] )
 end
 
+module Constructors = struct
+  let test_value_in_fq12_but_not_in_prime_subgroup () =
+    (* High probability a random point in Fq12 is not in the prime subgroup *)
+    let values = [Bls12_381.Fq12.zero; Bls12_381.Fq12.random ()] in
+    List.iter
+      (fun x ->
+        let x_bytes = Bls12_381.Fq12.to_bytes x in
+        assert (not @@ Bls12_381.GT.check_bytes x_bytes) ;
+        assert (Option.is_none (Bls12_381.GT.of_bytes_opt x_bytes)) ;
+        try
+          ignore @@ Bls12_381.GT.of_bytes_exn x_bytes ;
+          assert false
+        with Bls12_381.GT.Not_in_group _ -> ())
+      values
+
+  let get_tests () =
+    let open Alcotest in
+    ( "Constructors properties",
+      [ test_case
+          "Values not in the prime subgroup"
+          `Quick
+          test_value_in_fq12_but_not_in_prime_subgroup ] )
+end
+
 module ValueGeneration = MakeValueGeneration (Bls12_381.GT)
 module IsZero = MakeIsZero (Bls12_381.GT)
 module IsOne = MakeIsOne (Bls12_381.GT)
@@ -305,4 +329,5 @@ let () =
       IsOne.get_tests ();
       ValueGeneration.get_tests ();
       Equality.get_tests ();
+      Constructors.get_tests ();
       GroupProperties.get_tests () ]

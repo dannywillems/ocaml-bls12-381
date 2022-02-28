@@ -3,7 +3,7 @@
 module Stubs = struct
   type t = Fq12.Stubs.fp12
 
-  external is_in_group : t -> bool = "caml_blst_fp12_in_group_stubs"
+  external is_in_group : t -> int = "caml_blst_fp12_in_group_stubs"
 end
 
 module GT = struct
@@ -11,7 +11,12 @@ module GT = struct
 
   let check_bytes b =
     let x = Fq12.of_bytes_opt b in
-    match x with None -> false | Some x -> Stubs.is_in_group x
+    match x with
+    | None -> false
+    | Some x ->
+        (not (Fq12.is_zero x))
+        (* https://github.com/supranational/blst/issues/108 *)
+        && Stubs.is_in_group x = 1
 
   exception Not_in_group of Bytes.t
 
@@ -21,7 +26,13 @@ module GT = struct
     let x = Fq12.of_bytes_opt b in
     match x with
     | None -> None
-    | Some x -> if Stubs.is_in_group x then Some x else None
+    | Some x ->
+        if
+          (not (Fq12.is_zero x))
+          (* https://github.com/supranational/blst/issues/108 *)
+          && Stubs.is_in_group x = 1
+        then Some x
+        else None
 
   let of_bytes_exn b =
     match of_bytes_opt b with None -> raise (Not_in_group b) | Some x -> x
