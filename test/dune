@@ -171,3 +171,13 @@
   (:test test_gt.bc.js))
  (action
   (run node -- preload.js %{test})))
+
+(executable
+ (name check_built_blst_portable_set)
+ (libraries bls12-381)
+ (modules check_built_blst_portable_set))
+
+(executable
+ (name check_built_blst_portable_not_set)
+ (libraries bls12-381)
+ (modules check_built_blst_portable_not_set))

@@ -11,6 +11,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __BLST_PORTABLE__
+#define BUILT_WITH_BLST_PORTABLE 1
+#else
+#define BUILT_WITH_BLST_PORTABLE 0
+#endif
+
 // From ocaml-ctypes:
 // https://github.com/ocamllabs/ocaml-ctypes/blob/9048ac78b885cc3debeeb020c56ea91f459a4d33/src/ctypes/ctypes_primitives.h#L110
 #if SIZE_MAX == UINT64_MAX
@@ -1262,4 +1268,9 @@ CAMLprim value caml_blst_g2_pippenger_contiguous_affine_array_stubs(
   free(scratch);
 
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+CAMLprim value caml_built_with_blst_portable_stubs(value unit) {
+  CAMLparam1(unit);
+  CAMLreturn(Val_bool(BUILT_WITH_BLST_PORTABLE));
 }

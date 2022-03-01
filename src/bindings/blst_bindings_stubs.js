@@ -1727,3 +1727,8 @@ function caml_blst_g2_pippenger_contiguous_affine_array_stubs(
 
   return 0;
 }
+
+//Provides: caml_built_with_blst_portable_stubs
+function caml_built_with_blst_portable_stubs(unit) {
+  return 0;
+}

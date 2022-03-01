@@ -105,6 +105,20 @@ lint-c:
     - dune build @install
     - dune build @runtest
     - dune build @runtest-js
+    # Check built_with_blst_portable is set to true if libblst built with __BLST_PORTABLE__
+    - dune clean
+    - BLST_PORTABLE=y dune exec ./test/check_built_blst_portable_set.exe
+    - dune clean
+    - BLST_PORTABLE=y dune build -p bls12-381
+    - BLST_PORTABLE=y dune exec ./test/check_built_blst_portable_set.exe
+    - dune exec ./test/check_built_blst_portable_set.exe
+    # Check built_with_blst_portable is set to false if libblst not built with __BLST_PORTABLE__
+    - dune clean
+    - dune exec ./test/check_built_blst_portable_not_set.exe
+    - dune clean
+    - dune build -p bls12-381
+    - BLST_PORTABLE=y dune exec ./test/check_built_blst_portable_not_set.exe
+    - dune exec ./test/check_built_blst_portable_not_set.exe
   rules:
     - when: always
 
@@ -199,6 +213,20 @@ build-ocaml-4.14-debian-11:
     - dune build @install
     - dune build @runtest
     # - dune build @runtest-js
+    # Check built_with_blst_portable is set to true if libblst built with __BLST_PORTABLE__
+    - dune clean
+    - BLST_PORTABLE=y dune exec ./test/check_built_blst_portable_set.exe
+    - dune clean
+    - BLST_PORTABLE=y dune build -p bls12-381
+    - BLST_PORTABLE=y dune exec ./test/check_built_blst_portable_set.exe
+    - dune exec ./test/check_built_blst_portable_set.exe
+    # Check built_with_blst_portable is set to false if libblst not built with __BLST_PORTABLE__
+    - dune clean
+    - dune exec ./test/check_built_blst_portable_not_set.exe
+    - dune clean
+    - dune build -p bls12-381
+    - BLST_PORTABLE=y dune exec ./test/check_built_blst_portable_not_set.exe
+    - dune exec ./test/check_built_blst_portable_not_set.exe
   rules:
     - when: always
 

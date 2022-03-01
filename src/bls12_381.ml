@@ -209,4 +209,7 @@ module Signature = Signature
 module Poseidon128 = Poseidon128
 module Rescue = Rescue
 
-let built_with_blst_portable = Option.is_some (Sys.getenv_opt "BLST_PORTABLE")
+external built_with_blst_portable_stubs : unit -> bool
+  = "caml_built_with_blst_portable_stubs"
+
+let built_with_blst_portable = built_with_blst_portable_stubs ()
