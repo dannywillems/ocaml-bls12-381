@@ -1,5 +1,12 @@
 ### unreleased
 
+- Fix `Bls12_381.built_with_blst_portable`. Detect using `Sys.getenv_opt` was not
+  a working solution. Projects relying on the value must update the library.
+- Fix GT.check_bytes, see https://github.com/supranational/blst/issues/108 and
+  https://github.com/dannywillems/ocaml-bls12-381/pull/4
+- Replace GT.one with the hexadecimal representation of the generator, instead
+  of computing using Pairing.pairing
+
 ### 0.4.0
 
 #### Changes
