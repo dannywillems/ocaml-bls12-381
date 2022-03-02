@@ -31,7 +31,7 @@ module Stubs = struct
   external miller_loop_list : Fq12.t -> (G1.t * G2.t) array -> int -> int
     = "caml_blst_miller_loop_list_stubs"
 
-  external final_exponentiation : Fq12.t -> Fq12.t -> int
+  external final_exponentiation : Fq12.t -> Gt.t -> int
     = "caml_blst_final_exponentiation_stubs"
 end
 
@@ -71,4 +71,4 @@ let pairing g1 g2 =
 
 let pairing_check points =
   let res_opt = miller_loop points |> final_exponentiation_opt in
-  match res_opt with None -> false | Some res -> Fq12.is_one res
+  match res_opt with None -> false | Some res -> Gt.is_zero res
