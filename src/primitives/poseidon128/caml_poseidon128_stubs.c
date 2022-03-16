@@ -12,10 +12,6 @@
 
 #define Poseidon128_ctxt_val(v) (*((poseidon128_ctxt_t **)Data_custom_val(v)))
 
-#define Fr_val_i(v, i) Blst_fr_val(Field(v, i))
-
-#define Fr_val_ij(v, i, j) Blst_fr_val(Field(Field(v, i), j))
-
 static void finalize_free_poseidon128_ctxt(value v) {
   free(Poseidon128_ctxt_val(v));
 }
@@ -59,7 +55,7 @@ CAMLprim value caml_poseidon128_constants_init_stubs(value vark, value vmds,
   }
 
   for (int i = 0; i < ark_len; i++) {
-    memcpy(ark + i, Fr_val_i(vark, i), sizeof(blst_fr));
+    memcpy(ark + i, Fr_val_k(vark, i), sizeof(blst_fr));
   }
 
   int res =

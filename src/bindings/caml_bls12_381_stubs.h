@@ -31,6 +31,8 @@
 
 #define Fr_val_k(v, k) (Blst_fr_val(Field(v, k)))
 
+#define Fr_val_ij(v, i, j) Blst_fr_val(Field(Field(v, i), j))
+
 #define G1_val_k(v, k) (Blst_p1_val(Field(v, k)))
 
 #define G2_val_k(v, k) (Blst_p2_val(Field(v, k)))
