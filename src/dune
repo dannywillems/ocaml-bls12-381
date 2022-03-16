@@ -4,6 +4,9 @@
   primitives/poseidon128/{caml_poseidon128_stubs.c,caml_poseidon128_stubs.js,poseidon128.h,poseidon128.c})
 
 (copy_files
+  primitives/poseidon/{caml_poseidon_stubs.c,caml_poseidon_stubs.js,poseidon.h,poseidon.c})
+
+(copy_files
   primitives/rescue/{caml_rescue_stubs.c,caml_rescue_stubs.js,rescue.h,rescue.c})
 
 (copy_files primitives/fft/{fft.c,fft.h,caml_fft_stubs.c,caml_fft_stubs.js})
@@ -70,6 +73,7 @@
   fq2
   fft
   poseidon128
+  poseidon
   poseidon_utils
   rescue)
  (instrumentation
@@ -88,7 +92,7 @@
    -Wno-incompatible-pointer-types
    (:include c_flags_blst.sexp))
   (names blst_wrapper blst_bindings_stubs caml_poseidon128_stubs poseidon128
-    rescue caml_rescue_stubs fft caml_fft_stubs)))
+    poseidon caml_poseidon_stubs rescue caml_rescue_stubs fft caml_fft_stubs)))
 
 (executable
  (name gen_wasm_needed_names)
