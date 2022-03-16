@@ -18,6 +18,14 @@ module Stubs = struct
     = "caml_poseidon128_get_state_stubs"
 end
 
+let width = 3
+
+let nb_partial_rounds = 56
+
+let nb_full_rounds = 8
+
+let batch_size = 3
+
 type ctxt = Stubs.ctxt
 
 let constants_init ark mds =
@@ -28,7 +36,13 @@ let constants_init ark mds =
         arc_intermediate_state,
         arc_unbatched,
         arc_full_round_end ) =
-    compute_updated_constants 56 8 3 3 ark mds
+    compute_updated_constants
+      nb_partial_rounds
+      nb_full_rounds
+      width
+      batch_size
+      ark
+      mds
   in
   let ark =
     Array.concat
@@ -36,9 +50,9 @@ let constants_init ark mds =
         arc_intermediate_state;
         arc_unbatched;
         arc_full_round_end;
-        (* Adding dummy constants, zeroes, for the last round as we apply the round key at the end of
-           a full round. *)
-        Array.make 3 Fr.zero ]
+        (* Adding dummy constants, zeroes, for the last round as we apply the
+           round key at the end of a full round. *)
+        Array.make width Fr.zero ]
   in
   let ark_len = Array.length ark in
   assert (0 = Stubs.constants_init ark mds ark_len mds_nb_rows mds_nb_cols)
