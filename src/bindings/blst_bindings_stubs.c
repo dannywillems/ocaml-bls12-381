@@ -34,21 +34,6 @@
 #define Is_none(v) ((v) == Val_none)
 #define Is_some(v) Is_block(v)
 
-static int caml_blst_fr_compare(value x, value y) {
-  blst_fr *x_c = Blst_fr_val(x);
-  blst_fr *y_c = Blst_fr_val(y);
-  return (blst_fr_compare(x_c, y_c));
-}
-
-static struct custom_operations blst_fr_ops = {"blst_fr",
-                                               custom_finalize_default,
-                                               caml_blst_fr_compare,
-                                               custom_hash_default,
-                                               custom_serialize_default,
-                                               custom_deserialize_default,
-                                               custom_compare_ext_default,
-                                               custom_fixed_length_default};
-
 static struct custom_operations blst_scalar_ops = {"blst_scalar",
                                                    custom_finalize_default,
                                                    custom_compare_default,

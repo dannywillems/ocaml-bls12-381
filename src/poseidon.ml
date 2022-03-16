@@ -13,11 +13,18 @@ module Stubs = struct
     ctxt
     = "caml_poseidon_allocate_ctxt_stubs_bytecode" "caml_poseidon_allocate_ctxt_stubs"
 
-  external init : ctxt -> Fr.t array -> unit = "caml_poseidon_init_stubs"
+  external init : ctxt -> width:int -> Fr.t array -> unit
+    = "caml_poseidon_init_stubs"
 
-  external apply_perm : ctxt -> unit = "caml_poseidon_apply_perm_stubs"
+  external apply_perm :
+    ctxt ->
+    width:int ->
+    nb_full_rounds:int ->
+    nb_partial_rounds:int ->
+    batch_size:int ->
+    unit = "caml_poseidon_apply_perm_stubs"
 
-  external get_state : Fr.t array -> ctxt -> unit
+  external get_state : Fr.t array -> ctxt -> int -> unit
     = "caml_poseidon_get_state_stubs"
 end
 
@@ -75,13 +82,14 @@ struct
         ~ark:modified_ark
         ~mds
     in
-    Stubs.init ctxt inputs ;
+    Stubs.init ctxt ~width inputs ;
     ctxt
 
-  let apply_permutation ctxt = Stubs.apply_perm ctxt
+  let apply_permutation ctxt =
+    Stubs.apply_perm ctxt ~width ~nb_full_rounds ~nb_partial_rounds ~batch_size
 
   let get ctxt =
     let res = Array.init width (fun _ -> Fr.(copy zero)) in
-    Stubs.get_state res ctxt ;
+    Stubs.get_state res ctxt width ;
     res
 end
