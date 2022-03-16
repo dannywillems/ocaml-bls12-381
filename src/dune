@@ -70,6 +70,7 @@
   fq2
   fft
   poseidon128
+  poseidon_utils
   rescue)
  (instrumentation
   (backend bisect_ppx))
