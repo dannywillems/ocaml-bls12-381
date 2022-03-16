@@ -39,6 +39,94 @@ let t2 =
       let () = NPoseidon128.apply_permutation ctxt in
       ())
 
-let command = Bench.make_command [t1; t2]
+let create_bench nb_full_rounds nb_partial_rounds width batch_size =
+  let ark_length = width * (nb_full_rounds + nb_partial_rounds) in
+  let ark = Array.init ark_length (fun _ -> Bls12_381.Fr.random ()) in
+  let mds =
+    Array.init width (fun _ ->
+        Array.init width (fun _ -> Bls12_381.Fr.random ()))
+  in
+  let inputs = Array.init width (fun _ -> Bls12_381.Fr.random ()) in
+  let module Parameters = struct
+    let nb_full_rounds = nb_full_rounds
+
+    let nb_partial_rounds = nb_partial_rounds
+
+    let batch_size = batch_size
+
+    let width = width
+
+    let ark = ark
+
+    let mds = mds
+  end in
+  let module Poseidon = Bls12_381.Poseidon.Make (Parameters) in
+  let ctxt = Poseidon.init inputs in
+  let name =
+    Printf.sprintf
+      "Benchmark Poseidon: width = %d, partial = %d, full = %d, batch size = %d"
+      width
+      nb_partial_rounds
+      nb_full_rounds
+      batch_size
+  in
+  let t =
+    Bench.Test.create ~name (fun () ->
+        let () = Poseidon.apply_permutation ctxt in
+        ())
+  in
+  t
+
+let create_bench_different_batch_size_same_parameters_width width =
+  let nb_full_rounds = 8 in
+  let nb_partial_rounds = 56 in
+  let ark_length = width * (nb_full_rounds + nb_partial_rounds) in
+  let ark = Array.init ark_length (fun _ -> Bls12_381.Fr.random ()) in
+  let mds =
+    Array.init width (fun _ ->
+        Array.init width (fun _ -> Bls12_381.Fr.random ()))
+  in
+  let inputs = Array.init width (fun _ -> Bls12_381.Fr.random ()) in
+  let module BaseParameters = struct
+    let nb_full_rounds = nb_full_rounds
+
+    let nb_partial_rounds = nb_partial_rounds
+
+    let width = width
+
+    let ark = ark
+
+    let mds = mds
+  end in
+  let batch_sizes = [1; 2; 3; 5; 7; 10; 15] in
+  let benches =
+    List.map
+      (fun batch_size ->
+        let module Parameters = struct
+          include BaseParameters
+
+          let batch_size = batch_size
+        end in
+        let module Poseidon = Bls12_381.Poseidon.Make (Parameters) in
+        let ctxt = Poseidon.init inputs in
+        let name =
+          Printf.sprintf
+            "Benchmark Poseidon: width = %d, batch size = %d"
+            width
+            batch_size
+        in
+        Bench.Test.create ~name (fun () ->
+            let () = Poseidon.apply_permutation ctxt in
+            ()))
+      batch_sizes
+  in
+  benches
+
+let command =
+  Bench.make_command
+    (t1 :: t2
+    :: List.concat
+         [ create_bench_different_batch_size_same_parameters_width 5;
+           create_bench_different_batch_size_same_parameters_width 3 ])
 
 let () = Core.Command.run command
