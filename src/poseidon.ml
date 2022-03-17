@@ -47,6 +47,8 @@ struct
   type ctxt = Stubs.ctxt
 
   let init inputs =
+    if Array.length inputs <> width then
+      failwith (Printf.sprintf "The inputs must be of size %d" width) ;
     let modified_ark =
       let ( arc_full_round_start_with_first_partial,
             arc_intermediate_state,
