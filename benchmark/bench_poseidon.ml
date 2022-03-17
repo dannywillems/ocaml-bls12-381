@@ -122,9 +122,40 @@ let create_bench_different_batch_size_same_parameters_width width =
   in
   benches
 
+let bench_neptunus =
+  let width = 5 in
+  let nb_full_rounds = 60 in
+  let nb_partial_rounds = 0 in
+  let ark_length = width * (nb_full_rounds + nb_partial_rounds) in
+  let ark = Array.init ark_length (fun _ -> Bls12_381.Fr.random ()) in
+  let mds =
+    Array.init width (fun _ ->
+        Array.init width (fun _ -> Bls12_381.Fr.random ()))
+  in
+  let inputs = Array.init width (fun _ -> Bls12_381.Fr.random ()) in
+  let module Parameters = struct
+    let nb_full_rounds = nb_full_rounds
+
+    let nb_partial_rounds = nb_partial_rounds
+
+    let width = width
+
+    let ark = ark
+
+    let mds = mds
+
+    let batch_size = 2
+  end in
+  let module Poseidon = Bls12_381.Poseidon.Make (Parameters) in
+  let ctxt = Poseidon.init inputs in
+  let name = "Benchmark Neptunus" in
+  Bench.Test.create ~name (fun () ->
+      let () = Poseidon.apply_permutation ctxt in
+      ())
+
 let command =
   Bench.make_command
-    (t1 :: t2
+    (t1 :: t2 :: bench_neptunus
     :: List.concat
          [ create_bench_different_batch_size_same_parameters_width 5;
            create_bench_different_batch_size_same_parameters_width 3 ])
