@@ -179,7 +179,15 @@ struct
     Bench.Test.create ~name (fun () ->
         ignore @@ SignatureM.Pop.verify pk msg' signature)
 
-  let benches = [t1; t2; t3; t4; t5; t6; t7; t8; t9; t10; t11; t12]
+  let t13 =
+    let name = Printf.sprintf "%s - \nGenerate public keys" SignatureM.name in
+    Bench.Test.create ~name (fun () ->
+        let ikm = generate_random_bytes 32 in
+        let sk = Bls12_381.Signature.generate_sk ikm in
+        let pk = SignatureM.derive_pk sk in
+        ignore pk)
+
+  let benches = [t1; t2; t3; t4; t5; t6; t7; t8; t9; t10; t11; t12; t13]
 end
 
 module MinPkBenches = MakeBenches (struct
