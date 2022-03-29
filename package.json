@@ -1,0 +1,16 @@
+{
+  "name": "@dannywillems/ocaml-bls12-381",
+  "main": "dist/blst.js",
+  "license": "MIT",
+  "collaborators": [
+      "Danny Willems <be.danny.willems@gmail.com>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/dannywillems/ocaml-bls12-381.git"
+  },
+  "files": [
+    "dist/blst.wasm",
+    "dist/blst.js"
+  ]
+}

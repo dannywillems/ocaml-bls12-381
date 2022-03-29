@@ -1,8 +1,28 @@
+# Testing on multiple platforms and Caml version, but some jobs can share the
+# _opam and _build directory.
+variables:
+  IMAGE_WITH_CACHE: "ocaml/opam:debian-testing-opam"
+  OCAML_COMPILER: "4.13.0"
+  # A workaround against a bug in gitlab-runner's default
+  # unzipping implementation, which partially breaks caching for the dune _build cache.
+  # See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27496 for more details.
+  FF_USE_FASTZIP: "true"
+
+.job-with-cache: &job_with_cache
+  image: ${IMAGE_WITH_CACHE}
+  cache:
+    # Make the cache unique per commit
+    key: opam-cache-$CI_COMMIT_SHORT_SHA
+    paths:
+      - _build
+      - _opam
+
 stages:
   # - dependencies-check
   - lint
   - build
-  - benchmark
+  - test-debian
+  - test-alpine
   - install
   - doc
   - deploy
@@ -53,12 +73,8 @@ lint-c:
     - apt-get update -y
     - apt-get install clang-format-11 git -y
     - clang-format-11 --version
-    - clang-format-11 src/primitives/fft/*.c -i
-    - clang-format-11 src/primitives/fft/*.h -i
-    - clang-format-11 src/primitives/poseidon128/*.c -i
-    - clang-format-11 src/primitives/poseidon128/*.h -i
-    - clang-format-11 src/primitives/rescue/*.c -i
-    - clang-format-11 src/primitives/rescue/*.h -i
+    - clang-format-11 src/primitives/**/*.c -i
+    - clang-format-11 src/primitives/**/*.h -i
     - clang-format-11 src/bindings/*.c -i
     - clang-format-11 src/bindings/*.h -i
     # Check if a file has been modified and uncommited
@@ -66,10 +82,10 @@ lint-c:
   rules:
     - when: always
 
-# Build pipeline for alpine
+# Build pipeline for debian
 # Keep it close to the one for other distributions
 .build-test-debian: &build_definition_debian
-  stage: build
+  stage: test-debian
   before_script:
     # Always update system package manager + setup OPAM env
     - sudo apt-get update
@@ -93,14 +109,11 @@ lint-c:
     - emcc --version
     - echo $OPAM_SWITCH_PREFIX
   script:
-    # Install external dependencies
-    - opam depext -i -y zarith
-    # Pin for later installation
-    - opam pin add bls12-381.dev . --no-action
-    # Install the dependencies
-    - opam install bls12-381 -y --with-test --deps-only
+    - opam install depext --yes
+    - opam depext -iy
+    - opam install . --dry-run --deps-only --locked --with-test --with-doc --yes | awk '/-> installed/{print $3}' | xargs opam depext -iy
     # For benchmark repository
-    - opam install core_bench
+    - opam install "core_bench<=v0.14.1" -y
     - dune build
     - dune build @install
     - dune build @runtest
@@ -178,12 +191,48 @@ build-ocaml-4.14-debian-11:
   <<: *build_definition_debian
   image: ocaml/opam:debian-11-ocaml-4.14
 
+# Build and use cache. Useful for other jobs not related to testing.
+# Does not run any test
+build:
+  <<: *job_with_cache
+  stage: build
+  before_script:
+    # Always update system package manager + setup OPAM env
+    - sudo apt-get update
+    - opam switch create --yes --no-install . $OCAML_COMPILER
+    - eval $(opam env)
+    - opam update
+    - sudo apt-get install nodejs python3 -y
+
+    # Install emsdk to install emcc
+    - git clone https://github.com/emscripten-core/emsdk.git
+    - cd emsdk
+    - ./emsdk install latest
+    - ./emsdk activate latest
+    - source "./emsdk_env.sh"
+    - cd ../
+
+    # List versions and environments
+    - ocaml --version
+    - opam --version
+    - cc --version
+    - emcc --version
+    - echo $OPAM_SWITCH_PREFIX
+  script:
+    - opam install depext --yes
+    - opam install . --dry-run --deps-only --locked --with-test --with-doc --yes | awk '/-> installed/{print $3}' | xargs opam depext -iy
+    # For benchmark repository. Not included in opam deps
+    - opam install "core_bench<=v0.14.1" -y
+    - dune build
+  rules:
+    - when: always
+
 # Build pipeline for alpine
 # Keep it close to the one for other distributions
 # Keep it close to utils/Dockerfile-alpine to be able to debug alpine on a dev
 # machine.
 .build-test-alpine: &build_definition_alpine
-  stage: build
+  stage: test-alpine
   before_script:
     # Always update system package manager + setup OPAM env
     - eval $(opam env)
@@ -204,12 +253,8 @@ build-ocaml-4.14-debian-11:
     - cc --version
     - echo $OPAM_SWITCH_PREFIX
   script:
-    # Install external dependencies
-    - opam depext -i -y zarith
-    # Pin for later installation
-    - opam pin add bls12-381.dev . --no-action
-    # Install the dependencies
-    - opam install bls12-381 -y --with-test --deps-only
+    - opam install depext --yes
+    - opam install . --dry-run --deps-only --locked --with-test --with-doc --yes | awk '/-> installed/{print $3}' | xargs opam depext -iy
     - dune build @install
     - dune build @runtest
     # - dune build @runtest-js
@@ -286,41 +331,6 @@ build-ocaml-4.14-alpine-3.15:
   <<: *build_definition_alpine
   image: ocaml/opam:alpine-3.15-ocaml-4.14
 
-# Benchmarks
-.benchmark: &benchmark_definition
-  stage: benchmark
-  before_script:
-    # Always update system package manager + setup OPAM env
-    - sudo apt-get update && sudo apt-get upgrade -y
-    - eval $(opam env)
-    - opam repository set-url default https://opam.ocaml.org
-    - opam update
-    # List versions and environments
-    - ocaml --version
-    - opam --version
-    - cc --version
-    - echo $OPAM_SWITCH_PREFIX
-    # Depext
-    - opam depext -i -y zarith conf-pkg-config conf-libffi
-    # Pin for later installation
-    - opam pin add bls12-381.dev . --no-action
-    # Install the packages
-    - opam install bls12-381 -y --with-test
-  script:
-    # Benchmark
-    - opam install core_bench
-    - dune build benchmark/bench_fr.exe
-    - dune build benchmark/bench_g1.exe
-    - dune build benchmark/bench_g2.exe
-    - dune build benchmark/bench_pairing.exe
-    - dune build benchmark/bench_signature.exe
-  rules:
-    - when: always
-
-benchmark-ocaml-4.09:
-  <<: *benchmark_definition
-  image: ocaml/opam:debian-ocaml-4.09
-
 opam-install-and-remove:
   stage: install
   image: ocaml/opam:debian-ocaml-4.11
@@ -335,17 +345,21 @@ opam-install-and-remove:
   script:
   script:
     - opam pin add bls12-381.dev . --no-action
-
-    - opam depext bls12-381.dev -y -v
+    - opam depext bls12-381.dev -i -y -v
     - opam install bls12-381.dev -y -v --deps-only
     - opam install bls12-381.dev -y -v
+    # Check blst headers are installed
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst.h
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst_aux.h
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst_misc.h
+    - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/caml_bls12_381_stubs.h
     - opam remove -a -y bls12-381.dev
   rules:
     - when: always
 
 opam-install-and-remove-local-switch:
   stage: install
-  image: ocaml/opam:debian-ocaml-4.09
+  image: ocaml/opam:debian-ocaml-4.11
   before_script:
     # Run everything in a local switch
     - opam switch create ./ 4.09.1 --no-install
@@ -359,51 +373,24 @@ opam-install-and-remove-local-switch:
     - opam update
   script:
     - opam pin add bls12-381.dev . --no-action
-
-    - opam depext bls12-381.dev -y -v
+    - opam depext bls12-381.dev -i -y -v
     - opam install bls12-381.dev -y -v --deps-only
     - opam install bls12-381.dev -y -v
-    - opam remove -a -y bls12-381.dev
-  rules:
-    - when: always
-
-check-blst-headers-are-installed:
-  stage: install
-  image: ocaml/opam:debian-ocaml-4.12
-  before_script:
-    # List versions and environments
-    - ocaml --version
-    - opam --version
-    - cc --version
-    - echo $OPAM_SWITCH_PREFIX
-    - opam repository set-url default https://opam.ocaml.org
-    - opam update
-  script:
-    - opam pin add bls12-381.dev . --no-action
-    - opam depext bls12-381.dev -y -v
-    - opam install bls12-381.dev -y -v --deps-only
-    - opam install bls12-381.dev -y -v
+    # Check blst headers are installed
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst.h
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst_aux.h
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst_misc.h
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/caml_bls12_381_stubs.h
+    - opam remove -a -y bls12-381.dev
   rules:
     - when: always
 
 doc:
+  <<: *job_with_cache
   stage: doc
-  image: ocaml/opam:debian-ocaml-4.12
   before_script:
-    - sudo apt-get update && sudo apt-get upgrade -y
     - eval $(opam env)
-    - opam repository set-url default https://opam.ocaml.org
-    - opam update
-    - opam depext -i -y zarith conf-libffi conf-perl conf-pkg-config
-    - sudo apt-get install m4 -y
-    # Pin dev versions. Avoid clash with public opam-repository
-    - opam pin add bls12-381.dev . --no-action
     - opam install odoc -y
-    - opam install . -y --deps-only
   script:
     - dune build @doc
     - cp -r _build/default/_doc/_html _odoc/
@@ -414,8 +401,8 @@ doc:
     - when: always
 
 pages:
+  <<: *job_with_cache
   stage: deploy
-  image: ocaml/opam:debian-ocaml-4.12
   script:
     - cp -r _odoc public/
   artifacts:
@@ -423,3 +410,40 @@ pages:
       - public
   rules:
     - if: '$CI_COMMIT_BRANCH == "master"'
+
+npm-publish:
+  <<: *job_with_cache
+  only:
+    - tags
+    - master
+  stage: deploy
+  before_script:
+    - sudo apt-get update -y
+    - sudo apt-get install git curl jq -y
+    # Install NVM to publish the package
+    # Using nodejs/npm from debian registry does not work. Looks like node.12.22
+    # does not work. Do not know why.
+    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+    - export NVM_DIR="$HOME/.nvm"
+    - . "$NVM_DIR/nvm.sh"
+    - nvm install 12.16.1
+    - nvm use 12.16.1
+    # Print binaries versions
+    - jq --version
+    - node --version
+    - npm --version
+    - mkdir -p dist
+    - cp _build/default/src/blst.js dist/blst.js
+    - cp _build/default/src/blst.wasm dist/blst.wasm
+  script:
+    # !! projects/${CI_PROJECT_ID} is required
+    - echo "@dannywillems:registry=https://gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/" > .npmrc
+    # https://docs.gitlab.com/ee/user/packages/npm_registry/
+    - echo "//gitlab.com/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${NPM_TOKEN}" >> .npmrc
+    - echo "//gitlab.com/api/v4/packages/npm/:_authToken=${NPM_TOKEN}" >> .npmrc
+    # In the case of a tag, git describe outputs only the tag, not tag-NB_COMMIT-HASH
+    - >
+      jq --arg version $(git describe) '. + {version: $version}' < package.json > package.json.new
+    - mv package.json.new package.json
+    - cat package.json
+    - npm publish
