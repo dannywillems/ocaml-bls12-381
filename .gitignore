@@ -6,3 +6,4 @@ _coverage
 node_modules
 *.o
 .ccls-cache
+*.~undo-tree~
