@@ -206,9 +206,15 @@ module GT = Gt
 module Fq12 = Fq12
 module Pairing = Pairing
 module Signature = Signature
-module Poseidon128 = Poseidon128
-module Poseidon = Poseidon
-module Rescue = Rescue
+
+module Hash = struct
+  module Poseidon128 = Poseidon128
+end
+
+module Permutation = struct
+  module Hades = Hades
+  module Rescue = Rescue
+end
 
 external built_with_blst_portable_stubs : unit -> bool
   = "caml_built_with_blst_portable_stubs"

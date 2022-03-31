@@ -45,10 +45,12 @@ let test_consistent_with_mec () =
     (fun (inputs, expected_output) ->
       let inputs = Array.map Bls12_381.Fr.of_string inputs in
       let expected_output = Array.map Bls12_381.Fr.of_string expected_output in
-      Bls12_381.Rescue.constants_init Rescue_ark.v Rescue_mds.v ;
-      let ctxt = Bls12_381.Rescue.init inputs.(0) inputs.(1) inputs.(2) in
-      let () = Bls12_381.Rescue.apply_permutation ctxt in
-      let a, b, c = Bls12_381.Rescue.get ctxt in
+      Bls12_381.Permutation.Rescue.constants_init Rescue_ark.v Rescue_mds.v ;
+      let ctxt =
+        Bls12_381.Permutation.Rescue.init inputs.(0) inputs.(1) inputs.(2)
+      in
+      let () = Bls12_381.Permutation.Rescue.apply_permutation ctxt in
+      let a, b, c = Bls12_381.Permutation.Rescue.get ctxt in
       let output = [| a; b; c |] in
       Array.iter2
         (fun a b ->

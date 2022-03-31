@@ -14,25 +14,25 @@ module Parameters = struct
   let mds = Poseidon128_mds.v
 end
 
-module NPoseidon128 = Bls12_381.Poseidon.Make (Parameters)
+module NPoseidon128 = Bls12_381.Permutation.Hades.Make (Parameters)
 
 let () =
-  Bls12_381.Poseidon128.constants_init Poseidon128_ark.v Poseidon128_mds.v
+  Bls12_381.Hash.Poseidon128.constants_init Poseidon128_ark.v Poseidon128_mds.v
 
 let a, b, c =
   (Bls12_381.Fr.random (), Bls12_381.Fr.random (), Bls12_381.Fr.random ())
 
 let t1 =
   let name = "Benchmark one permutation of Poseidon128 from the library" in
-  let ctxt = Bls12_381.Poseidon128.init a b c in
+  let ctxt = Bls12_381.Hash.Poseidon128.init a b c in
   Bench.Test.create ~name (fun () ->
-      let () = Bls12_381.Poseidon128.apply_permutation ctxt in
+      let () = Bls12_381.Hash.Poseidon128.apply_permutation ctxt in
       ())
 
 let t2 =
   let name =
     "Benchmark one permutation of Poseidon128 instantiate with \
-     Bls12_381.Poseidon.Make"
+     Bls12_381.Permutation.Hades.Make"
   in
   let ctxt = NPoseidon128.init [| a; b; c |] in
   Bench.Test.create ~name (fun () ->
@@ -60,8 +60,8 @@ let create_bench nb_full_rounds nb_partial_rounds width batch_size =
 
     let mds = mds
   end in
-  let module Poseidon = Bls12_381.Poseidon.Make (Parameters) in
-  let ctxt = Poseidon.init inputs in
+  let module Hades = Bls12_381.Permutation.Hades.Make (Parameters) in
+  let ctxt = Hades.init inputs in
   let name =
     Printf.sprintf
       "Benchmark Poseidon: width = %d, partial = %d, full = %d, batch size = %d"
@@ -72,7 +72,7 @@ let create_bench nb_full_rounds nb_partial_rounds width batch_size =
   in
   let t =
     Bench.Test.create ~name (fun () ->
-        let () = Poseidon.apply_permutation ctxt in
+        let () = Hades.apply_permutation ctxt in
         ())
   in
   t
@@ -107,8 +107,8 @@ let create_bench_different_batch_size_same_parameters_width width =
 
           let batch_size = batch_size
         end in
-        let module Poseidon = Bls12_381.Poseidon.Make (Parameters) in
-        let ctxt = Poseidon.init inputs in
+        let module = Bls12_381.Permutation.Hades.Make (Parameters) in
+        let ctxt = Hades.init inputs in
         let name =
           Printf.sprintf
             "Benchmark Poseidon: width = %d, batch size = %d"
@@ -116,7 +116,7 @@ let create_bench_different_batch_size_same_parameters_width width =
             batch_size
         in
         Bench.Test.create ~name (fun () ->
-            let () = Poseidon.apply_permutation ctxt in
+            let () = Hades.apply_permutation ctxt in
             ()))
       batch_sizes
   in
@@ -146,11 +146,11 @@ let bench_neptunus =
 
     let batch_size = 2
   end in
-  let module Poseidon = Bls12_381.Poseidon.Make (Parameters) in
-  let ctxt = Poseidon.init inputs in
+  let module Hades = Bls12_381.Permutation.Hades.Make (Parameters) in
+  let ctxt = Hades.init inputs in
   let name = "Benchmark Neptunus" in
   Bench.Test.create ~name (fun () ->
-      let () = Poseidon.apply_permutation ctxt in
+      let () = Hades.apply_permutation ctxt in
       ())
 
 let command =

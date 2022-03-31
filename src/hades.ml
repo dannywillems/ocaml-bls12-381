@@ -1,4 +1,4 @@
-open Poseidon_utils
+open Hades_utils
 
 module Stubs = struct
   type ctxt
@@ -11,10 +11,10 @@ module Stubs = struct
     ark:Fr.t array ->
     mds:Fr.t array array ->
     ctxt
-    = "caml_poseidon_allocate_ctxt_stubs_bytecode" "caml_poseidon_allocate_ctxt_stubs"
+    = "caml_hades_allocate_ctxt_stubs_bytecode" "caml_hades_allocate_ctxt_stubs"
 
   external init : ctxt -> width:int -> Fr.t array -> unit
-    = "caml_poseidon_init_stubs"
+    = "caml_hades_init_stubs"
 
   external apply_perm :
     ctxt ->
@@ -22,10 +22,10 @@ module Stubs = struct
     nb_full_rounds:int ->
     nb_partial_rounds:int ->
     batch_size:int ->
-    unit = "caml_poseidon_apply_perm_stubs"
+    unit = "caml_hades_apply_perm_stubs"
 
   external get_state : Fr.t array -> ctxt -> int -> unit
-    = "caml_poseidon_get_state_stubs"
+    = "caml_hades_get_state_stubs"
 end
 
 module Make (Parameters : sig

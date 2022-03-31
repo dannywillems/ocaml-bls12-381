@@ -1,6 +1,6 @@
-#include "poseidon.h"
+#include "hades.h"
 
-int poseidon_compute_number_of_constants(int batch_size, int nb_partial_rounds,
+int hades_compute_number_of_constants(int batch_size, int nb_partial_rounds,
                                          int nb_full_rounds, int width) {
   int nb_tmp_var = batch_size - 1;
   int nb_batched_partial_rounds = nb_partial_rounds / batch_size;
@@ -24,7 +24,7 @@ int poseidon_compute_number_of_constants(int batch_size, int nb_partial_rounds,
   return (nb_constants);
 }
 
-void poseidon_apply_sbox(blst_fr *ctxt, int full, int width) {
+void hades_apply_sbox(blst_fr *ctxt, int full, int width) {
   blst_fr buffer;
   int partial_round_idx_sbox = width - 1;
   int begin_idx = full ? 0 : partial_round_idx_sbox;
@@ -37,7 +37,7 @@ void poseidon_apply_sbox(blst_fr *ctxt, int full, int width) {
   }
 }
 
-void poseidon_apply_matrix_multiplication(blst_fr *ctxt, int width,
+void hades_apply_matrix_multiplication(blst_fr *ctxt, int width,
                                           int ark_len) {
   blst_fr buffer;
   blst_fr res[width];
@@ -57,14 +57,14 @@ void poseidon_apply_matrix_multiplication(blst_fr *ctxt, int width,
   }
 }
 
-int poseidon_apply_cst(blst_fr *ctxt, int width, int offset_ark) {
+int hades_apply_cst(blst_fr *ctxt, int width, int offset_ark) {
   for (int i = 0; i < width; i++) {
     blst_fr_add(ctxt + i, ctxt + i, ctxt + offset_ark + i);
   }
   return (offset_ark + width);
 }
 
-int poseidon_apply_batched_partial_round(blst_fr *ctxt, int batch_size,
+int hades_apply_batched_partial_round(blst_fr *ctxt, int batch_size,
                                          int width, int offset_ark) {
   // FIXME: if batch_size is 0, fails
   int nb_tmp_var = batch_size - 1;
@@ -113,31 +113,31 @@ int poseidon_apply_batched_partial_round(blst_fr *ctxt, int batch_size,
   return ark - ctxt;
 }
 
-void poseidon_apply_perm(blst_fr *ctxt, int width, int nb_full_rounds,
+void hades_apply_perm(blst_fr *ctxt, int width, int nb_full_rounds,
                          int nb_partial_rounds, int batch_size) {
   int nb_batched_partial_rounds = nb_partial_rounds / batch_size;
   int nb_unbatched_partial_rounds = nb_partial_rounds % batch_size;
-  int ark_len = poseidon_compute_number_of_constants(
+  int ark_len = hades_compute_number_of_constants(
       batch_size, nb_partial_rounds, nb_full_rounds, width);
   int offset_ark = width;
-  offset_ark = poseidon_apply_cst(ctxt, width, offset_ark);
+  offset_ark = hades_apply_cst(ctxt, width, offset_ark);
   for (int i = 0; i < nb_full_rounds / 2; i++) {
-    poseidon_apply_sbox(ctxt, 1, width);
-    poseidon_apply_matrix_multiplication(ctxt, width, ark_len);
-    offset_ark = poseidon_apply_cst(ctxt, width, offset_ark);
+    hades_apply_sbox(ctxt, 1, width);
+    hades_apply_matrix_multiplication(ctxt, width, ark_len);
+    offset_ark = hades_apply_cst(ctxt, width, offset_ark);
   }
   for (int i = 0; i < nb_batched_partial_rounds; i++) {
-    offset_ark = poseidon_apply_batched_partial_round(ctxt, batch_size, width,
+    offset_ark = hades_apply_batched_partial_round(ctxt, batch_size, width,
                                                       offset_ark);
   }
   for (int i = 0; i < nb_unbatched_partial_rounds; i++) {
-    poseidon_apply_sbox(ctxt, 0, width);
-    poseidon_apply_matrix_multiplication(ctxt, width, ark_len);
-    offset_ark = poseidon_apply_cst(ctxt, width, offset_ark);
+    hades_apply_sbox(ctxt, 0, width);
+    hades_apply_matrix_multiplication(ctxt, width, ark_len);
+    offset_ark = hades_apply_cst(ctxt, width, offset_ark);
   }
   for (int i = 0; i < nb_full_rounds / 2; i++) {
-    poseidon_apply_sbox(ctxt, 1, width);
-    poseidon_apply_matrix_multiplication(ctxt, width, ark_len);
-    offset_ark = poseidon_apply_cst(ctxt, width, offset_ark);
+    hades_apply_sbox(ctxt, 1, width);
+    hades_apply_matrix_multiplication(ctxt, width, ark_len);
+    offset_ark = hades_apply_cst(ctxt, width, offset_ark);
   }
 }

@@ -12,19 +12,19 @@ module Parameters = struct
   let mds = Poseidon128_mds.v
 end
 
-module NPoseidon128 = Bls12_381.Poseidon.Make (Parameters)
+module NPoseidon128 = Bls12_381.Permutation.Hades.Make (Parameters)
 
 let () =
-  Bls12_381.Poseidon128.constants_init Poseidon128_ark.v Poseidon128_mds.v
+  Bls12_381.Hash.Poseidon128.constants_init Poseidon128_ark.v Poseidon128_mds.v
 
 let test_instantiate_correctly_poseidon128 () =
   let inputs = Array.init Parameters.width (fun _ -> Bls12_381.Fr.random ()) in
   let n_ctxt = NPoseidon128.init inputs in
   let () = NPoseidon128.apply_permutation n_ctxt in
   let n_output = NPoseidon128.get n_ctxt in
-  let ctxt = Bls12_381.Poseidon128.init inputs.(0) inputs.(1) inputs.(2) in
-  let () = Bls12_381.Poseidon128.apply_permutation ctxt in
-  let a, b, c = Bls12_381.Poseidon128.get ctxt in
+  let ctxt = Bls12_381.Hash.Poseidon128.init inputs.(0) inputs.(1) inputs.(2) in
+  let () = Bls12_381.Hash.Poseidon128.apply_permutation ctxt in
+  let a, b, c = Bls12_381.Hash.Poseidon128.get ctxt in
   let output = [| a; b; c |] in
   Array.iter2
     (fun a b ->
@@ -53,7 +53,7 @@ let test_poseidon128_with_different_batch_size () =
 
       let mds = Poseidon128_mds.v
     end in
-    let module NPoseidon128 = Bls12_381.Poseidon.Make (Parameters) in
+    let module NPoseidon128 = Bls12_381.Permutation.Hades.Make (Parameters) in
     let ctxt = NPoseidon128.init inputs in
     let () = NPoseidon128.apply_permutation ctxt in
     NPoseidon128.get ctxt
@@ -95,7 +95,7 @@ let test_random_instanciations_of_poseidon_with_different_batch_size () =
 
       let mds = mds
     end in
-    let module NPoseidon128 = Bls12_381.Poseidon.Make (Parameters) in
+    let module NPoseidon128 = Bls12_381.Permutation.Hades.Make (Parameters) in
     let ctxt = NPoseidon128.init inputs in
     let () = NPoseidon128.apply_permutation ctxt in
     NPoseidon128.get ctxt
@@ -135,7 +135,7 @@ let test_regression_tests_for_poseidon252 () =
            "e6ddc232b1895b132931211f1052df5a9945ef7c62011a45c5509490cf8cb001"
         |] ) ]
   in
-  let module Poseidon252 = Bls12_381.Poseidon.Make (Parameters) in
+  let module Poseidon252 = Bls12_381.Permutation.Hades.Make (Parameters) in
   List.iter
     (fun (inputs, expected_output) ->
       let expected_output =

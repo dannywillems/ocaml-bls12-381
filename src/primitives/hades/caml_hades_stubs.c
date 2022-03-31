@@ -4,7 +4,7 @@
 #define CAML_NAME_SPACE
 #include "caml_bls12_381_stubs.h"
 #include "ocaml_integers.h"
-#include "poseidon.h"
+#include "hades.h"
 #include <caml/alloc.h>
 #include <caml/custom.h>
 #include <caml/fail.h>
@@ -23,7 +23,7 @@
   The goal is to use the CPU cache and use the instance parameters as values on
   the stack
   */
-CAMLprim value caml_poseidon_allocate_ctxt_stubs(value width,
+CAMLprim value caml_hades_allocate_ctxt_stubs(value width,
                                                  value nb_full_rounds,
                                                  value nb_partial_rounds,
                                                  value batch_size, value ark,
@@ -36,7 +36,7 @@ CAMLprim value caml_poseidon_allocate_ctxt_stubs(value width,
   int nb_full_rounds_c = Int_val(nb_full_rounds);
   int nb_partial_rounds_c = Int_val(nb_partial_rounds);
   int batch_size_c = Int_val(batch_size);
-  int nb_constants = poseidon_compute_number_of_constants(
+  int nb_constants = hades_compute_number_of_constants(
       batch_size_c, nb_partial_rounds_c, nb_full_rounds_c, width_c);
   // state + ark length + MDS
   int nb_blst_fr_elem = width + nb_constants + width * width;
@@ -58,13 +58,13 @@ CAMLprim value caml_poseidon_allocate_ctxt_stubs(value width,
   CAMLreturn(block);
 }
 
-CAMLprim value caml_poseidon_allocate_ctxt_stubs_bytecode(value *argv,
+CAMLprim value caml_hades_allocate_ctxt_stubs_bytecode(value *argv,
                                                           value argc) {
-  return caml_poseidon_allocate_ctxt_stubs(argv[0], argv[1], argv[2], argv[3],
+  return caml_hades_allocate_ctxt_stubs(argv[0], argv[1], argv[2], argv[3],
                                            argv[4], argv[5]);
 }
 
-CAMLprim value caml_poseidon_init_stubs(value ctxt, value width, value inputs) {
+CAMLprim value caml_hades_init_stubs(value ctxt, value width, value inputs) {
   CAMLparam3(ctxt, width, inputs);
   blst_fr *ctxt_c = Blst_fr_val(ctxt);
   int width_c = Int_val(width);
@@ -74,18 +74,18 @@ CAMLprim value caml_poseidon_init_stubs(value ctxt, value width, value inputs) {
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value caml_poseidon_apply_perm_stubs(value ctxt, value width,
+CAMLprim value caml_hades_apply_perm_stubs(value ctxt, value width,
                                               value nb_full_rounds,
                                               value nb_partial_rounds,
                                               value batch_size) {
   CAMLparam5(ctxt, width, nb_full_rounds, nb_partial_rounds, batch_size);
-  poseidon_apply_perm(Blst_fr_val(ctxt), Int_val(width),
+  hades_apply_perm(Blst_fr_val(ctxt), Int_val(width),
                       Int_val(nb_full_rounds), Int_val(nb_partial_rounds),
                       Int_val(batch_size));
   CAMLreturn(Val_unit);
 }
 
-CAMLprim value caml_poseidon_get_state_stubs(value buffer, value ctxt,
+CAMLprim value caml_hades_get_state_stubs(value buffer, value ctxt,
                                              value width) {
   CAMLparam3(buffer, ctxt, width);
   int width_c = Int_val(width);
