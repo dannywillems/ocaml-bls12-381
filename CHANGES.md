@@ -1,5 +1,7 @@
 ### Unreleased
 
+- Add `Bls12_381.Poseidon` modular C implementation. See https://gitlab.com/dannywillems/ocaml-bls12-381/-/merge_requests/186
+
 ### 3.0.1
 
 #### Bugfix
