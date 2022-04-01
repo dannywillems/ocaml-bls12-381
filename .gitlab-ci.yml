@@ -98,7 +98,6 @@ lint-c:
     - source "./emsdk_env.sh"
     - cd ../
 
-    - opam depext -i -y conf-pkg-config conf-libffi
     # List versions and environments
     - ocaml --version
     - opam --version
@@ -107,7 +106,6 @@ lint-c:
     - echo $OPAM_SWITCH_PREFIX
   script:
     - opam install depext --yes
-    - opam depext -iy
     - opam install . --dry-run --deps-only --locked --with-test --with-doc --yes | awk '/-> installed/{print $3}' | xargs opam depext -iy
     # For benchmark repository
     - opam install "core_bench<=v0.14.1" -y
@@ -234,7 +232,6 @@ build:
     # Always update system package manager + setup OPAM env
     - eval $(opam env)
     - opam update
-    - opam depext -i -y conf-pkg-config conf-libffi
     - sudo apk add build-base python3
     # Install emsdk to install emcc
     - git clone https://github.com/emscripten-core/emsdk.git
