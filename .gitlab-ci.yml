@@ -410,7 +410,6 @@ npm-publish:
   <<: *job_with_cache
   only:
     - tags
-    - master
   stage: deploy
   before_script:
     - sudo apt-get update -y
