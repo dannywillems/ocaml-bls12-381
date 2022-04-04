@@ -442,4 +442,11 @@ npm-publish:
       jq --arg version $(git describe) '. + {version: $version}' < package.json > package.json.new
     - mv package.json.new package.json
     - cat package.json
-    - npm publish
+    # Do not publish with the tag `latest` and rely on the SemVer to get the
+    # latest version.
+    # See https://docs.npmjs.com/cli/v8/commands/npm-dist-tag
+    # > Publishing a package sets the latest tag to the published version unless
+    # > the --tag option is used. For example, npm publish --tag=beta.
+    # Useful to not rely on the latest tag when there are bugfixes in a previous
+    # major version
+    - npm publish --tag tag-$(git describe)
