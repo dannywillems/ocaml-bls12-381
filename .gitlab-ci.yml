@@ -337,7 +337,6 @@ opam-install-and-remove:
     - opam repository set-url default https://opam.ocaml.org
     - opam update
   script:
-  script:
     - opam pin add bls12-381.dev . --no-action
     - opam depext bls12-381.dev -i -y -v
     - opam install bls12-381.dev -y -v --deps-only
