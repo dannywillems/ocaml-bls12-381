@@ -194,7 +194,7 @@ build:
   before_script:
     # Always update system package manager + setup OPAM env
     - sudo apt-get update
-    - opam switch create --yes --no-install . $OCAML_COMPILER
+    - "[ -d _opam ] || opam switch create --yes --no-install . $OCAML_COMPILER"
     - eval $(opam env)
     - opam update
     - sudo apt-get install nodejs python3 -y
