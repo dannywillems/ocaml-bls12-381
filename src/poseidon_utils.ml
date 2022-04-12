@@ -430,25 +430,18 @@ let compute_updated_constants r_p r_f width batch_size arc mds =
      partial round. *)
   let arc_offset = (r_f * width / 2) + width in
   let nb_batch = r_p / batch_size in
+  let nb_unbatched_partial_rounds = r_p mod batch_size in
   let arc_per_batch = batch_size * width in
   (* We retrieve the ARC constants for each batch. *)
   let batched_arc =
     Array.init nb_batch (fun i ->
         Array.sub arc (arc_offset + (i * arc_per_batch)) arc_per_batch)
   in
+  let unbatched_arc_size = nb_unbatched_partial_rounds * width in
   (* We retrieve the remaining ARC constants. *)
   let unbatched_arc_offset = arc_offset + (arc_per_batch * nb_batch) in
-  let unbatched_arc_size = r_p mod batch_size * width in
-  let unbatched_arc = Array.sub arc unbatched_arc_offset unbatched_arc_size in
-  (* The remaining constants are for the last set of full rounds. As a round ends
-     with adding the round keys, there are (r_f / 2 - 1) * width constants left. *)
-  let arc_full_round_end =
-    Array.sub
-      arc
-      (unbatched_arc_offset + unbatched_arc_size)
-      (((r_f / 2) - 1) * width)
-  in
-  let constants =
+  let arc_full_round_start = Array.sub arc 0 arc_offset in
+  let batched_partial_rounds_constants =
     Array.fold_left
       (fun acc ks ->
         (* We split the ARC constants per batch in chunks of size width and
@@ -465,8 +458,35 @@ let compute_updated_constants r_p r_f width batch_size arc mds =
       []
       batched_arc
   in
-  let arc_full_round_start = Array.sub arc 0 arc_offset in
+  let unbatched_partial_rounds_constants =
+    if nb_unbatched_partial_rounds != 0 then
+      let ks =
+        Array.sub arc unbatched_arc_offset unbatched_arc_size
+      in
+      let k_cols =
+        Array.init nb_unbatched_partial_rounds (fun i ->
+            Array.init width (fun j -> [| ks.((i * width) + j) |]))
+      in
+        compute_updated_constants_one_batch width nb_unbatched_partial_rounds mds k_cols
+    else []
+  in
+  (* The remaining constants are for the last set of full rounds. As a round ends
+     with adding the round keys, there are (r_f / 2 - 1) * width constants left. *)
+  let arc_full_round_end =
+    Array.sub
+      arc
+      (unbatched_arc_offset + unbatched_arc_size)
+      (((r_f / 2) - 1) * width)
+  in
+  Printf.printf "Batch size = %d\n" (batch_size);
+  Printf.printf "Width = %d\n" width;
+  Printf.printf "r_p = %d\n" r_p;
+  Printf.printf "r_f = %d\n" r_f;
+  Printf.printf "full round start: %d\n" (Array.length arc_full_round_start);
+  Printf.printf "batched partial round start: %d\n" (List.length batched_partial_rounds_constants);
+  Printf.printf "unbatched partial round start: %d\n" (List.length unbatched_partial_rounds_constants);
+  Printf.printf "full round end: %d\n" (Array.length arc_full_round_end);
   ( arc_full_round_start,
-    Array.of_list constants,
-    unbatched_arc,
+    Array.of_list batched_partial_rounds_constants,
+    Array.of_list unbatched_partial_rounds_constants,
     arc_full_round_end )
