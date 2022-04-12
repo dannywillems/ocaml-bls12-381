@@ -467,7 +467,7 @@ let compute_updated_constants r_p r_f width batch_size arc mds =
         Array.init nb_unbatched_partial_rounds (fun i ->
             Array.init width (fun j -> [| ks.((i * width) + j) |]))
       in
-        compute_updated_constants_one_batch width nb_unbatched_partial_rounds mds k_cols
+      compute_updated_constants_one_batch width nb_unbatched_partial_rounds mds k_cols
     else []
   in
   (* The remaining constants are for the last set of full rounds. As a round ends
@@ -479,6 +479,7 @@ let compute_updated_constants r_p r_f width batch_size arc mds =
       (((r_f / 2) - 1) * width)
   in
   Printf.printf "Batch size = %d\n" (batch_size);
+  Printf.printf "nb_unbatched_partial_rounds = %d\n" nb_unbatched_partial_rounds;
   Printf.printf "Width = %d\n" width;
   Printf.printf "r_p = %d\n" r_p;
   Printf.printf "r_f = %d\n" r_f;
