@@ -206,7 +206,6 @@ module GT = Gt
 module Fq12 = Fq12
 module Pairing = Pairing
 module Signature = Signature
-module Poseidon128 = Poseidon128
 module Poseidon = Poseidon
 module Rescue = Rescue
 
