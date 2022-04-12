@@ -77,7 +77,8 @@ let create_bench nb_full_rounds nb_partial_rounds width batch_size =
   in
   t
 
-let create_bench_different_batch_size_same_parameters_width nb_partial_rounds width batch_sizes =
+let create_bench_different_batch_size_same_parameters_width nb_partial_rounds
+    width batch_sizes =
   let nb_full_rounds = 8 in
   let ark_length = width * (nb_full_rounds + nb_partial_rounds) in
   let ark = Array.init ark_length (fun _ -> Bls12_381.Fr.random ()) in
@@ -109,7 +110,8 @@ let create_bench_different_batch_size_same_parameters_width nb_partial_rounds wi
         let ctxt = Poseidon.init inputs in
         let name =
           Printf.sprintf
-            "Benchmark Poseidon: width = %d, batch size = %d, partial rounds = %d"
+            "Benchmark Poseidon: width = %d, batch size = %d, partial rounds = \
+             %d"
             width
             batch_size
             nb_partial_rounds
@@ -154,9 +156,10 @@ let bench_neptunus =
 
 let command =
   Bench.make_command
-    (
-    List.concat
-         [ create_bench_different_batch_size_same_parameters_width 59 5 [1; 4; 5; 6; 7; 8]])
-
+    (List.concat
+       [ create_bench_different_batch_size_same_parameters_width
+           59
+           5
+           [1; 4; 5; 6; 7; 8] ])
 
 let () = Core.Command.run command

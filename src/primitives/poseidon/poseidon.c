@@ -157,21 +157,17 @@ void poseidon_apply_perm(blst_fr *ctxt, int width, int nb_full_rounds,
     offset_ark = poseidon_apply_batched_partial_round(ctxt, batch_size, width,
                                                       offset_ark);
   }
-  if (nb_unbatched_partial_rounds != 0) {
+  printf("Offset unbatched rounds: %d\n", offset_ark - width);
+  if (nb_unbatched_partial_rounds > 0) {
     offset_ark = poseidon_apply_batched_partial_round(ctxt, nb_unbatched_partial_rounds, width,
                                                       offset_ark);
+    /* printf("%d\n", offset_ark - width); */
   }
 
+  /* printf("------------\n"); */
   for (int i = 0; i < nb_full_rounds / 2; i++) {
     poseidon_apply_sbox(ctxt, 1, width);
     poseidon_apply_matrix_multiplication(ctxt, width, ark_len);
     offset_ark = poseidon_apply_cst(ctxt, width, offset_ark);
   }
-  printf("R_f: %d\n", nb_full_rounds);
-  printf("R_p: %d\n", nb_partial_rounds);
-  printf("Width: %d\n", width);
-  printf("Batch size: %d\n", batch_size);
-  printf("Addition: %d\n", nb_addition);
-  printf("Multiplication: %d\n", nb_multiplication);
-  printf("------------------\n");
 }

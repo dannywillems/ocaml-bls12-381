@@ -21,21 +21,21 @@ let run () =
 
     let mds = mds
   end in
-        let module Parameters = struct
-          include BaseParameters
+  let module Parameters = struct
+    include BaseParameters
 
-          let batch_size = batch_size
-        end in
-        let module Poseidon = Bls12_381.Poseidon.Make (Parameters) in
-        let ctxt = Poseidon.init inputs in
-        let name =
-          Printf.sprintf
-            "Benchmark Poseidon: width = %d, batch size = %d, partial rounds = %d"
-            width
-            batch_size
-            nb_partial_rounds
-        in
-        print_endline name;
-            Poseidon.apply_permutation ctxt
+    let batch_size = batch_size
+  end in
+  let module Poseidon = Bls12_381.Poseidon.Make (Parameters) in
+  let ctxt = Poseidon.init inputs in
+  let name =
+    Printf.sprintf
+      "Benchmark Poseidon: width = %d, batch size = %d, partial rounds = %d"
+      width
+      batch_size
+      nb_partial_rounds
+  in
+  print_endline name ;
+  Poseidon.apply_permutation ctxt
 
 let () = run ()
