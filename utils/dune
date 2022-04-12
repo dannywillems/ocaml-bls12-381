@@ -6,6 +6,8 @@
 
 (copy_files ../test/test_vectors/pop_g2/{*})
 
+(executable (name run_poseidon) (modules run_poseidon) (libraries bls12-381))
+
 (executable
  (name generate_pairing_vectors)
  (modules generate_pairing_vectors)
