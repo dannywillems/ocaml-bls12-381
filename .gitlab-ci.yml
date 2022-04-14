@@ -57,7 +57,7 @@ lint:
   stage: lint
   image: ocaml/opam:debian-ocaml-4.12
   before_script:
-    - opam depext ocamlformat.$(cat .ocamlformat | grep version | cut -d '=' -f 2) --install
+    - opam install ocamlformat.0.20.1
   script:
     - dune build @fmt
   rules:
