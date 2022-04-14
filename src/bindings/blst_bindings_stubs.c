@@ -971,8 +971,9 @@ CAMLprim value caml_blst_g1_pippenger_stubs(value buffer, value jacobian_list,
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
 
-  blst_p1s_mult_pippenger(Blst_p1_val(buffer), addr_ps, npoints_c,
-                          addr_scalars_bs, 256, scratch);
+  blst_p1s_mult_pippenger(Blst_p1_val(buffer), (const blst_p1_affine **)addr_ps,
+                          npoints_c, (const byte **)addr_scalars_bs, 256,
+                          scratch);
 
   free(addr_ps);
   free(ps);
@@ -1037,8 +1038,9 @@ CAMLprim value caml_blst_g2_pippenger_stubs(value buffer, value jacobian_list,
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
 
-  blst_p2s_mult_pippenger(Blst_p2_val(buffer), addr_ps, npoints_c,
-                          addr_scalars_bs, 256, scratch);
+  blst_p2s_mult_pippenger(Blst_p2_val(buffer), (const blst_p2_affine **)addr_ps,
+                          npoints_c, (const byte **)addr_scalars_bs, 256,
+                          scratch);
 
   free(addr_ps);
   free(ps);
@@ -1151,8 +1153,8 @@ CAMLprim value caml_blst_g1_pippenger_contiguous_affine_array_stubs(
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
 
-  blst_p1s_mult_pippenger(Blst_p1_val(buffer), addr_ps, len_c, addr_scalars_bs,
-                          256, scratch);
+  blst_p1s_mult_pippenger(Blst_p1_val(buffer), (const blst_p1_affine **)addr_ps,
+                          len_c, (const byte **)addr_scalars_bs, 256, scratch);
 
   free(addr_ps);
   free(addr_scalars_bs);
@@ -1243,8 +1245,8 @@ CAMLprim value caml_blst_g2_pippenger_contiguous_affine_array_stubs(
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
 
-  blst_p2s_mult_pippenger(Blst_p2_val(buffer), addr_ps, len_c, addr_scalars_bs,
-                          256, scratch);
+  blst_p2s_mult_pippenger(Blst_p2_val(buffer), (const blst_p2_affine **)addr_ps,
+                          len_c, (const byte **)addr_scalars_bs, 256, scratch);
 
   free(addr_ps);
   free(addr_scalars_bs);
