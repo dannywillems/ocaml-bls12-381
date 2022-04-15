@@ -95,6 +95,18 @@ void set_fr_to_one(blst_fr *x) {
 }
 
 int blst_fr_pow(blst_fr *out, blst_fr *x, byte *exp, int exp_nb_bits) {
+  if (exp_nb_bits == 0) {
+    // out = x^0 = one
+    set_fr_to_one(out);
+    return 0;
+  }
+
+  if (blst_fr_is_zero(x) || blst_fr_is_one(x)) {
+    // out = 0^exp = 0 (exp <> 0) or out = 1^exp = 1
+    memcpy(out, x, sizeof(blst_fr));
+    return 0;
+  }
+
   // Assert that the most significant bit of exp is 1, otherwise
   // fail with error value 2 (Invalid_Argument).
   if (!(exp[(exp_nb_bits - 1) / 8] & (1 << (exp_nb_bits - 1) % 8)))
