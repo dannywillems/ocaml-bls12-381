@@ -85,6 +85,11 @@ void blst_lendian_from_fr(byte b[32], blst_fr *x) {
   free(s);
 }
 
+void set_fr_to_zero(blst_fr *x) {
+  uint64_t x_uint_64[4] = {0};
+  blst_fr_from_uint64(x, x_uint_64);
+}
+
 void set_fr_to_one(blst_fr *x) {
   uint64_t x_uint_64[4];
   x_uint_64[0] = 1lu;
