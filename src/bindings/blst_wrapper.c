@@ -166,7 +166,27 @@ void blst_fp12_of_bytes(blst_fp12 *buffer_c, byte *p) {
   blst_fp_from_lendian(&(buffer_c->fp6[1].fp2[2].fp[1]), p + 11 * 48);
 }
 
+bool blst_fp12_is_ff_one(blst_fp12 *p) {
+  unsigned char one[48 * 12] = {0};
+  one[0] = 1;
+  return memcmp(p, one, sizeof(blst_fp12)) == 0;
+}
+
 int blst_fp12_pow(blst_fp12 *out, blst_fp12 *x, byte *exp, int exp_nb_bits) {
+  if (exp_nb_bits == 0) {
+    // out = x^0 = one
+    blst_fp12_set_to_one(out);
+    return 0;
+  }
+
+  // We use blst_fq12_is_ff_one because in blst, blst_fq12_is_one is defined as
+  // the generator of the prime subgroup of Fq12.
+  if (blst_fp12_is_zero(x) || blst_fp12_is_ff_one(x)) {
+    // out = 0^exp = 0 (exp <> 0) or out = 1^exp = 1
+    memcpy(out, x, sizeof(blst_fp12));
+    return 0;
+  }
+
   // Assert that the most significant bit of exp is 1, otherwise
   // fail with error value 2 (Invalid_Argument).
   if (!(exp[(exp_nb_bits - 1) / 8] & (1 << (exp_nb_bits - 1) % 8)))

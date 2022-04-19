@@ -151,15 +151,11 @@ module Fq12 = struct
 
   let pow x n =
     let n = Z.erem n (Z.pred order) in
-    if Z.equal n Z.zero then one
-    else if is_zero x then zero
-    else if Z.equal n Z.one then x
-    else
-      let buffer = Stubs.allocate_fq12 () in
-      let exp = Z.to_bits n |> Bytes.unsafe_of_string in
-      let exp_len = Z.numbits n in
-      ignore @@ Stubs.pow buffer x exp exp_len ;
-      buffer
+    let buffer = Stubs.allocate_fq12 () in
+    let exp = Z.to_bits n |> Bytes.unsafe_of_string in
+    let exp_len = Z.numbits n in
+    ignore @@ Stubs.pow buffer x exp exp_len ;
+    buffer
 end
 
 include Fq12
