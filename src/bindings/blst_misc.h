@@ -11,8 +11,6 @@ size_t blst_fr_sizeof();
 
 int blst_fr_compare(blst_fr *s_c, blst_fr *t_c);
 
-int blst_fr_compare(blst_fr *x_c, blst_fr *y_c);
-
 bool blst_fr_from_lendian(blst_fr *x, byte b[32]);
 
 void blst_lendian_from_fr(byte b[32], blst_fr *x);
