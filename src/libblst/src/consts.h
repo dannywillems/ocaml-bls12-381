@@ -26,5 +26,6 @@ extern const vec384 BLS12_381_RR;   /* (1<<768)%P, "radix"^2, to-Montgomery   */
 extern const vec256 BLS12_381_r;    /* order */
 static const limb_t r0 = (limb_t)0xfffffffeffffffff;  /* -1/r */
 extern const vec256 BLS12_381_rRR;  /* (1<<512)%r, "radix"^2, to-Montgomery   */
+extern const vec256 BLS12_381_rR;   /* (1<<256)%r, "radix", one-in-Montgomery */
 
 #endif

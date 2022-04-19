@@ -259,15 +259,11 @@ module Fr = struct
 
   let pow x n =
     let n = Z.erem n (Z.pred order) in
-    if Z.equal n Z.zero then one
-    else if is_zero x then zero
-    else if Z.equal n Z.one then x
-    else
-      let buffer = Stubs.mallocate_fr () in
-      let exp = Z.to_bits n |> Bytes.unsafe_of_string in
-      let exp_len = Z.numbits n in
-      ignore @@ Stubs.pow buffer x exp exp_len ;
-      buffer
+    let buffer = Stubs.mallocate_fr () in
+    let exp = Z.to_bits n |> Bytes.unsafe_of_string in
+    let exp_len = Z.numbits n in
+    ignore @@ Stubs.pow buffer x exp exp_len ;
+    buffer
 
   let ( ** ) = pow
 
@@ -378,20 +374,18 @@ module Fr = struct
 
   let compare x y = Stdlib.compare (to_bytes x) (to_bytes y)
 
-  let inner_product_exn a b =
-    if Array.length a <> Array.length b then
-      raise (Invalid_argument "Both parameters must be of the same length")
-    else
-      let res = Stubs.callocate_fr () in
-      ignore @@ Stubs.inner_product res a b (Array.length a) ;
-      res
-
   let inner_product_opt a b =
     if Array.length a <> Array.length b then None
     else
-      let res = Stubs.callocate_fr () in
+      let res = copy zero in
       ignore @@ Stubs.inner_product res a b (Array.length a) ;
       Some res
+
+  let inner_product_exn a b =
+    match inner_product_opt a b with
+    | None ->
+        raise (Invalid_argument "Both parameters must be of the same length")
+    | Some x -> x
 
   let of_int x = of_z (Z.of_int x)
 end

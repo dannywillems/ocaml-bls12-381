@@ -33,7 +33,7 @@ module Stubs = struct
 
   external equal : fp12 -> fp12 -> bool = "caml_blst_fp12_is_equal_stubs"
 
-  external is_one : fp12 -> bool = "caml_blst_fp12_is_one_stubs"
+  external is_zero : fp12 -> bool = "caml_blst_fp12_is_zero_stubs"
 
   external inverse : fp12 -> fp12 -> int = "caml_blst_fp12_inverse_stubs"
 
@@ -103,7 +103,7 @@ module Fq12 = struct
     let res = eq p zero in
     res
 
-  let is_one p = Stubs.is_one p
+  let is_one p = eq p one
 
   let mul x y =
     let buffer = Stubs.allocate_fq12 () in

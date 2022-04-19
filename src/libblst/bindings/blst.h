@@ -100,6 +100,11 @@ void blst_fr_from_uint64(blst_fr *ret, const uint64_t a[4]);
 void blst_uint64_from_fr(uint64_t ret[4], const blst_fr *a);
 void blst_fr_from_scalar(blst_fr *ret, const blst_scalar *a);
 void blst_scalar_from_fr(blst_scalar *ret, const blst_fr *a);
+bool blst_fr_is_zero(const blst_fr *a);
+bool blst_fr_is_one(const blst_fr *a);
+bool blst_fr_is_equal(const blst_fr *a, const blst_fr *b);
+void blst_fr_set_to_zero(blst_fr *a);
+void blst_fr_set_to_one(blst_fr *a);
 
 /*
  * BLS12-381-specifc Fp operations.

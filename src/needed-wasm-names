@@ -3,10 +3,11 @@ _blst_fp12_in_group
 _blst_fp12_inverse
 _blst_fp12_is_equal
 _blst_fp12_is_one
+_blst_fp12_is_zero
 _blst_fp12_mul
 _blst_fp12_of_bytes
 _blst_fp12_pow
-_blst_fp12_set_one
+_blst_fp12_set_to_one
 _blst_fp12_sizeof
 _blst_fp12_sqr
 _blst_fp12_to_bytes
@@ -15,7 +16,7 @@ _blst_fp2_assign
 _blst_fp2_cneg
 _blst_fp2_mul
 _blst_fp2_of_bytes_components
-_blst_fp2_set_one
+_blst_fp2_set_to_one
 _blst_fp2_sizeof
 _blst_fp2_sqrt
 _blst_fp2_to_bytes

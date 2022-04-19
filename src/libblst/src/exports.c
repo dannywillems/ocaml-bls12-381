@@ -457,6 +457,31 @@ void blst_fr_from_uint64(vec256 ret, const unsigned long long a[4])
     mul_mont_sparse_256(ret, (const limb_t *)a, BLS12_381_rRR, BLS12_381_r, r0);
 }
 
+bool_t blst_fr_is_zero(const vec256 a_fr)
+{
+  return vec_is_zero(a_fr, sizeof(vec256));
+}
+
+bool_t blst_fr_is_one(const vec256 a_fr)
+{
+  return vec_is_equal(a_fr, BLS12_381_rR, sizeof(vec256));
+}
+
+bool_t blst_fr_is_equal(const vec256 a, const vec256 b)
+{
+  return vec_is_equal(a, b, sizeof(vec256));
+}
+
+void blst_fr_set_to_zero(vec256 a_fr)
+{
+  vec_zero(a_fr, sizeof(vec256));
+}
+
+void blst_fr_set_to_one(vec256 a_fr)
+{
+  vec_copy(a_fr, BLS12_381_rR, sizeof(vec256));
+}
+
 void blst_uint64_from_fr(unsigned long long ret[4], const vec256 a)
 {
     const union {

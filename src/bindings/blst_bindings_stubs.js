@@ -369,7 +369,7 @@ function caml_blst_fp2_zero_stubs(buffer) {
 //Requires: Blst_fp2_val
 function caml_blst_fp2_one_stubs(buffer) {
   var buffer_c = Blst_fp2_val(buffer);
-  wasm_call('_blst_fp2_set_one', buffer_c);
+  wasm_call('_blst_fp2_set_to_one', buffer_c);
   return 0;
 }
 
@@ -442,6 +442,14 @@ function caml_blst_fp12_is_equal_stubs(p, q) {
   return b ? 1 : 0;
 }
 
+//Provides: caml_blst_fp12_is_zero_stubs
+//Requires: wasm_call
+//Requires: Blst_fp12_val
+function caml_blst_fp12_is_zero_stubs(p) {
+    var b = wasm_call('_blst_fp12_is_zero', Blst_fp12_val(p));
+    return b ? 1 : 0;
+}
+
 //Provides: caml_blst_fp12_is_one_stubs
 //Requires: wasm_call
 //Requires: Blst_fp12_val
@@ -471,7 +479,7 @@ function caml_blst_fp12_sqr_stubs(buffer, p) {
 //Requires: Blst_fp12_val
 function caml_blst_fp12_one_stubs(buffer) {
   var buffer_c = Blst_fp12_val(buffer);
-  wasm_call('_blst_fp12_set_one', buffer_c);
+  wasm_call('_blst_fp12_set_to_one', buffer_c);
   return 0;
 }
 
@@ -1013,7 +1021,7 @@ function caml_blst_miller_loop_stubs(buffer, g2, g1) {
 //Requires: Blst_fp12, Blst_p1_affine, Blst_p2_affine
 function caml_blst_miller_loop_list_stubs(out, points_array, length) {
   var out_c = Blst_fp12_val(out);
-  wasm_call('_blst_fp12_set_one', out_c);
+  wasm_call('_blst_fp12_set_to_one', out_c);
 
   var tmp = Blst_fp12_val(new Blst_fp12());
   var tmp_p1 = Blst_p1_affine_val(new Blst_p1_affine());

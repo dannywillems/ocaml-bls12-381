@@ -38,35 +38,6 @@ int blst_fr_compare(blst_fr *s_c, blst_fr *t_c) {
   return (lt ? -1 : 1);
 }
 
-// Additional functions for Fr.eq, Fr.is_zero and Fr.is_one
-bool blst_fr_is_equal(blst_fr *x, blst_fr *y) {
-  uint64_t x_uint_64[4];
-  blst_uint64_from_fr(x_uint_64, x);
-
-  uint64_t y_uint_64[4];
-  blst_uint64_from_fr(y_uint_64, y);
-  bool is_equal =
-      ((y_uint_64[0] == x_uint_64[0])) && ((y_uint_64[1] == x_uint_64[1])) &&
-      ((y_uint_64[2] == x_uint_64[2])) && ((y_uint_64[3] == x_uint_64[3]));
-  return (is_equal);
-}
-
-bool blst_fr_is_zero(blst_fr *x) {
-  uint64_t x_uint_64[4];
-  blst_uint64_from_fr(x_uint_64, x);
-  bool is_zero = (x_uint_64[0] == 0lu) && (x_uint_64[1] == 0lu) &&
-                 (x_uint_64[2] == 0lu) && (x_uint_64[3] == 0lu);
-  return (is_zero);
-}
-
-bool blst_fr_is_one(blst_fr *x) {
-  uint64_t x_uint_64[4];
-  blst_uint64_from_fr(x_uint_64, x);
-  bool is_one = (x_uint_64[0] == 1lu) && (x_uint_64[1] == 0lu) &&
-                (x_uint_64[2] == 0lu) && (x_uint_64[3] == 0lu);
-  return (is_one);
-}
-
 bool blst_fr_from_lendian(blst_fr *x, byte b[32]) {
   blst_scalar *s = (blst_scalar *)calloc(1, sizeof(blst_scalar));
   blst_scalar_from_lendian(s, b);
@@ -85,16 +56,19 @@ void blst_lendian_from_fr(byte b[32], blst_fr *x) {
   free(s);
 }
 
-void set_fr_to_one(blst_fr *x) {
-  uint64_t x_uint_64[4];
-  x_uint_64[0] = 1lu;
-  x_uint_64[1] = 0lu;
-  x_uint_64[2] = 0lu;
-  x_uint_64[3] = 0lu;
-  blst_fr_from_uint64(x, x_uint_64);
-}
-
 int blst_fr_pow(blst_fr *out, blst_fr *x, byte *exp, int exp_nb_bits) {
+  if (exp_nb_bits == 0) {
+    // out = x^0 = one
+    blst_fr_set_to_one(out);
+    return 0;
+  }
+
+  if (blst_fr_is_zero(x) || blst_fr_is_one(x)) {
+    // out = 0^exp = 0 (exp <> 0) or out = 1^exp = 1
+    memcpy(out, x, sizeof(blst_fr));
+    return 0;
+  }
+
   // Assert that the most significant bit of exp is 1, otherwise
   // fail with error value 2 (Invalid_Argument).
   if (!(exp[(exp_nb_bits - 1) / 8] & (1 << (exp_nb_bits - 1) % 8)))
@@ -134,7 +108,7 @@ void blst_fp2_zero(blst_fp2 *buffer_c) {
   blst_fp_from_lendian(&buffer_c->fp[1], zero_bytes);
 }
 
-void blst_fp2_set_one(blst_fp2 *buffer_c) {
+void blst_fp2_set_to_one(blst_fp2 *buffer_c) {
   byte bytes[48] = {0};
   blst_fp_from_lendian(&buffer_c->fp[0], bytes);
   bytes[0] = 1;
@@ -154,7 +128,7 @@ void blst_fp2_to_bytes(byte *out, blst_fp2 *p_c) {
 
 size_t blst_fp12_sizeof() { return sizeof(blst_fp12); }
 
-void blst_fp12_set_one(blst_fp12 *buffer_c) {
+void blst_fp12_set_to_one(blst_fp12 *buffer_c) {
   // Set all coordinates to 0. If allocated with allocate_fp12_stubs it's
   // normally fine, but doing it just in case...
   memset(buffer_c, 0, sizeof(blst_fp12));
@@ -162,6 +136,11 @@ void blst_fp12_set_one(blst_fp12 *buffer_c) {
   byte out[48] = {0};
   out[0] = 1;
   blst_fp_from_lendian(&(buffer_c->fp6[0].fp2[0].fp[0]), out);
+}
+
+bool blst_fp12_is_zero(blst_fp12 *p) {
+  unsigned char zero[48 * 12] = {0};
+  return memcmp(p, zero, sizeof(blst_fp12)) == 0;
 }
 
 void blst_fp12_to_bytes(byte *buffer, blst_fp12 *p_c) {

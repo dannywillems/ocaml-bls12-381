@@ -124,7 +124,6 @@ CAMLprim value mallocate_fr_stubs(value unit) {
   CAMLparam1(unit);
   CAMLlocal1(block);
   block = caml_alloc_custom(&blst_fr_ops, sizeof(blst_fr), 0, 1);
-  blst_fr *c = Blst_fr_val(block);
   CAMLreturn(block);
 }
 
@@ -309,7 +308,7 @@ CAMLprim value caml_blst_fp2_zero_stubs(value buffer) {
 CAMLprim value caml_blst_fp2_one_stubs(value buffer) {
   CAMLparam1(buffer);
   blst_fp2 *buffer_c = Blst_fp2_val(buffer);
-  blst_fp2_set_one(buffer_c);
+  blst_fp2_set_to_one(buffer_c);
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 CAMLprim value caml_blst_fp2_of_bytes_components_stubs(value buffer, value x1,
@@ -360,6 +359,12 @@ CAMLprim value caml_blst_fp12_is_equal_stubs(value p, value q) {
   CAMLreturn(Val_bool(b));
 }
 
+CAMLprim value caml_blst_fp12_is_zero_stubs(value p) {
+  CAMLparam1(p);
+  bool b = blst_fp12_is_zero(Blst_fp12_val(p));
+  CAMLreturn(Val_bool(b));
+}
+
 CAMLprim value caml_blst_fp12_is_one_stubs(value p) {
   CAMLparam1(p);
   bool b = blst_fp12_is_one(Blst_fp12_val(p));
@@ -381,7 +386,7 @@ CAMLprim value caml_blst_fp12_sqr_stubs(value buffer, value p) {
 CAMLprim value caml_blst_fp12_one_stubs(value buffer) {
   CAMLparam1(buffer);
   blst_fp12 *buffer_c = Blst_fp12_val(buffer);
-  blst_fp12_set_one(buffer_c);
+  blst_fp12_set_to_one(buffer_c);
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
@@ -720,7 +725,7 @@ CAMLprim value caml_blst_miller_loop_list_stubs(value out, value points_array,
   blst_fp12 *out_c = Blst_fp12_val(out);
   int length_c = Int_val(length);
 
-  blst_fp12_set_one(out_c);
+  blst_fp12_set_to_one(out_c);
 
   blst_fp12 tmp;
   blst_p1_affine tmp_p1;
