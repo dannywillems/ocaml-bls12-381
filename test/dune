@@ -10,7 +10,7 @@
  (modes native js)
  (deps
   (source_tree test_vectors))
- (libraries bls12-381 alcotest ff-pbt hex))
+ (libraries bls12-381 alcotest ff-pbt hex integers_stubs_js zarith_stubs_js))
 
 (copy_files ../src/blst.js)
 
