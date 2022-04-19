@@ -10,18 +10,11 @@ size_t blst_fr_sizeof() { return sizeof(blst_fr); }
 int blst_fr_compare(blst_fr *s_c, blst_fr *t_c) {
   uint64_t s_uint64[4];
   uint64_t t_uint64[4];
-  blst_scalar *buffer = (blst_scalar *)(calloc(1, sizeof(blst_scalar)));
 
-  blst_scalar_from_fr(buffer, s_c);
-  blst_uint64_from_scalar(s_uint64, buffer);
+  blst_uint64_from_fr(s_uint64, s_c);
+  blst_uint64_from_fr(t_uint64, t_c);
 
-  blst_scalar_from_fr(buffer, t_c);
-  blst_uint64_from_scalar(t_uint64, buffer);
-
-  free(buffer);
-
-  // Check first it is equal. To get constant time, decomposing on individual
-  // lines
+  // Check first it is equal.
   bool is_equal = 1;
   is_equal = is_equal && (s_uint64[0] == t_uint64[0]);
   is_equal = is_equal && (s_uint64[1] == t_uint64[1]);
@@ -39,21 +32,19 @@ int blst_fr_compare(blst_fr *s_c, blst_fr *t_c) {
 }
 
 bool blst_fr_from_lendian(blst_fr *x, byte b[32]) {
-  blst_scalar *s = (blst_scalar *)calloc(1, sizeof(blst_scalar));
-  blst_scalar_from_lendian(s, b);
-  bool is_ok = blst_scalar_fr_check(s);
+  blst_scalar s;
+  blst_scalar_from_lendian(&s, b);
+  bool is_ok = blst_scalar_fr_check(&s);
   if (is_ok) {
-    blst_fr_from_scalar(x, s);
+    blst_fr_from_scalar(x, &s);
   }
-  free(s);
   return (is_ok);
 }
 
 void blst_lendian_from_fr(byte b[32], blst_fr *x) {
-  blst_scalar *s = (blst_scalar *)calloc(1, sizeof(blst_scalar));
-  blst_scalar_from_fr(s, x);
-  blst_lendian_from_scalar(b, s);
-  free(s);
+  blst_scalar s;
+  blst_scalar_from_fr(&s, x);
+  blst_lendian_from_scalar(b, &s);
 }
 
 int blst_fr_pow(blst_fr *out, blst_fr *x, byte *exp, int exp_nb_bits) {
