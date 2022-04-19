@@ -83,6 +83,27 @@ let test_is_one_with_gt_zero () =
     Bls12_381.Fq12.is_one
       Bls12_381.Fq12.(of_bytes_exn Bls12_381.GT.(to_bytes zero)))
 
+let test_is_zero_with_one () =
+  assert (not (Bls12_381.Fq12.is_zero Bls12_381.Fq12.one))
+
+let test_is_zero_with_random () =
+  assert (not (Bls12_381.Fq12.is_zero (Bls12_381.Fq12.random ())))
+
+let test_is_zero_with_zero () =
+  assert (Bls12_381.Fq12.is_zero Bls12_381.Fq12.zero)
+
+let test_is_zero_with_gt_generator () =
+  assert (
+    not
+      (Bls12_381.Fq12.is_zero
+         Bls12_381.Fq12.(of_bytes_exn Bls12_381.GT.(to_bytes one))))
+
+let test_is_zero_with_gt_zero () =
+  assert (
+    not
+      (Bls12_381.Fq12.is_zero
+         Bls12_381.Fq12.(of_bytes_exn Bls12_381.GT.(to_bytes zero))))
+
 let () =
   let open Alcotest in
   run
@@ -120,11 +141,20 @@ let () =
             "pow to negative exponent"
             `Quick
             (Utils.repeat 100 pow_to_negative_exponent) ] );
-      ( "Is one",
+      ( "is one",
         [ test_case "is_one with random value" `Quick test_is_one_with_random;
           test_case "is_one with zero" `Quick test_is_one_with_zero;
           test_case
-            "is_one with GT generator"
+            "is_one with gt generator"
             `Quick
             test_is_one_with_gt_generator;
-          test_case "is_one with GT zero" `Quick test_is_one_with_gt_zero ] ) ]
+          test_case "is_one with gt zero" `Quick test_is_one_with_gt_zero ] );
+      ( "is zero",
+        [ test_case "is_zero with random value" `Quick test_is_zero_with_random;
+          test_case "is_zero with zero" `Quick test_is_zero_with_zero;
+          test_case
+            "is_zero with gt generator"
+            `Quick
+            test_is_zero_with_gt_generator;
+          test_case "is_zero with gt zero" `Quick test_is_zero_with_gt_zero ] )
+    ]
