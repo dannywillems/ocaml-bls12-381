@@ -64,6 +64,25 @@ let pow_add_multiplicative_group_order_to_a_random_power () =
       (Bls12_381.Fq12.pow x (Z.add n order))
       (Bls12_381.Fq12.pow x n))
 
+let test_is_one_with_one () = assert (Bls12_381.Fq12.is_one Bls12_381.Fq12.one)
+
+let test_is_one_with_random () =
+  assert (not (Bls12_381.Fq12.is_one (Bls12_381.Fq12.random ())))
+
+let test_is_one_with_zero () =
+  assert (not (Bls12_381.Fq12.is_one Bls12_381.Fq12.zero))
+
+let test_is_one_with_gt_generator () =
+  assert (
+    not
+      (Bls12_381.Fq12.is_one
+         Bls12_381.Fq12.(of_bytes_exn Bls12_381.GT.(to_bytes one))))
+
+let test_is_one_with_gt_zero () =
+  assert (
+    Bls12_381.Fq12.is_one
+      Bls12_381.Fq12.(of_bytes_exn Bls12_381.GT.(to_bytes zero)))
+
 let () =
   let open Alcotest in
   run
@@ -100,4 +119,12 @@ let () =
           test_case
             "pow to negative exponent"
             `Quick
-            (Utils.repeat 100 pow_to_negative_exponent) ] ) ]
+            (Utils.repeat 100 pow_to_negative_exponent) ] );
+      ( "Is one",
+        [ test_case "is_one with random value" `Quick test_is_one_with_random;
+          test_case "is_one with zero" `Quick test_is_one_with_zero;
+          test_case
+            "is_one with GT generator"
+            `Quick
+            test_is_one_with_gt_generator;
+          test_case "is_one with GT zero" `Quick test_is_one_with_gt_zero ] ) ]
