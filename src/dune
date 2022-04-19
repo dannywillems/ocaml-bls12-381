@@ -79,7 +79,7 @@
  (instrumentation
   (backend bisect_ppx))
  (private_modules fq fq2 fft)
- (libraries ff-sig hex integers integers_stubs_js zarith zarith_stubs_js)
+ (libraries ff-sig hex integers zarith)
  (library_flags :standard -linkall -ccopt -lpthread)
  (foreign_archives blst)
  (js_of_ocaml
