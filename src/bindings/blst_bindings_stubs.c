@@ -740,6 +740,31 @@ CAMLprim value caml_blst_miller_loop_list_stubs(value out, value points_array,
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
+CAMLprim value caml_blst_miller_loop_offset_stubs(value out, value g1_args,
+                                                  value g2_args, value length) {
+  CAMLparam4(out, g1_args, g2_args, length);
+  blst_fp12 *out_c = Blst_fp12_val(out);
+  value g1_pts_c = Field(g1_args, 0);
+  value g2_pts_c = Field(g2_args, 0);
+  int offset_1_c = Int_val(Field(g1_args, 1));
+  int offset_2_c = Int_val(Field(g2_args, 1));
+  int length_c = Int_val(length);
+
+  blst_fp12_set_to_one(out_c);
+
+  blst_fp12 tmp;
+  blst_p1_affine tmp_p1;
+  blst_p2_affine tmp_p2;
+
+  for (int i = 0; i < length_c; i++) {
+    blst_p1_to_affine(&tmp_p1, Blst_p1_val(Field(g1_pts_c, offset_1_c + i)));
+    blst_p2_to_affine(&tmp_p2, Blst_p2_val(Field(g2_pts_c, offset_2_c + i)));
+    blst_miller_loop(&tmp, &tmp_p2, &tmp_p1);
+    blst_fp12_mul(out_c, out_c, &tmp);
+  }
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
 CAMLprim value caml_blst_final_exponentiation_stubs(value buffer, value p) {
   CAMLparam2(buffer, p);
   blst_final_exp(Blst_fp12_val(buffer), Blst_fp12_val(p));

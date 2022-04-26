@@ -359,11 +359,38 @@ module RegressionTests = struct
         test_case "miller loop" `Quick test_miller_loop ] )
 end
 
+let test_miller_loop_offset () =
+  let n = 1 + Random.int 100 in
+  let offset1 = Random.int n in
+  let offset2 = Random.int n in
+  let max_offset = max offset1 offset2 in
+  let length = Random.int (n - max_offset) in
+  let g1_pts = Array.init n (fun _ -> Bls12_381.G1.random ()) in
+  let g2_pts = Array.init n (fun _ -> Bls12_381.G2.random ()) in
+  let exp_output =
+    let g1_pts = Array.sub g1_pts offset1 length in
+    let g2_pts = Array.sub g2_pts offset2 length in
+    let pts = List.init length (fun i -> (g1_pts.(i), g2_pts.(i))) in
+    Bls12_381.Pairing.miller_loop pts
+    |> Bls12_381.Pairing.final_exponentiation_exn
+  in
+  let output =
+    Bls12_381.Pairing.ip_pairing
+      (g1_pts, offset1, length)
+      (g2_pts, offset2, length)
+  in
+  assert (Bls12_381.GT.eq exp_output output)
+
 let () =
   let open Alcotest in
   run
     "Pairing"
     [ RegressionTests.get_tests ();
+      ( "Miller loop offset",
+        [ test_case
+            "consistent with miller_loop on random args"
+            `Quick
+            (Utils.repeat 100 test_miller_loop_offset) ] );
       ( "Properties",
         [ test_case
             "with zero as first component"

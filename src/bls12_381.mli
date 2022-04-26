@@ -585,6 +585,9 @@ module Pairing : sig
       is empty. *)
   val miller_loop : (G1.t * G2.t) list -> Fq12.t
 
+  (** [ip_pairing (pts_g1, offset_g1, len1) (pts_g2, offset_g2, len2)] *)
+  val ip_pairing : G1.t array * int * int -> G2.t array * int * int -> GT.t
+
   (** Compute the miller loop on a single tuple of point. *)
   val miller_loop_simple : G1.t -> G2.t -> Fq12.t
 

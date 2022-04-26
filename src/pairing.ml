@@ -31,6 +31,10 @@ module Stubs = struct
   external miller_loop_list : Fq12.t -> (G1.t * G2.t) array -> int -> int
     = "caml_blst_miller_loop_list_stubs"
 
+  external miller_loop_offset :
+    Fq12.t -> G1.t array * int -> G2.t array * int -> int -> int
+    = "caml_blst_miller_loop_offset_stubs"
+
   external final_exponentiation : Fq12.t -> Gt.t -> int
     = "caml_blst_final_exponentiation_stubs"
 end
@@ -72,3 +76,21 @@ let pairing g1 g2 =
 let pairing_check points =
   let res_opt = miller_loop points |> final_exponentiation_opt in
   match res_opt with None -> false | Some res -> Gt.is_zero res
+
+(* FIXME: check offset *)
+let ip_pairing (pts_g1, offset_1, len1) (pts_g2, offset_2, len2) =
+  if len1 <> len2 then
+    failwith
+      (Printf.sprintf
+         "miller_loop_offset: expect same length. len1 = %d, len2 = %d"
+         len1
+         len2)
+  else
+    let buffer = Fq12.Stubs.allocate_fq12 () in
+    ignore
+    @@ Stubs.miller_loop_offset
+         buffer
+         (pts_g1, offset_1)
+         (pts_g2, offset_2)
+         len1 ;
+    final_exponentiation_exn buffer
