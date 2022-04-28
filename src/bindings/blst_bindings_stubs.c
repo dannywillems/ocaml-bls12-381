@@ -1115,54 +1115,32 @@ CAMLprim value caml_blst_p1_affine_array_get_stubs(value buffer, value list,
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
-// Hypothesis: affine_list and scalars are arrays of size *at least* start +
-// length
 CAMLprim value caml_blst_g1_pippenger_contiguous_affine_array_stubs(
     value buffer, value affine_list, value scalars, value start, value len) {
   CAMLparam5(buffer, affine_list, scalars, start, len);
   size_t start_c = ctypes_size_t_val(start);
+  const blst_p1_affine *pts_c = Blst_p1_affine_val(affine_list) + start_c;
   size_t len_c = ctypes_size_t_val(len);
-  blst_p1_affine *affine_list_c = Blst_p1_affine_val(affine_list);
 
-  blst_p1_affine **addr_ps =
-      (blst_p1_affine **)calloc(len_c, sizeof(blst_p1_affine *));
-  if (addr_ps == NULL) {
-    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
-  }
-
-  byte **addr_scalars_bs = (byte **)calloc(len_c, sizeof(byte *));
-  if (addr_scalars_bs == NULL) {
-    free(addr_ps);
-    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
-  }
   byte *scalars_bs = (byte *)calloc(len_c * 32, sizeof(byte));
   if (scalars_bs == NULL) {
-    free(addr_ps);
-    free(addr_scalars_bs);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
-  blst_scalar scalar;
 
   for (int i = 0; i < len_c; i++) {
-    blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
-    blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
-    addr_scalars_bs[i] = scalars_bs + i * 32;
-    addr_ps[i] = affine_list_c + start_c + i;
+    blst_lendian_from_fr(scalars_bs + i * 32,
+                         Blst_fr_val(Field(scalars, start_c + i)));
   }
 
   limb_t *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(len_c));
   if (scratch == NULL) {
-    free(addr_ps);
-    free(addr_scalars_bs);
     free(scalars_bs);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
 
-  blst_p1s_mult_pippenger(Blst_p1_val(buffer), (const blst_p1_affine **)addr_ps,
-                          len_c, (const byte **)addr_scalars_bs, 256, scratch);
+  blst_p1s_mult_pippenger_cont(Blst_p1_val(buffer), pts_c, len_c, scalars_bs,
+                               256, scratch);
 
-  free(addr_ps);
-  free(addr_scalars_bs);
   free(scalars_bs);
   free(scratch);
 
@@ -1214,47 +1192,28 @@ CAMLprim value caml_blst_g2_pippenger_contiguous_affine_array_stubs(
     value buffer, value affine_list, value scalars, value start, value len) {
   CAMLparam5(buffer, affine_list, scalars, start, len);
   size_t start_c = ctypes_size_t_val(start);
+  const blst_p2_affine *pts_c = Blst_p2_affine_val(affine_list) + start_c;
   size_t len_c = ctypes_size_t_val(len);
 
-  blst_p2_affine **addr_ps =
-      (blst_p2_affine **)calloc(len_c, sizeof(blst_p2_affine *));
-  if (addr_ps == NULL) {
-    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
-  }
-
-  byte **addr_scalars_bs = (byte **)calloc(len_c, sizeof(byte *));
-  if (addr_scalars_bs == NULL) {
-    free(addr_ps);
-    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
-  }
   byte *scalars_bs = (byte *)calloc(len_c * 32, sizeof(byte));
   if (scalars_bs == NULL) {
-    free(addr_ps);
-    free(addr_scalars_bs);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
 
-  blst_scalar scalar;
-
   for (int i = 0; i < len_c; i++) {
-    blst_scalar_from_fr(&scalar, Blst_fr_val(Field(scalars, start_c + i)));
-    blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
-    addr_scalars_bs[i] = scalars_bs + i * 32;
-    addr_ps[i] = Blst_p2_affine_val(affine_list) + start_c + i;
+    blst_lendian_from_fr(scalars_bs + i * 32,
+                         Blst_fr_val(Field(scalars, start_c + i)));
   }
+
   limb_t *scratch = calloc(1, blst_p2s_mult_pippenger_scratch_sizeof(len_c));
   if (scratch == NULL) {
-    free(addr_ps);
-    free(addr_scalars_bs);
     free(scalars_bs);
     CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
   }
 
-  blst_p2s_mult_pippenger(Blst_p2_val(buffer), (const blst_p2_affine **)addr_ps,
-                          len_c, (const byte **)addr_scalars_bs, 256, scratch);
+  blst_p2s_mult_pippenger_cont(Blst_p2_val(buffer), pts_c, len_c, scalars_bs,
+                               256, scratch);
 
-  free(addr_ps);
-  free(addr_scalars_bs);
   free(scalars_bs);
   free(scratch);
 
