@@ -55,7 +55,6 @@ lint-js:
     - ./node_modules/eslint/bin/eslint.js -c .eslintrc.js ../../src/primitives/rescue/caml_rescue_stubs.js
   rules:
     - when: always
-  allow_failure: true
 
 lint:
   stage: lint
