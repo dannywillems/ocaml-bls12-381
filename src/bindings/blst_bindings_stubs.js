@@ -446,8 +446,8 @@ function caml_blst_fp12_is_equal_stubs(p, q) {
 //Requires: wasm_call
 //Requires: Blst_fp12_val
 function caml_blst_fp12_is_zero_stubs(p) {
-    var b = wasm_call('_blst_fp12_is_zero', Blst_fp12_val(p));
-    return b ? 1 : 0;
+  var b = wasm_call('_blst_fp12_is_zero', Blst_fp12_val(p));
+  return b ? 1 : 0;
 }
 
 //Provides: caml_blst_fp12_is_one_stubs
