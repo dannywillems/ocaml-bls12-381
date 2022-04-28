@@ -492,3 +492,4 @@ void prefix##s_mult_pippenger_cont(ptype *ret, \
 { ptype##s_mult_pippenger_cont(ret, points, npoints, scalars, nbits, scratch, 0); }
 
 POINTS_MULT_PIPPENGER_CONT_IMPL(blst_p1, POINTonE1)
+POINTS_MULT_PIPPENGER_CONT_IMPL(blst_p2, POINTonE2)
