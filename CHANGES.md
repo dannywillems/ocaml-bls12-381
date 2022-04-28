@@ -1,5 +1,13 @@
 ### Unreleased
 
+#### New features
+
+- Blst: modify pippenger to work with contiguous arrays of byte sequences and
+  affine points
+- `Bls12_381.G1.pippenger_with_affine_array` and
+  `Bls12_381.G2.pippenger_with_affine_array` works with the contiguous version
+  from blst.
+
 ### 3.0.1
 
 #### Bugfix
