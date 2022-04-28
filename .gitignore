@@ -9,3 +9,4 @@ node_modules
 .npmrc
 package-lock.json
 *.~undo-tree~
+src/c_flags_blst.sexp
