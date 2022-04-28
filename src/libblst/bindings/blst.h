@@ -248,6 +248,11 @@ void blst_p1s_tile_pippenger(blst_p1 *ret, const blst_p1_affine *const points[],
                              size_t nbits, limb_t *scratch,
                              size_t bit0, size_t window);
 
+// FIXME: See multi_scalar.c. Should we move to another file?
+void blst_p1s_mult_pippenger_cont(blst_p1 *ret, const blst_p1_affine points[],
+                                  size_t npoints, const byte scalars[],
+                                  size_t nbits, limb_t *scratch);
+
 void blst_p2s_to_affine(blst_p2_affine dst[], const blst_p2 *const points[],
                         size_t npoints);
 void blst_p2s_add(blst_p2 *ret, const blst_p2_affine *const points[],
