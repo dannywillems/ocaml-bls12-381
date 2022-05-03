@@ -80,64 +80,74 @@ module InplaceOperations = struct
     let x = Bls12_381.Fr.random () in
     let y = Bls12_381.Fr.random () in
     let res = Bls12_381.Fr.add x y in
-    Bls12_381.Fr.add_inplace x y ;
-    assert (Bls12_381.Fr.eq x res)
+    let res2 = Bls12_381.Fr.(copy one) in
+    Bls12_381.Fr.add_inplace res2 x y ;
+    assert (Bls12_381.Fr.eq res res2)
 
   let test_double_inplace () =
     let x = Bls12_381.Fr.random () in
     let res = Bls12_381.Fr.double x in
-    Bls12_381.Fr.double_inplace x ;
-    assert (Bls12_381.Fr.eq x res)
+    let res2 = Bls12_381.Fr.(copy one) in
+    Bls12_381.Fr.double_inplace res2 x ;
+    assert (Bls12_381.Fr.eq res res2)
 
   let test_square_inplace () =
     let x = Bls12_381.Fr.random () in
     let res = Bls12_381.Fr.square x in
-    Bls12_381.Fr.square_inplace x ;
-    assert (Bls12_381.Fr.eq x res)
+    let res2 = Bls12_381.Fr.(copy one) in
+    Bls12_381.Fr.square_inplace res2 x ;
+    assert (Bls12_381.Fr.eq res res2)
 
   let test_negate_inplace () =
     let x = Bls12_381.Fr.random () in
     let res = Bls12_381.Fr.negate x in
-    Bls12_381.Fr.negate_inplace x ;
-    assert (Bls12_381.Fr.eq x res)
+    let res2 = Bls12_381.Fr.(copy one) in
+    Bls12_381.Fr.negate_inplace res2 x ;
+    assert (Bls12_381.Fr.eq res res2)
 
   let test_inverse_inplace () =
     let x = Bls12_381.Fr.random () in
     let res = Bls12_381.Fr.inverse_exn x in
-    Bls12_381.Fr.inverse_exn_inplace x ;
-    assert (Bls12_381.Fr.eq x res)
+    let res2 = Bls12_381.Fr.(copy one) in
+    Bls12_381.Fr.inverse_exn_inplace res2 x ;
+    assert (Bls12_381.Fr.eq res res2)
 
   let test_add_inplace_with_same_value () =
     let x = Bls12_381.Fr.random () in
     let res = Bls12_381.Fr.add x x in
-    Bls12_381.Fr.add_inplace x x ;
-    assert (Bls12_381.Fr.eq x res)
+    let res2 = Bls12_381.Fr.(copy one) in
+    Bls12_381.Fr.add_inplace res2 x x ;
+    assert (Bls12_381.Fr.eq res res2)
 
   let test_sub_inplace () =
     let x = Bls12_381.Fr.random () in
     let y = Bls12_381.Fr.random () in
     let res = Bls12_381.Fr.sub x y in
-    Bls12_381.Fr.sub_inplace x y ;
-    assert (Bls12_381.Fr.eq x res)
+    let res2 = Bls12_381.Fr.(copy one) in
+    Bls12_381.Fr.sub_inplace res2 x y ;
+    assert (Bls12_381.Fr.eq res res2)
 
   let test_sub_inplace_with_same_value () =
     let x = Bls12_381.Fr.random () in
     let res = Bls12_381.Fr.sub x x in
-    Bls12_381.Fr.sub_inplace x x ;
-    assert (Bls12_381.Fr.eq x res)
+    let res2 = Bls12_381.Fr.(copy one) in
+    Bls12_381.Fr.sub_inplace res2 x x ;
+    assert (Bls12_381.Fr.eq res res2)
 
   let test_mul_inplace () =
     let x = Bls12_381.Fr.random () in
     let y = Bls12_381.Fr.random () in
     let res = Bls12_381.Fr.mul x y in
-    Bls12_381.Fr.mul_inplace x y ;
-    assert (Bls12_381.Fr.eq x res)
+    let res2 = Bls12_381.Fr.(copy one) in
+    Bls12_381.Fr.mul_inplace res2 x y ;
+    assert (Bls12_381.Fr.eq res res2)
 
   let test_mul_inplace_with_same_value () =
     let x = Bls12_381.Fr.random () in
     let res = Bls12_381.Fr.mul x x in
-    Bls12_381.Fr.mul_inplace x x ;
-    assert (Bls12_381.Fr.eq x res)
+    let res2 = Bls12_381.Fr.(copy one) in
+    Bls12_381.Fr.mul_inplace res2 x x ;
+    assert (Bls12_381.Fr.eq res res2)
 
   let get_tests () =
     let txt = "Inplace operations" in

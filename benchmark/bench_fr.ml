@@ -11,9 +11,10 @@ module MakeBenchBlst = struct
   let test_addition_inplace =
     let e1 = F.random () in
     let e2 = F.random () in
+    let res = F.(copy one) in
     Bench.Test.create
       ~name:"Addition inplace Fr (save an allocation)"
-      (fun () -> ignore (F.add_inplace e1 e2))
+      (fun () -> ignore (F.add_inplace res e1 e2))
 
   let test_multiplication =
     let e1 = F.random () in
@@ -23,9 +24,10 @@ module MakeBenchBlst = struct
   let test_multiplication_inplace =
     let e1 = F.random () in
     let e2 = F.random () in
+    let res = F.(copy one) in
     Bench.Test.create
       ~name:"Multiplication inplace Fr (save an allocation)"
-      (fun () -> ignore (F.mul_inplace e1 e2))
+      (fun () -> ignore (F.mul_inplace res e1 e2))
 
   let test_sub =
     let e1 = F.random () in
@@ -35,9 +37,10 @@ module MakeBenchBlst = struct
   let test_sub_inplace =
     let e1 = F.random () in
     let e2 = F.random () in
+    let res = F.(copy one) in
     Bench.Test.create
       ~name:"Substraction inplace Fr (save an allocation)"
-      (fun () -> ignore (F.sub_inplace e1 e2))
+      (fun () -> ignore (F.sub_inplace res e1 e2))
 
   let test_negate =
     let e1 = F.random () in
@@ -45,9 +48,10 @@ module MakeBenchBlst = struct
 
   let test_negate_inplace =
     let e1 = F.random () in
+    let res = F.(copy one) in
     Bench.Test.create
       ~name:"Negation inplace Fr (save an allocation)"
-      (fun () -> ignore (F.negate_inplace e1))
+      (fun () -> ignore (F.negate_inplace res e1))
 
   let test_square =
     let e1 = F.random () in
@@ -55,8 +59,9 @@ module MakeBenchBlst = struct
 
   let test_square_inplace =
     let e1 = F.random () in
+    let res = F.(copy one) in
     Bench.Test.create ~name:"Square inplace Fr (save an allocation)" (fun () ->
-        ignore (F.square_inplace e1))
+        ignore (F.square_inplace res e1))
 
   let test_double =
     let e1 = F.random () in
@@ -64,8 +69,9 @@ module MakeBenchBlst = struct
 
   let test_double_inplace =
     let e1 = F.random () in
+    let res = F.(copy one) in
     Bench.Test.create ~name:"Double inplace Fr (save an allocation)" (fun () ->
-        ignore (F.double_inplace e1))
+        ignore (F.double_inplace res e1))
 
   let test_inverse =
     let e1 = F.random () in
@@ -73,8 +79,9 @@ module MakeBenchBlst = struct
 
   let test_inverse_inplace =
     let e1 = F.random () in
+    let res = F.(copy one) in
     Bench.Test.create ~name:"Inverse inplace Fr (save an allocation)" (fun () ->
-        ignore (F.inverse_exn_inplace e1))
+        ignore (F.inverse_exn_inplace res e1))
 
   let test_pow =
     let e1 = F.random () in
