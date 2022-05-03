@@ -62,36 +62,39 @@ module Fr : sig
       array [points] instead of returning a new array *)
   val ifft_inplace : domain:t array -> points:t array -> unit
 
-  (** [add_inplace a b] is the same than {!add} but writes the result in the first
-      argument, i.e. [a]. No allocation happens. *)
-  val add_inplace : t -> t -> unit
+  (** [add_inplace res a b] is the same than {!add} but writes the result in
+      [res]. No allocation happens. *)
+  val add_inplace : t -> t -> t -> unit
 
-  (** [sub_inplace a b] is the same than {!sub} but writes the result in the first
-      argument, i.e. [a]. No allocation happens. *)
-  val sub_inplace : t -> t -> unit
+  (** [sub_inplace res a b] is the same than {!sub} but writes the result in
+      [res]. No allocation happens. *)
+  val sub_inplace : t -> t -> t -> unit
 
-  (** [mul_inplace a b] is the same than {!sub} but writes the result in the first
-      argument, i.e. [a]. No allocation happens. *)
-  val mul_inplace : t -> t -> unit
+  (** [mul_inplace res a b] is the same than {!sub} but writes the result in
+      [res]. No allocation happens. *)
+  val mul_inplace : t -> t -> t -> unit
 
-  (** [inverse_exn_inplace a] is the same than {!inverse_exn} but writes the
-      result in [a]. No allocation happens. *)
-  val inverse_exn_inplace : t -> unit
+  (** [inverse_exn_inplace res a] is the same than {!inverse_exn} but writes
+      the result in [res]. No allocation happens. *)
+  val inverse_exn_inplace : t -> t -> unit
 
-  (** [double_inplace a] is the same than {!double} but writes the
-      result in [a]. No allocation happens. *)
-  val double_inplace : t -> unit
+  (** [double_inplace res a] is the same than {!double} but writes the
+      result in [res]. No allocation happens. *)
+  val double_inplace : t -> t -> unit
 
-  (** [square_inplace a] is the same than {!square} but writes the
-      result in [a]. No allocation happens. *)
-  val square_inplace : t -> unit
+  (** [square_inplace res a] is the same than {!square} but writes the
+      result in [res]. No allocation happens. *)
+  val square_inplace : t -> t -> unit
 
-  (** [negate_inplace a] is the same than {!negate} but writes the
-      result in [a]. No allocation happens. *)
-  val negate_inplace : t -> unit
+  (** [negate_inplace res a] is the same than {!negate} but writes the
+      result in [res]. No allocation happens. *)
+  val negate_inplace : t -> t -> unit
 
   (** [copy x] return a fresh copy of [x] *)
   val copy : t -> t
+
+  (** [memcpy a b] overwrites the content of [a] with the content of [b]. *)
+  val memcpy : t -> t -> unit
 
   (** [add_bulk xs] returns the sum of the elements of [xs] by performing only
       one allocation for the output. This method is recommended to save the

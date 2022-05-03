@@ -88,12 +88,12 @@ module Fr = struct
 
   type t = Stubs.fr
 
-  let global_buffer = Stubs.callocate_fr ()
-
   let copy src =
     let dst = Stubs.mallocate_fr () in
     ignore @@ Stubs.memcpy dst src ;
     dst
+
+  let memcpy a b = ignore @@ Stubs.memcpy a b
 
   let size_in_bytes = 32
 
@@ -173,9 +173,7 @@ module Fr = struct
     ignore @@ Stubs.add buffer x y ;
     buffer
 
-  let add_inplace x y =
-    ignore @@ Stubs.add global_buffer x y ;
-    ignore @@ Stubs.memcpy x global_buffer
+  let add_inplace res a b = ignore @@ Stubs.add res a b
 
   let add_bulk xs =
     let buffer = Stubs.callocate_fr () in
@@ -189,9 +187,7 @@ module Fr = struct
     ignore @@ Stubs.mul buffer x y ;
     buffer
 
-  let mul_inplace x y =
-    ignore @@ Stubs.mul global_buffer x y ;
-    ignore @@ Stubs.memcpy x global_buffer
+  let mul_inplace res a b = ignore @@ Stubs.mul res a b
 
   let mul_bulk xs =
     let buffer = Stubs.callocate_fr () in
@@ -211,40 +207,31 @@ module Fr = struct
   let inverse_exn x =
     match inverse_opt x with None -> raise Division_by_zero | Some x -> x
 
-  let inverse_exn_inplace x =
+  let inverse_exn_inplace res x =
     if is_zero x then raise Division_by_zero
-    else ignore @@ Stubs.eucl_inverse global_buffer x ;
-    ignore @@ Stubs.memcpy x global_buffer
+    else ignore @@ Stubs.eucl_inverse res x
 
   let sub a b =
     let buffer = Stubs.mallocate_fr () in
     ignore @@ Stubs.sub buffer a b ;
     buffer
 
-  let sub_inplace x y =
-    ignore @@ Stubs.sub global_buffer x y ;
-    ignore @@ Stubs.memcpy x global_buffer
+  let sub_inplace res x y = ignore @@ Stubs.sub res x y
 
   let square x =
     let buffer = Stubs.mallocate_fr () in
     ignore @@ Stubs.sqr buffer x ;
     buffer
 
-  let square_inplace x =
-    ignore @@ Stubs.mul global_buffer x x ;
-    ignore @@ Stubs.memcpy x global_buffer
+  let square_inplace res x = ignore @@ Stubs.mul res x x
 
   let double x = x + x
 
-  let double_inplace x =
-    ignore @@ Stubs.add global_buffer x x ;
-    ignore @@ Stubs.memcpy x global_buffer
+  let double_inplace res x = ignore @@ Stubs.add res x x
 
   let negate x = sub zero x
 
-  let negate_inplace x =
-    ignore @@ Stubs.sub global_buffer zero x ;
-    ignore @@ Stubs.memcpy x global_buffer
+  let negate_inplace res x = ignore @@ Stubs.sub res zero x
 
   let ( - ) = negate
 
