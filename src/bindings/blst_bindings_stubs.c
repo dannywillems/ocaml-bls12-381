@@ -7,6 +7,7 @@
 #include <caml/custom.h>
 #include <caml/fail.h>
 #include <caml/memory.h>
+#include <caml/memprof.h>
 #include <caml/mlvalues.h>
 #include <stdlib.h>
 #include <string.h>
@@ -772,6 +773,8 @@ CAMLprim value caml_blst_pairing_init_stubs(value check, value dst,
   CAMLparam3(check, dst, dst_length);
   CAMLlocal1(block);
   size_t dst_length_c = ctypes_size_t_val(dst_length);
+  // Copy is mandatory
+  // https://gitlab.com/dannywillems/ocaml-bls12-381/-/issues/63
   byte *dst_copy = malloc(sizeof(byte) * dst_length_c);
   if (dst_copy == NULL) {
     caml_raise_out_of_memory();
@@ -783,6 +786,12 @@ CAMLprim value caml_blst_pairing_init_stubs(value check, value dst,
     free(dst_copy);
     caml_raise_out_of_memory();
   }
+  // DW: See https://github.com/ocaml/ocaml/pull/10025/. Maybe
+  // caml_alloc_custom_mem can be used, but I don't understand what the last two
+  // parameters mean.
+  size_t allocated_mem_out_of_heap = dst_length_c * sizeof(byte) +
+    blst_pairing_sizeof();
+  caml_memprof_track_custom(block, allocated_mem_out_of_heap);
   blst_pairing **d = (blst_pairing **)Data_custom_val(block);
   *d = p;
   blst_pairing_init(Blst_pairing_val(block), Bool_val(check), dst_copy,

@@ -15,12 +15,12 @@
 # supporting ADX on a arch supporting ADX.
 cd libblst
 if [ $(uname --machine) = "s390x" ]; then
-    echo "()" > ../c_flags_blst.sexp
+    echo "(-DCAML_INTERNALS)" > ../c_flags_blst.sexp
     ./build.sh -shared -Wno-missing-braces -D__BLST_NO_ASM__
 elif [ -n "${BLST_PORTABLE}" ]; then
-    echo "(-D__BLST_PORTABLE__)" > ../c_flags_blst.sexp
+    echo "(-D__BLST_PORTABLE__ -DCAML_INTERNALS)" > ../c_flags_blst.sexp
     ./build.sh -shared -Wno-missing-braces -D__BLST_PORTABLE__
 else
-    echo "()" > ../c_flags_blst.sexp
+    echo "(-DCAML_INTERNALS)" > ../c_flags_blst.sexp
     ./build.sh -shared -Wno-missing-braces
 fi
