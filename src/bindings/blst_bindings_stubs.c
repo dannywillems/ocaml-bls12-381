@@ -783,12 +783,15 @@ CAMLprim value caml_blst_pairing_init_stubs(value check, value dst,
     caml_raise_out_of_memory();
   }
   memcpy(dst_copy, Bytes_val(dst), dst_length_c * sizeof(byte));
-  block = caml_alloc_custom(&blst_pairing_ops, sizeof(blst_pairing *), 0, 1);
   void *p = calloc(1, blst_pairing_sizeof());
   if (p == NULL) {
     free(dst_copy);
     caml_raise_out_of_memory();
   }
+  size_t out_of_heap_memory_size =
+      blst_pairing_sizeof() + sizeof(byte) * dst_length_c;
+  block = caml_alloc_custom_mem(&blst_pairing_ops, sizeof(blst_pairing *),
+                                out_of_heap_memory_size);
   blst_pairing **d = (blst_pairing **)Data_custom_val(block);
   *d = p;
   blst_pairing_init(Blst_pairing_val(block), Bool_val(check), dst_copy,
