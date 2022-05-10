@@ -155,6 +155,8 @@ module type CURVE = sig
 
   val hash_to_curve : Bytes.t -> Bytes.t -> t
 
+  module Carray : Carray.S
+
   (** [pippenger ?start ?len pts scalars] computes the multi scalar
       exponentiation/multiplication. The scalars are given in [scalars] and the
       points in [pts]. If [pts] and [scalars] are not of the same length,

@@ -326,6 +326,14 @@ module Fr = struct
         in
         Some (aux s c (pow x q) (pow x (Z.divexact (Z.succ q) two_z)))
 
+  module Carray = Carray.Make (struct
+    type t = Stubs.fr
+
+    let fresh () = random ()
+
+    let size_in_bytes = 32
+  end)
+
   module M = struct
     type group = t
 

@@ -353,6 +353,14 @@ module G1 = struct
          Unsigned.Size_t.zero ;
     buffer
 
+  module Carray = Carray.Make (struct
+    type t = Stubs.jacobian
+
+    let fresh () = random ()
+
+    let size_in_bytes = 48 * 3
+  end)
+
   let pippenger ?(start = 0) ?len ps ss =
     let l_ss = Array.length ss in
     let l_ps = Array.length ps in

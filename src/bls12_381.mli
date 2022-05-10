@@ -31,6 +31,8 @@ module Fr : sig
   (** Check if a point, represented as a byte array, is in the field **)
   val check_bytes : Bytes.t -> bool
 
+  module Carray : Carray.S
+
   (** [fft ~domain ~points] performs a Fourier transform on [points] using
       [domain] The domain should be of the form [w^{i}] where [w] is a principal
       root of unity. If the domain is of size [n], [w] must be a [n]-th
@@ -279,6 +281,8 @@ module type CURVE = sig
       https://www.ietf.org/archive/id/draft-irtf-cfrg-hash-to-curve-14.txt } Hashing
       to Elliptic Curves} applied to BLS12-381 *)
   val hash_to_curve : Bytes.t -> Bytes.t -> t
+
+  module Carray : Carray.S
 
   (** [pippenger ?start ?len pts scalars] computes the multi scalar
       exponentiation/multiplication. The scalars are given in [scalars] and the
