@@ -30,5 +30,5 @@ x-ci-accept-failures: [
   "oraclelinux-7"
 ]
 pin-depends: [
-  [ "carray.dev" "git+https://gitlab.com/dannywillems/ocaml-carray#\78529f2d97e0e17b278899af78b766a5215e2bae"]
+  [ "carray.dev" "git+https://gitlab.com/dannywillems/ocaml-carray#78529f2d97e0e17b278899af78b766a5215e2bae" ]
 ]
