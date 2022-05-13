@@ -34,8 +34,3 @@ const vec256 BLS12_381_rRR = {  /* (1<<512)%r, "radix"^2, to-Montgomery */
     TO_LIMB_T(0xc999e990f3f29c6d), TO_LIMB_T(0x2b6cedcb87925c23),
     TO_LIMB_T(0x05d314967254398f), TO_LIMB_T(0x0748d9d99f59ff11)
 };
-
-const vec256 BLS12_381_rR = {  /* (1<<256)%r, "radix", one-in-Montgomery */
-    TO_LIMB_T(0x00000001fffffffe), TO_LIMB_T(0x5884b7fa00034802),
-    TO_LIMB_T(0x998c4fefecbc4ff5), TO_LIMB_T(0x1824b159acc5056f)
-};
