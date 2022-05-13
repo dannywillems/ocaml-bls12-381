@@ -469,6 +469,8 @@ extern const blst_p1_affine BLS12_381_NEG_G1;
 extern const blst_p2_affine BLS12_381_G2;
 extern const blst_p2_affine BLS12_381_NEG_G2;
 
+#include "blst_extended.h"
+
 #include "blst_aux.h"
 
 #ifdef __cplusplus

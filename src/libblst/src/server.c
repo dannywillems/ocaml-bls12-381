@@ -22,3 +22,4 @@
 #include "vect.c"
 #include "exports.c"
 #include "rb_tree.c"
+#include "blst_extended.c"
