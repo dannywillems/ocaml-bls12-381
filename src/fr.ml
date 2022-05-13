@@ -223,7 +223,7 @@ module Fr = struct
     ignore @@ Stubs.sqr buffer x ;
     buffer
 
-  let square_inplace res x = ignore @@ Stubs.mul res x x
+  let square_inplace res x = ignore @@ Stubs.sqr res x
 
   let double x = x + x
 
