@@ -2,6 +2,7 @@
 #include "blst_misc.h"
 #define CAML_NAME_SPACE
 #include "caml_bls12_381_stubs.h"
+#include "ocaml_carray.h"
 #include "ocaml_integers.h"
 #include <caml/alloc.h>
 #include <caml/custom.h>
@@ -1231,4 +1232,38 @@ CAMLprim value caml_blst_g2_pippenger_contiguous_affine_array_stubs(
 CAMLprim value caml_built_with_blst_portable_stubs(value unit) {
   CAMLparam1(unit);
   CAMLreturn(Val_bool(BUILT_WITH_BLST_PORTABLE));
+}
+
+CAMLprim value caml_blst_miller_loop_carray_stubs(value buffer, value g1_carray,
+                                                  value g2_carray, value length,
+                                                  value size_g1,
+                                                  value size_g2) {
+  CAMLparam5(buffer, g1_carray, g2_carray, length, size_g1);
+  CAMLxparam1(size_g2);
+  blst_fp12 *buffer_c = Blst_fp12_val(buffer);
+  int length_c = Int_val(length);
+  int size_g1_c = Int_val(size_g1);
+  int size_g2_c = Int_val(size_g2);
+  blst_p1 *g1_carray_c = Carray_val(g1_carray, size_g1_c);
+  blst_p2 *g2_carray_c = Carray_val(g2_carray, size_g2_c);
+
+  blst_fp12_set_to_one(buffer_c);
+
+  blst_fp12 tmp;
+  blst_p1_affine tmp_p1;
+  blst_p2_affine tmp_p2;
+
+  for (int i = 0; i < length_c; i++) {
+    blst_p1_to_affine(&tmp_p1, g1_carray_c + i);
+    blst_p2_to_affine(&tmp_p2, g2_carray_c + i);
+    blst_miller_loop(&tmp, &tmp_p2, &tmp_p1);
+    blst_fp12_mul(buffer_c, buffer_c, &tmp);
+  }
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+CAMLprim value caml_blst_miller_loop_carray_stubs_bytecode(value *argv,
+                                                           int argc) {
+  return caml_blst_miller_loop_carray_stubs(argv[0], argv[1], argv[2], argv[3],
+                                            argv[4], argv[5]);
 }

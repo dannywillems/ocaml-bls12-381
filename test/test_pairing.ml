@@ -359,11 +359,52 @@ module RegressionTests = struct
         test_case "miller loop" `Quick test_miller_loop ] )
 end
 
+let test_carray_miller_loop () =
+  let n = 1 + Random.int 100 in
+  let g1s = Array.init n (fun _ -> Bls12_381.G1.random ()) in
+  let g2s = Array.init n (fun _ -> Bls12_381.G2.random ()) in
+  let exp_res =
+    let pts = List.init n (fun i -> (g1s.(i), g2s.(i))) in
+    Bls12_381.Pairing.miller_loop pts
+  in
+  let res =
+    let g1s = G1.Carray.of_array g1s in
+    let g2s = G2.Carray.of_array g2s in
+    Bls12_381.Pairing.miller_loop_carray g1s g2s
+  in
+  assert (Bls12_381.Fq12.eq res exp_res)
+
+let test_carray_miller_loop_with_sub_noalloc () =
+  let n = 1 + Random.int 100 in
+  let start = Random.int n in
+  let length = 1 + Random.int (n - start) in
+  let g1s = Array.init n (fun _ -> Bls12_381.G1.random ()) in
+  let g2s = Array.init n (fun _ -> Bls12_381.G2.random ()) in
+  let exp_res =
+    let pts = List.init length (fun i -> (g1s.(start + i), g2s.(start + i))) in
+    Bls12_381.Pairing.miller_loop pts
+  in
+  let res =
+    let g1s = G1.Carray.sub_noalloc (G1.Carray.of_array g1s) start length in
+    let g2s = G2.Carray.sub_noalloc (G2.Carray.of_array g2s) start length in
+    Bls12_381.Pairing.miller_loop_carray g1s g2s
+  in
+  assert (Bls12_381.Fq12.eq res exp_res)
+
 let () =
   let open Alcotest in
   run
     "Pairing"
     [ RegressionTests.get_tests ();
+      ( "Carray",
+        [ test_case
+            "miller_loop"
+            `Quick
+            (Utils.repeat 10 test_carray_miller_loop);
+          test_case
+            "miller_loop with sub noalloc"
+            `Quick
+            (Utils.repeat 10 test_carray_miller_loop_with_sub_noalloc) ] );
       ( "Properties",
         [ test_case
             "with zero as first component"

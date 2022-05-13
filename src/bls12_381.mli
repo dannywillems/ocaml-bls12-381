@@ -284,6 +284,8 @@ module type CURVE = sig
 
   module Carray : Carray.S
 
+  module Carray_affine : Carray.S
+
   (** [pippenger ?start ?len pts scalars] computes the multi scalar
       exponentiation/multiplication. The scalars are given in [scalars] and the
       points in [pts]. If [pts] and [scalars] are not of the same length,
@@ -591,6 +593,9 @@ module Pairing : sig
   (** Compute the miller loop on a list of points. Return {!Fq12.one} if the list
       is empty. *)
   val miller_loop : (G1.t * G2.t) list -> Fq12.t
+
+  (** Compute the miller loop using Carray of G1 and G2 points *)
+  val miller_loop_carray : G1.t G1.Carray.t -> G2.t G2.Carray.t -> Fq12.t
 
   (** Compute the miller loop on a single tuple of point. *)
   val miller_loop_simple : G1.t -> G2.t -> Fq12.t

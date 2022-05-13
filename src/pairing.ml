@@ -33,6 +33,10 @@ module Stubs = struct
 
   external final_exponentiation : Fq12.t -> Gt.t -> int
     = "caml_blst_final_exponentiation_stubs"
+
+  external miller_loop_carray :
+    Fq12.t -> G1.t G1.Carray.t -> G2.t G2.Carray.t -> int -> int -> int -> unit
+    = "caml_blst_miller_loop_carray_stubs_bytecode" "caml_blst_miller_loop_carray_stubs"
 end
 
 let miller_loop_simple g1 g2 =
@@ -42,6 +46,18 @@ let miller_loop_simple g1 g2 =
   ignore @@ G1.Stubs.to_affine g1_affine g1 ;
   ignore @@ G2.Stubs.to_affine g2_affine g2 ;
   ignore @@ Stubs.miller_loop buffer g2_affine g1_affine ;
+  buffer
+
+let miller_loop_carray g1s g2s =
+  let buffer = Fq12.Stubs.allocate_fq12 () in
+  assert (G1.Carray.length g1s = G2.Carray.length g2s) ;
+  Stubs.miller_loop_carray
+    buffer
+    g1s
+    g2s
+    (G1.Carray.length g1s)
+    G1.Carray.size_in_bytes
+    G2.Carray.size_in_bytes ;
   buffer
 
 let miller_loop l =

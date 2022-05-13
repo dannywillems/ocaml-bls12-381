@@ -47,7 +47,7 @@ let t3 =
 
 let t4 =
   let open Bls12_381 in
-  let p = List.init 6 ~f:(fun _i -> (G1.random (), G2.random ())) in
+  let p = List.init 4 ~f:(fun _i -> (G1.random (), G2.random ())) in
   Bench.Test.create ~name:"Miller loop on 6 couples of points" (fun () ->
       ignore @@ Bls12_381.Pairing.miller_loop p)
 
@@ -60,4 +60,18 @@ let t5 =
     (fun () ->
       ignore @@ Bls12_381.Pairing.(final_exponentiation_exn (miller_loop p)))
 
-let () = Core.Command.run (Bench.make_command [t1; t2; t3; t4; t5])
+let t6 =
+  let open Bls12_381 in
+  let n = 6 in
+  let g1s = G1.Carray.init n (fun _ -> G1.random ()) in
+  let g2s = G2.Carray.init n (fun _ -> G2.random ()) in
+  Bench.Test.create
+    ~name:
+      "Miller loop carray on 6 couples of points followed by a final \
+       exponentiation"
+    (fun () ->
+      ignore
+      @@ Bls12_381.Pairing.(
+           final_exponentiation_exn (miller_loop_carray g1s g2s)))
+
+let () = Core.Command.run (Bench.make_command [t5; t6])

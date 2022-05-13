@@ -101,6 +101,10 @@ module Stubs = struct
     Unsigned.Size_t.t ->
     int = "caml_blst_g1_pippenger_stubs"
 
+  external pippenger_carray :
+    jacobian -> G1.t G1.Carray.t -> Fr.t Fr.Carray.t -> int -> int -> int -> int
+    = "caml_blst_g1_pippenger_carray_stubs_bytecode" "caml_blst_g1_pippenger_carray_stubs"
+
   external continuous_array_get : jacobian -> affine_array -> int -> int
     = "caml_blst_p1_affine_array_get_stubs"
 
@@ -381,6 +385,20 @@ module G1 = struct
       in
       assert (res = 0) ;
       buffer
+
+  let pippenger_carray ps ss =
+    assert (G1.Carray.length ps = Fr.Carray.length ss) ;
+    let buffer = Stubs.allocate_g1 () in
+    let res =
+      Stubs.pippenger_carray
+        buffer
+        ps
+        ss
+        (G1.Carray.length ps)
+        G1.Carray.size_in_bytes
+        G2.Carray.size_in_bytes
+    in
+    res
 
   let pippenger_with_affine_array ?(start = 0) ?len (ps, n) ss =
     let l = min n (Array.length ss) in
