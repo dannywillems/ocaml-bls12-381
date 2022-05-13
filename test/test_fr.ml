@@ -134,6 +134,13 @@ module InplaceOperations = struct
     Bls12_381.Fr.sub_inplace res2 x x ;
     assert (Bls12_381.Fr.eq res res2)
 
+  let test_sub_inplace_with_same_value_as_output () =
+    let x = Bls12_381.Fr.random () in
+    let y = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.sub x y in
+    Bls12_381.Fr.sub_inplace x x y ;
+    assert (Bls12_381.Fr.eq x res)
+
   let test_mul_inplace () =
     let x = Bls12_381.Fr.random () in
     let y = Bls12_381.Fr.random () in
@@ -149,6 +156,32 @@ module InplaceOperations = struct
     Bls12_381.Fr.mul_inplace res2 x x ;
     assert (Bls12_381.Fr.eq res res2)
 
+  let test_add_inplace_with_same_value_as_output () =
+    let x = Bls12_381.Fr.random () in
+    let y = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.add x y in
+    Bls12_381.Fr.add_inplace x x y ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_mul_inplace_with_same_value_as_output () =
+    let x = Bls12_381.Fr.random () in
+    let y = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.mul x y in
+    Bls12_381.Fr.mul_inplace x x y ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_inverse_inplace_with_same_value_as_output () =
+    let x = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.inverse_exn x in
+    Bls12_381.Fr.inverse_exn_inplace x x ;
+    assert (Bls12_381.Fr.eq x res)
+
+  let test_negate_inplace_with_same_value_as_output () =
+    let x = Bls12_381.Fr.random () in
+    let res = Bls12_381.Fr.negate x in
+    Bls12_381.Fr.negate_inplace x x ;
+    assert (Bls12_381.Fr.eq x res)
+
   let get_tests () =
     let txt = "Inplace operations" in
     let open Alcotest in
@@ -163,13 +196,33 @@ module InplaceOperations = struct
         test_case "double" `Quick (Utils.repeat 100 test_double_inplace);
         test_case "inverse" `Quick (Utils.repeat 100 test_inverse_inplace);
         test_case
+          "negate with same value as output"
+          `Quick
+          (Utils.repeat 100 test_negate_inplace_with_same_value_as_output);
+        test_case
+          "inverse_exn with same value as output"
+          `Quick
+          (Utils.repeat 100 test_inverse_inplace_with_same_value_as_output);
+        test_case
           "sub with same value"
           `Quick
           (Utils.repeat 100 test_sub_inplace_with_same_value);
         test_case
+          "sub with same value as output"
+          `Quick
+          (Utils.repeat 100 test_sub_inplace_with_same_value_as_output);
+        test_case
           "mul with same value"
           `Quick
           (Utils.repeat 100 test_mul_inplace_with_same_value);
+        test_case
+          "add with same value as output"
+          `Quick
+          (Utils.repeat 100 test_add_inplace_with_same_value_as_output);
+        test_case
+          "mul with same value as output"
+          `Quick
+          (Utils.repeat 100 test_mul_inplace_with_same_value_as_output);
         test_case "sub" `Quick (Utils.repeat 100 test_sub_inplace);
         test_case "mul" `Quick (Utils.repeat 100 test_mul_inplace) ] )
 end
