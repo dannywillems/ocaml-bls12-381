@@ -100,11 +100,6 @@ void blst_fr_from_uint64(blst_fr *ret, const uint64_t a[4]);
 void blst_uint64_from_fr(uint64_t ret[4], const blst_fr *a);
 void blst_fr_from_scalar(blst_fr *ret, const blst_scalar *a);
 void blst_scalar_from_fr(blst_scalar *ret, const blst_fr *a);
-bool blst_fr_is_zero(const blst_fr *a);
-bool blst_fr_is_one(const blst_fr *a);
-bool blst_fr_is_equal(const blst_fr *a, const blst_fr *b);
-void blst_fr_set_to_zero(blst_fr *a);
-void blst_fr_set_to_one(blst_fr *a);
 
 /*
  * BLS12-381-specifc Fp operations.
@@ -248,11 +243,6 @@ void blst_p1s_tile_pippenger(blst_p1 *ret, const blst_p1_affine *const points[],
                              size_t nbits, limb_t *scratch,
                              size_t bit0, size_t window);
 
-// FIXME: See multi_scalar.c. Should we move to another file?
-void blst_p1s_mult_pippenger_cont(blst_p1 *ret, const blst_p1_affine points[],
-                                  size_t npoints, const byte scalars[],
-                                  size_t nbits, limb_t *scratch);
-
 void blst_p2s_to_affine(blst_p2_affine dst[], const blst_p2 *const points[],
                         size_t npoints);
 void blst_p2s_add(blst_p2 *ret, const blst_p2_affine *const points[],
@@ -276,11 +266,6 @@ void blst_p2s_tile_pippenger(blst_p2 *ret, const blst_p2_affine *const points[],
                              size_t npoints, const byte *const scalars[],
                              size_t nbits, limb_t *scratch,
                              size_t bit0, size_t window);
-
-// FIXME: See multi_scalar.c. Should we move to another file?
-void blst_p2s_mult_pippenger_cont(blst_p2 *ret, const blst_p2_affine points[],
-                                  size_t npoints, const byte scalars[],
-                                  size_t nbits, limb_t *scratch);
 
 /*
  * Hash-to-curve operations.
@@ -483,8 +468,6 @@ extern const blst_p1_affine BLS12_381_G1;
 extern const blst_p1_affine BLS12_381_NEG_G1;
 extern const blst_p2_affine BLS12_381_G2;
 extern const blst_p2_affine BLS12_381_NEG_G2;
-
-#include "blst_extended.h"
 
 #include "blst_aux.h"
 
