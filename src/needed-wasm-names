@@ -28,6 +28,7 @@ _blst_fp_mul
 _blst_fp_sizeof
 _blst_fp_sqrt
 _blst_fr_add
+_blst_fr_cneg
 _blst_fr_compare
 _blst_fr_eucl_inverse
 _blst_fr_from_lendian

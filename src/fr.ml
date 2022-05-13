@@ -55,6 +55,8 @@ module Stubs = struct
 
   external eq : fr -> fr -> bool = "caml_blst_fr_is_equal_stubs"
 
+  external cneg : fr -> fr -> bool -> bool = "caml_blst_fr_cneg_stubs"
+
   external is_zero : fr -> bool = "caml_blst_fr_is_zero_stubs"
 
   external is_one : fr -> bool = "caml_blst_fr_is_one_stubs"
@@ -229,9 +231,12 @@ module Fr = struct
 
   let double_inplace res x = ignore @@ Stubs.add res x x
 
-  let negate x = sub zero x
+  let negate x =
+    let buffer = Stubs.mallocate_fr () in
+    ignore @@ Stubs.cneg buffer x true ;
+    buffer
 
-  let negate_inplace res x = ignore @@ Stubs.sub res zero x
+  let negate_inplace res x = ignore @@ Stubs.cneg res x true
 
   let ( - ) = negate
 

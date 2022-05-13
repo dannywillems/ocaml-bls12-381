@@ -126,6 +126,14 @@ function caml_blst_fr_mul_stubs(ret, p1, p2) {
   return 0;
 }
 
+//Provides: caml_blst_fr_cneg_stubs
+//Requires: wasm_call
+//Requires: Blst_fr_val
+function caml_blst_fr_cneg_stubs(ret, p1, flag) {
+  wasm_call('_blst_fr_cneg', Blst_fr_val(ret), Blst_fr_val(p1), flag);
+  return 0;
+}
+
 //Provides: caml_blst_fr_sqr_stubs
 //Requires: wasm_call
 //Requires: Blst_fr_val
