@@ -1,4 +1,4 @@
-// Initially in const.c
+// Include this file in server.c or cherry-pick 95dfbdd when updating blst
 
 const vec256 BLS12_381_rR = {/* (1<<256)%r, "radix", one-in-Montgomery */
                              TO_LIMB_T(0x00000001fffffffe),
@@ -6,7 +6,6 @@ const vec256 BLS12_381_rR = {/* (1<<256)%r, "radix", one-in-Montgomery */
                              TO_LIMB_T(0x998c4fefecbc4ff5),
                              TO_LIMB_T(0x1824b159acc5056f)};
 
-// initially in exports.c
 bool_t blst_fr_is_zero(const vec256 a_fr) {
   return vec_is_zero(a_fr, sizeof(vec256));
 }
@@ -26,7 +25,6 @@ void blst_fr_set_to_one(vec256 a_fr) {
 }
 
 // Improve pippenger using contiguous C array for scalars and affine points.
-// FIXME: must be moved into another file
 // FIXME: let's rename it? ATM, we use a suffix _cont
 #define POINTS_MULT_PIPPENGER_CONT_IMPL(prefix, ptype)                         \
   static void ptype##s_tile_pippenger_cont(                                    \

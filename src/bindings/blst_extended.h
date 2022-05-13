@@ -1,9 +1,10 @@
+// Include this file in blst.h or cherry-pick 95dfbdd when updating blst
+
 #ifndef BLST_EXTENDED_H
 #define BLST_EXTENDED_H
 
 #include "blst.h"
 
-// initially in blst.h
 bool blst_fr_is_zero(const blst_fr *a);
 bool blst_fr_is_one(const blst_fr *a);
 bool blst_fr_is_equal(const blst_fr *a, const blst_fr *b);
