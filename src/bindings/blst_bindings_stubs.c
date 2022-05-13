@@ -145,7 +145,6 @@ CAMLprim value caml_blst_fr_cneg_stubs(value ret, value a, value flag) {
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
-
 CAMLprim value caml_blst_fr_sqr_stubs(value ret, value p1) {
   CAMLparam2(ret, p1);
   blst_fr_sqr(Blst_fr_val(ret), Blst_fr_val(p1));
