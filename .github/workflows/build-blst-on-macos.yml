@@ -25,6 +25,7 @@ jobs:
       - run: |
           sudo xcode-select -s /Applications/Xcode_11.3.app/Contents/Developer
           cc --version
+          cp src/bindings/blst_extended.c src/libblst/src/blst_extended.c
           cd src/libblst && ./build.sh -shared -Wno-missing-braces
 
   blst-build-clang-12:
@@ -34,4 +35,5 @@ jobs:
       - run: |
           sudo xcode-select -s /Applications/Xcode_12.app/Contents/Developer
           cc --version
+          cp src/bindings/blst_extended.c src/libblst/src/blst_extended.c
           cd src/libblst && ./build.sh -shared -Wno-missing-braces
