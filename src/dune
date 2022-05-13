@@ -17,9 +17,13 @@
 
 (copy_files bindings/blst_misc.h)
 
+(copy_files bindings/blst_extended.h)
+
 (copy_files bindings/caml_bls12_381_stubs.h)
 
 (copy_files libblst/bindings/blst.h)
+
+(copy_files libblst/bindings/blst_extended.h)
 
 (copy_files libblst/bindings/blst_aux.h)
 
@@ -28,11 +32,16 @@
 (rule
  (deps
   (source_tree libblst)
-  build_blst.sh)
+   build_blst.sh
+   bindings/blst_extended.c
+   bindings/blst_extended.h
+ )
  (targets libblst.a dllblst.so c_flags_blst.sexp)
  (action
   (no-infer
    (progn
+    (run cp bindings/blst_extended.c libblst/src/blst_extended.c)
+    (run cp bindings/blst_extended.h libblst/bindings/blst_extended.h)
     (run ./build_blst.sh)
     (run cp libblst/libblst.a libblst.a)
     (with-accepted-exit-codes
@@ -110,7 +119,7 @@
    (run ./gen_wasm_needed_names.exe %{files}))))
 
 (install
- (files libblst/bindings/blst.h libblst/bindings/blst_aux.h
+ (files libblst/bindings/blst.h libblst/bindings/blst_aux.h bindings/blst_extended.h
    bindings/blst_misc.h bindings/caml_bls12_381_stubs.h)
  (section lib)
  (package bls12-381))
