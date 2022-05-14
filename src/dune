@@ -58,7 +58,6 @@
  (targets blst.wasm blst.js)
  (action
   (progn
-   (run cp bindings/blst_extended.c libblst/src/blst_extended.c)
    (run emcc -Os -o blst.js -I libblst/src/ libblst/src/server.c
      %{dep:blst_wrapper.c} %{dep:poseidon128.c} %{dep:rescue.c}
      -DENABLE_EMSCRIPTEN_STUBS -DENABLE_MODULE_RECOVERY -s
