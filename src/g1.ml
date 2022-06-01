@@ -101,6 +101,14 @@ module Stubs = struct
     Unsigned.Size_t.t ->
     int = "caml_blst_g1_pippenger_stubs"
 
+  external pippenger_carray :
+    jacobian ->
+    jacobian Carray.t ->
+    Fr.t Carray.t ->
+    Unsigned.Size_t.t ->
+    Unsigned.Size_t.t ->
+    int = "caml_blst_g1_pippenger_carray_stubs"
+
   external continuous_array_get : jacobian -> affine_array -> int -> int
     = "caml_blst_p1_affine_array_get_stubs"
 
@@ -365,6 +373,27 @@ module G1 = struct
       let buffer = Stubs.allocate_g1 () in
       let res =
         Stubs.pippenger
+          buffer
+          ps
+          ss
+          (Unsigned.Size_t.of_int start)
+          (Unsigned.Size_t.of_int len)
+      in
+      assert (res = 0) ;
+      buffer
+
+  let pippenger_carray ?(start = 0) ?len ps ss =
+    let l_ss = Carray.length ss in
+    let l_ps = Carray.length ps in
+    let l = min l_ss l_ps in
+    let len = Option.value ~default:(l - start) len in
+    if start < 0 || len < 1 || start + len > l then
+      raise @@ Invalid_argument (Format.sprintf "start %i len %i" start len) ;
+    if len = 1 then mul (Carray.get ps start) (Carray.get ss start)
+    else
+      let buffer = Stubs.allocate_g1 () in
+      let res =
+        Stubs.pippenger_carray
           buffer
           ps
           ss

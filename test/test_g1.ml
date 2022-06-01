@@ -446,6 +446,48 @@ module ArithmeticRegressionTests = struct
       [test_case "Regression tests" `Quick test_vectors] )
 end
 
+module Carray = struct
+  module G = Bls12_381.G1
+  module Array = Carray
+
+  let test_pippenger () =
+    let n = 1 + Random.int 5 in
+    let start = Random.int n in
+    let len = 1 + Random.int (n - start) in
+    let ps = Array.init n (fun _ -> G.random ()) in
+    let ss = Array.init n (fun _ -> G.Scalar.random ()) in
+    let left =
+      let ps = Array.sub ps start len in
+      let ss = Array.sub ss start len in
+      let xs = List.combine (Array.to_list ps) (Array.to_list ss) in
+      List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
+    in
+    let right = G.pippenger_carray ~start ~len ps ss in
+    assert (G.(eq left right))
+
+  let test_pippenger_different_size () =
+    let n_ps = 1 + Random.int 10 in
+    let n_ss = 1 + Random.int 10 in
+    let ps = Array.init n_ps (fun _ -> G.random ()) in
+    let ss = Array.init n_ss (fun _ -> G.Scalar.random ()) in
+    let left =
+      let n = min n_ps n_ss in
+      let ps = Array.sub ps 0 n in
+      let ss = Array.sub ss 0 n in
+      let xs = List.combine (Array.to_list ps) (Array.to_list ss) in
+      List.fold_left (fun acc (g, n) -> G.add acc (G.mul g n)) G.zero xs
+    in
+    let right = G.pippenger_carray ps ss in
+    assert (G.(eq left right))
+
+  let get_tests () =
+    let open Alcotest in
+    ( "Pippener continuous carray",
+      [ test_case "Normal" `Quick test_pippenger;
+        test_case "Normal different size" `Quick test_pippenger_different_size
+      ] )
+end
+
 let () =
   let open Alcotest in
   run
@@ -460,4 +502,5 @@ let () =
       CompressedRepresentation.get_tests ();
       InplaceOperations.get_tests ();
       ArithmeticRegressionTests.get_tests ();
+      Carrayy.get_tests ();
       Constructors.get_tests () ]

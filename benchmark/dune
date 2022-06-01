@@ -1,15 +1,10 @@
-; (executable
-;  (name bench_g1_pippenger)
-;  (modules bench_g1_pippenger)
-;  (libraries bls12-381 domainslib))
-
 (copy_files ../test/{poseidon128_ark.ml,poseidon128_mds.ml})
 
 (copy_files ../test/{rescue_ark.ml,rescue_mds.ml})
 
 (executables
- (names bench_g1 bench_g1_bulk bench_g2 bench_g2_bulk bench_fr bench_fr_bulk
-   bench_fq12 bench_pairing bench_pairing_slow bench_signature
-   bench_poseidon128 bench_poseidon bench_rescue bench_fft bench_fft_g1
-   bench_fft_g2 bench_fft_great_domain)
- (libraries bls12-381 core core_bench))
+ (names bench_g1 bench_g1_bulk bench_g1_pippenger bench_g2 bench_g2_bulk
+   bench_fr bench_fr_bulk bench_fq12 bench_pairing bench_pairing_slow
+   bench_signature bench_poseidon128 bench_poseidon bench_rescue bench_fft
+   bench_fft_g1 bench_fft_g2 bench_fft_great_domain)
+ (libraries bls12-381 core core_bench carray))

@@ -485,6 +485,25 @@ end
 module G1 : sig
   include CURVE
 
+  (** [pippenger_carray ?start ?len pts scalars] computes the multi scalar
+      exponentiation/multiplication. The scalars are given in [scalars] and the
+      points in [pts]. If [pts] and [scalars] are not of the same length,
+      perform the computation on the first [n] points where [n] is the smallest
+      size. Arguments [start] and [len] can be used to take advantages of
+      multicore OCaml. Default value for [start] (resp. [len]) is [0] (resp. the
+      length of the array [scalars]).
+
+      @raise Invalid_argument if [start] or [len] would infer out of bounds
+      array access.
+
+      Perform allocations on the C heap to convert scalars to bytes and to
+      convert the points [pts] in affine coordinates as values of type [t] are
+      in jacobian coordinates.
+
+      {b Warning.} Undefined behavior if the point to infinity is in the array *)
+  val pippenger_carray :
+    ?start:int -> ?len:int -> t Carray.t -> Scalar.t Carray.t -> t
+
   (** Create a point from the coordinates. If the point is not on the curve and
       in the prime subgroup,returns [None].
       The points must be given modulo the order of [Fq]. To

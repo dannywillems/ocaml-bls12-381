@@ -3,6 +3,7 @@
 #define CAML_NAME_SPACE
 #include "caml_bls12_381_stubs.h"
 #include "ocaml_integers.h"
+#include "ocaml_carray.h"
 #include <caml/alloc.h>
 #include <caml/custom.h>
 #include <caml/fail.h>
@@ -1002,6 +1003,54 @@ CAMLprim value caml_blst_g1_pippenger_stubs(value buffer, value jacobian_list,
 
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
+
+CAMLprim value caml_blst_g1_pippenger_carray_stubs(value buffer, value jacobian_list,
+                                                   value scalars, value start,
+                                                   value npoints) {
+  CAMLparam5(buffer, jacobian_list, scalars, start, npoints);
+  size_t npoints_c = ctypes_size_t_val(npoints);
+  size_t start_c = ctypes_size_t_val(start);
+  blst_p1 *jacobian_list_c = (blst_p1 *)(Carray_val(jacobian_list));
+  blst_fr *scalars_c = (blst_fr *)(Carray_val(scalars));
+
+  blst_p1_affine *ps =
+      (blst_p1_affine *)calloc(npoints_c, sizeof(blst_p1_affine));
+  if (ps == NULL) {
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+
+  byte *scalars_bs = (byte *)calloc(npoints_c * 32, sizeof(byte));
+  if (scalars_bs == NULL) {
+    free(ps);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+
+  blst_scalar scalar;
+
+  for (int i = 0; i < npoints_c; i++) {
+    blst_p1_to_affine(ps + i, jacobian_list + start_c + i);
+    blst_scalar_from_fr(&scalar, scalars + start_c + i);
+    blst_lendian_from_scalar(scalars_bs + i * 32, &scalar);
+  }
+  void *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(npoints_c));
+  if (scratch == NULL) {
+    free(ps);
+    free(scalars_bs);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+
+  blst_p1s_mult_pippenger_cont(Blst_p1_val(buffer), (const blst_p1_affine *)ps,
+                               npoints_c, (const byte *)scalars_bs, 256,
+                               scratch);
+
+  free(ps);
+  free(scalars_bs);
+  free(scratch);
+
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+
 
 // Hypothesis: jacobian_list and scalars are arrays of size *at least* start +
 // npoints
