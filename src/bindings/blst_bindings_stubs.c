@@ -726,6 +726,51 @@ CAMLprim value caml_blst_miller_loop_stubs(value buffer, value g2, value g1) {
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
+CAMLprim value caml_blst_miller_loop_carray_stubs(value vout, value vg1_pts,
+                                                  value vg2_pts,
+                                                  value vlength) {
+  CAMLparam4(vout, vg1_pts, vg2_pts, vlength);
+  blst_fp12 *out = Blst_fp12_val(vout);
+  blst_p1 *g1_pts = (blst_p1 *)(Carray_val(vg1_pts));
+  blst_p2 *g2_pts = (blst_p2 *)(Carray_val(vg2_pts));
+  int length = Int_val(vlength);
+
+  blst_fp12_set_to_one(out);
+
+  blst_fp12 tmp;
+  blst_p1_affine tmp_p1;
+  blst_p2_affine tmp_p2;
+
+  for (int i = 0; i < length; i++) {
+    blst_p1_to_affine(&tmp_p1, g1_pts + i);
+    blst_p2_to_affine(&tmp_p2, g2_pts + i);
+    blst_miller_loop(&tmp, &tmp_p2, &tmp_p1);
+    blst_fp12_mul(out, out, &tmp);
+  }
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+CAMLprim value caml_blst_miller_loop_affine_carray_stubs(value vout, value vg1_pts,
+                                                         value vg2_pts,
+                                                         value vlength) {
+  CAMLparam4(vout, vg1_pts, vg2_pts, vlength);
+  blst_fp12 *out = Blst_fp12_val(vout);
+  blst_p1_affine *g1_pts = (blst_p1_affine *)(Carray_val(vg1_pts));
+  blst_p2_affine *g2_pts = (blst_p2_affine *)(Carray_val(vg2_pts));
+  int length = Int_val(vlength);
+
+  blst_fp12_set_to_one(out);
+
+  blst_fp12 tmp;
+
+  for (int i = 0; i < length; i++) {
+    blst_miller_loop(&tmp, g2_pts + i, g1_pts + i);
+    blst_fp12_mul(out, out, &tmp);
+  }
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
+
 CAMLprim value caml_blst_miller_loop_list_stubs(value out, value points_array,
                                                 value length) {
   CAMLparam3(out, points_array, length);

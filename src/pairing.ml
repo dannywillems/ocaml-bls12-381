@@ -28,6 +28,13 @@ module Stubs = struct
   external miller_loop : Fq12.t -> G2.Stubs.affine -> G1.Stubs.affine -> int
     = "caml_blst_miller_loop_stubs"
 
+  external miller_loop_carray : Fq12.t -> G1.t Carray.t -> G2.t Carray.t -> int
+    = "caml_blst_miller_loop_carray_stubs"
+
+  external miller_loop_affine_carray :
+    Fq12.t -> G1.Stubs.affine Carray.t -> G2.Stubs.affine Carray.t -> int
+    = "caml_blst_miller_loop_affine_carray_stubs"
+
   external miller_loop_list : Fq12.t -> (G1.t * G2.t) array -> int -> int
     = "caml_blst_miller_loop_list_stubs"
 
@@ -49,6 +56,18 @@ let miller_loop l =
   let l = Array.of_list l in
   let length = Array.length l in
   ignore @@ Stubs.miller_loop_list out l length ;
+  out
+
+let miller_loop_carray g1s g2s =
+  let out = Fq12.Stubs.allocate_fq12 () in
+  let length = Carray.length g1s in
+  ignore @@ Stubs.miller_loop_carray out g1s g2s length ;
+  out
+
+let miller_loop_affine_carray g1s g2s =
+  let out = Fq12.Stubs.allocate_fq12 () in
+  let length = Carray.length g1s in
+  ignore @@ Stubs.miller_loop_affine_carray out g1s g2s length ;
   out
 
 let final_exponentiation_opt x =

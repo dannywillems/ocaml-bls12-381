@@ -607,6 +607,11 @@ module Pairing : sig
       is empty. *)
   val miller_loop : (G1.t * G2.t) list -> Fq12.t
 
+  val miller_loop_carray : G1.t Carray.t -> G2.t Carray.t -> Fq12.t
+
+  val miller_loop_affine_carray :
+    G1.affine Carray.t -> G2.affine Carray.t -> Fq12.t
+
   (** Compute the miller loop on a single tuple of point. *)
   val miller_loop_simple : G1.t -> G2.t -> Fq12.t
 
