@@ -1,5 +1,7 @@
 ### Unreleased
 
+### 4.0.0
+
 #### API changes
 
 - Fr: change API of inplace operators
