@@ -1051,37 +1051,37 @@ module Poseidon128 : sig
   val get : ctxt -> Fr.t * Fr.t * Fr.t
 end
 
-module Poseidon : sig
-  (** Generate your own Poseidon instance *)
-  module Make (Parameters : sig
-    val nb_full_rounds : int
+(* module Poseidon : sig *)
+(*   (\** Generate your own Poseidon instance *\) *)
+(*   module Make (Parameters : sig *)
+(*     val nb_full_rounds : int *)
 
-    val nb_partial_rounds : int
+(*     val nb_partial_rounds : int *)
 
-    val batch_size : int
+(*     val batch_size : int *)
 
-    val width : int
+(*     val width : int *)
 
-    val ark : Fr.t array
+(*     val ark : Fr.t array *)
 
-    val mds : Fr.t array array
-  end) : sig
-    (** Context of the permutation *)
-    type ctxt
+(*     val mds : Fr.t array array *)
+(*   end) : sig *)
+(*     (\** Context of the permutation *\) *)
+(*     type ctxt *)
 
-    (** [init inputs] returns a new context with an initialised state with the
-        value [inputs].
-    *)
-    val init : Fr.t array -> ctxt
+(*     (\** [init inputs] returns a new context with an initialised state with the *)
+(*         value [inputs]. *)
+(*     *\) *)
+(*     val init : Fr.t array -> ctxt *)
 
-    (** [apply_permutation ctxt] applies a permutation on the state. The context
-        is modified. *)
-    val apply_permutation : ctxt -> unit
+(*     (\** [apply_permutation ctxt] applies a permutation on the state. The context *)
+(*         is modified. *\) *)
+(*     val apply_permutation : ctxt -> unit *)
 
-    (** [get ctxt] returns the state of the permutation *)
-    val get : ctxt -> Fr.t array
-  end
-end
+(*     (\** [get ctxt] returns the state of the permutation *\) *)
+(*     val get : ctxt -> Fr.t array *)
+(*   end *)
+(* end *)
 
 (** Implementation of an instantiation of {{: https://eprint.iacr.org/2019/426 }
     Rescue } over the scalar field of BLS12-381 for a security of 128 bits and
