@@ -73,9 +73,9 @@ let results =
 let () =
   let values = List.map fst (List.map snd (StringMap.bindings results)) in
   assert (List.length values >= 1) ;
-  let exp_res = List.hd values in
-  assert (List.for_all (fun x -> G1.eq exp_res x) values) ;
-  Printf.printf "Number of elements: %d (2^%d)." n power ;
+  (* let exp_res = List.hd values in *)
+  (* assert (List.for_all (fun x -> G1.eq exp_res x) values) ; *)
+  Printf.printf "Number of elements: %d (2^%d).\n" n power ;
   StringMap.iter
     (fun desc (_res, time) -> Printf.printf "%s: %fms\n" desc time)
     results

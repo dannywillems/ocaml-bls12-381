@@ -1223,6 +1223,39 @@ CAMLprim value caml_blst_p1_affine_array_get_stubs(value buffer, value list,
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
+CAMLprim value caml_blst_g1_pippenger_affine_carray_stubs(
+    value vbuffer, value vcarray, value vscalars, value vstart, value vlen) {
+  CAMLparam5(vbuffer, vcarray, vscalars, vstart, vlen);
+  size_t start = ctypes_size_t_val(vstart);
+  const blst_p1_affine *carray = (blst_p1_affine *)(Carray_val(vcarray)) + start;
+  const blst_fr *scalars = (blst_fr *)(Carray_val(vscalars)) + start;
+  size_t len = ctypes_size_t_val(vlen);
+
+  byte *scalars_bs = (byte *)calloc(len * 32, sizeof(byte));
+  if (scalars_bs == NULL) {
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+
+  for (int i = 0; i < len; i++) {
+    blst_lendian_from_fr(scalars_bs + i * 32,
+                         scalars + i);
+  }
+
+  limb_t *scratch = calloc(1, blst_p1s_mult_pippenger_scratch_sizeof(len));
+  if (scratch == NULL) {
+    free(scalars_bs);
+    CAMLreturn(CAML_BLS12_381_OUTPUT_OUT_OF_MEMORY);
+  }
+
+  blst_p1s_mult_pippenger_cont(Blst_p1_val(vbuffer), carray, len, scalars_bs,
+                               256, scratch);
+
+  free(scalars_bs);
+  free(scratch);
+
+  CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
+}
+
 CAMLprim value caml_blst_g1_pippenger_contiguous_affine_array_stubs(
     value buffer, value affine_list, value scalars, value start, value len) {
   CAMLparam5(buffer, affine_list, scalars, start, len);

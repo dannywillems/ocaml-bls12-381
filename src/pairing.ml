@@ -28,11 +28,12 @@ module Stubs = struct
   external miller_loop : Fq12.t -> G2.Stubs.affine -> G1.Stubs.affine -> int
     = "caml_blst_miller_loop_stubs"
 
-  external miller_loop_carray : Fq12.t -> G1.t Carray.t -> G2.t Carray.t -> int
+  external miller_loop_carray :
+    Fq12.t -> G1.t Carray.t -> G2.t Carray.t -> int -> int
     = "caml_blst_miller_loop_carray_stubs"
 
   external miller_loop_affine_carray :
-    Fq12.t -> G1.Stubs.affine Carray.t -> G2.Stubs.affine Carray.t -> int
+    Fq12.t -> G1.Stubs.affine Carray.t -> G2.Stubs.affine Carray.t -> int -> int
     = "caml_blst_miller_loop_affine_carray_stubs"
 
   external miller_loop_list : Fq12.t -> (G1.t * G2.t) array -> int -> int

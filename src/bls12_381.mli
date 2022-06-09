@@ -504,6 +504,9 @@ module G1 : sig
   val pippenger_carray :
     ?start:int -> ?len:int -> t Carray.t -> Scalar.t Carray.t -> t
 
+  val pippenger_affine_carray :
+    ?start:int -> ?len:int -> affine Carray.t -> Scalar.t Carray.t -> t
+
   (** Create a point from the coordinates. If the point is not on the curve and
       in the prime subgroup,returns [None].
       The points must be given modulo the order of [Fq]. To
