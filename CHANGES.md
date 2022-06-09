@@ -1,5 +1,9 @@
 ### Unreleased
 
+#### API changes
+
+- Fr: change API of inplace operators
+
 #### New features
 
 - Blst: modify pippenger to work with contiguous arrays of byte sequences and
@@ -24,6 +28,9 @@
   (1fc351fada8e1cca5beb022cad0a694b2d0d1c5f,
   128d090c5ba72b48061831812330c22823fc646a,
   2dd4863705b0608831892b61e109521c9d80b46f)
+- Upgrade blst to 0.3.7
+- Fr: use `blst_fr_cneg` instead of `blst_fr_sub`  for `Fr.neg`
+- Fr: use `blst_fr_sqr` instead of `blst_fr_mul`  for `Fr.square_inplace`
 
 #### Performance improvements
 
@@ -35,6 +42,13 @@
 #### Bugfix
 
 - `Fp12.one` was set to a generator of the prime subgroup.
+- Signature: copy dst before calling blst_pairing_init. Bug
+  https://gitlab.com/dannywillems/ocaml-bls12-381/-/issues/63 reintroduced in
+  https://gitlab.com/dannywillems/ocaml-bls12-381/-/commit/bb1d1c5123ec66f5e2ac34b4c91e2baadf9b05c4
+  and wrong custom block structured used (blst_fp12_ops instead of
+  blst_pairing_ops) introduced in
+  https://gitlab.com/dannywillems/ocaml-bls12-381/-/commit/aa6c9566386c03bde0028fe64fb8c599a41f403f
+  which causes memleaks because a pointer is not free correctly.
 
 ### 3.0.2
 
