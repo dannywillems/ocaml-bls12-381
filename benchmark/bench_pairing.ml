@@ -45,11 +45,13 @@ let t3 =
   Bench.Test.create ~name:"Final exponentiation" (fun () ->
       ignore @@ Bls12_381.Pairing.final_exponentiation_exn x)
 
-let t4 =
+let miller_loop_benches =
   let open Bls12_381 in
-  let p = List.init 6 ~f:(fun _i -> (G1.random (), G2.random ())) in
-  Bench.Test.create ~name:"Miller loop on 6 couples of points" (fun () ->
-      ignore @@ Bls12_381.Pairing.miller_loop p)
+  List.init 10 ~f:(fun i ->
+    let p = List.init (1 + i) ~f:(fun _i -> (G1.random (), G2.random ())) in
+    let name = Printf.sprintf "Miller loop on %d couples of points" (i + 1) in
+    Bench.Test.create ~name (fun () ->
+        ignore @@ Bls12_381.Pairing.miller_loop p))
 
 let t5 =
   let open Bls12_381 in
@@ -60,4 +62,4 @@ let t5 =
     (fun () ->
       ignore @@ Bls12_381.Pairing.(final_exponentiation_exn (miller_loop p)))
 
-let () = Core.Command.run (Bench.make_command [t1; t2; t3; t4; t5])
+let () = Core.Command.run (Bench.make_command ([t1; t2; t3; t5] @ miller_loop_benches))
