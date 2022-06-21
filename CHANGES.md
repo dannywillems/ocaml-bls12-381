@@ -1,5 +1,9 @@
 ### Unreleased
 
+#### API changes
+
+- G1/G2: add `compressed_size_in_bytes`
+
 ### 4.0.0
 
 #### API changes
