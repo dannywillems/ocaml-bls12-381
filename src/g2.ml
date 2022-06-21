@@ -126,6 +126,8 @@ module G2 = struct
 
   let size_in_bytes = 192
 
+  let compressed_size_in_bytes = 96
+
   let affine_of_jacobian j =
     let b = Stubs.allocate_g2_affine () in
     ignore @@ Stubs.to_affine b j ;

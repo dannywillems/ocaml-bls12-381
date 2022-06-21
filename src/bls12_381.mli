@@ -159,6 +159,9 @@ module type CURVE = sig
   (** Actual number of bytes allocated for a value of type t *)
   val size_in_memory : int
 
+  (** Size in bytes for the compressed representation *)
+  val compressed_size_in_bytes : int
+
   (** The size of a point representation, in bytes *)
   val size_in_bytes : int
 

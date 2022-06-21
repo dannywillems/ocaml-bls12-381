@@ -129,6 +129,8 @@ module G1 = struct
 
   let size_in_bytes = 96
 
+  let compressed_size_in_bytes = 48
+
   let memcpy dst src = ignore @@ Stubs.memcpy dst src
 
   let affine_of_jacobian j =

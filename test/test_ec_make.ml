@@ -583,7 +583,7 @@ module MakeCompressedRepresentation (G : Bls12_381.CURVE) = struct
   (* it is correct to test this for BLS12-381 *)
   let test_compressed_version_is_half_the_size () =
     let g = G.random () in
-    assert (Bytes.length (G.to_compressed_bytes g) = G.size_in_bytes / 2)
+    assert (Bytes.length (G.to_compressed_bytes g) = G.compressed_size_in_bytes)
 
   let test_most_significant_bit_is_set_to_1 () =
     let g = G.random () in
@@ -607,7 +607,7 @@ module MakeCompressedRepresentation (G : Bls12_381.CURVE) = struct
        coordinate) are set to zero/unused. *)
     let g = G.random () in
     let g_bytes = G.to_bytes g in
-    let x_bytes_be = Bytes.sub g_bytes 0 (G.size_in_bytes / 2) in
+    let x_bytes_be = Bytes.sub g_bytes 0 G.compressed_size_in_bytes in
     let compressed_g_bytes = G.to_compressed_bytes g in
     let compressed_g_bytes_first_byte = Bytes.get compressed_g_bytes 0 in
     (* Get rid of the last 3 bits as it carries information unrelated to x *)
