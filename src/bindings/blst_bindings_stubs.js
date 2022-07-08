@@ -1748,3 +1748,15 @@ function caml_blst_g2_pippenger_contiguous_affine_array_stubs(
 function caml_built_with_blst_portable_stubs(unit) {
   return 0;
 }
+
+//Provides: caml_blst_fr_of_montgomery_le_stubs
+//Requires: caml_failwith
+function caml_blst_fr_of_montgomery_le_stubs(vx, vx0, vx1, vx2, vx3) {
+  caml_failwith('Not implemented');
+}
+
+//Provides: caml_blst_fr_to_montgomery_le_stubs
+//Requires: caml_failwith
+function caml_blst_fr_to_montgomery_le_stubs(vx0, vx1, vx2, vx3, vx) {
+  caml_failwith('Not implemented');
+}

@@ -25,6 +25,20 @@
 module Fr : sig
   include Ff_sig.PRIME
 
+  val of_montgomery_le :
+    Unsigned.UInt64.t
+    * Unsigned.UInt64.t
+    * Unsigned.UInt64.t
+    * Unsigned.UInt64.t ->
+    t
+
+  val to_montgomery_le :
+    t ->
+    Unsigned.UInt64.t
+    * Unsigned.UInt64.t
+    * Unsigned.UInt64.t
+    * Unsigned.UInt64.t
+
   (** Actual number of bytes allocated for a value of type t *)
   val size_in_memory : int
 

@@ -1241,3 +1241,27 @@ CAMLprim value caml_built_with_blst_portable_stubs(value unit) {
   CAMLparam1(unit);
   CAMLreturn(Val_bool(BUILT_WITH_BLST_PORTABLE));
 }
+
+CAMLprim value caml_blst_fr_to_montgomery_le_stubs(value vx0, value vx1,
+                                                   value vx2, value vx3,
+                                                   value vx) {
+  CAMLparam5(vx0, vx1, vx2, vx3, vx);
+  blst_fr *x = Blst_fr_val(vx);
+  memcpy(Data_custom_val(vx0), x->l + 0, sizeof(uint64_t));
+  memcpy(Data_custom_val(vx1), x->l + 1, sizeof(uint64_t));
+  memcpy(Data_custom_val(vx2), x->l + 2, sizeof(uint64_t));
+  memcpy(Data_custom_val(vx3), x->l + 3, sizeof(uint64_t));
+  CAMLreturn(Val_unit);
+}
+
+CAMLprim value caml_blst_fr_of_montgomery_le_stubs(value vx, value vx0,
+                                                   value vx1, value vx2,
+                                                   value vx3) {
+  CAMLparam5(vx, vx0, vx1, vx2, vx3);
+  blst_fr *x = Blst_fr_val(vx);
+  memcpy(x->l + 0, Data_custom_val(vx0), sizeof(uint64_t));
+  memcpy(x->l + 1, Data_custom_val(vx1), sizeof(uint64_t));
+  memcpy(x->l + 2, Data_custom_val(vx2), sizeof(uint64_t));
+  memcpy(x->l + 3, Data_custom_val(vx3), sizeof(uint64_t));
+  CAMLreturn(Val_unit);
+}
