@@ -1135,6 +1135,10 @@ module Rescue : sig
   val get : ctxt -> Fr.t * Fr.t * Fr.t
 end
 
+module Anemoi : sig
+  val jive128_1_compress : Fr.t -> Fr.t -> Fr.t
+end
+
 (** Return [true] if the environment variable `BLST_PORTABLE` was set when
     building the library, otherwise [false]. Can be used to detect if the
     backend blst has been optimised with ADX on ADX-supported platforms. *)
