@@ -28,9 +28,11 @@ module Stubs = struct
 
   type affine
 
-  type jacobian
+  type jacobian = Bytes.t
 
-  external allocate_g1 : unit -> jacobian = "allocate_p1_stubs"
+  let size_jacobian = 144
+
+  let allocate_g1 : unit -> jacobian = fun () -> Bytes.make size_jacobian '\000'
 
   external allocate_g1_affine_contiguous_array : int -> affine_array
     = "allocate_p1_affine_array_stubs"

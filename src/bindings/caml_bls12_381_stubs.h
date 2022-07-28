@@ -22,7 +22,7 @@
 
 #define Blst_fp12_val(v) ((blst_fp12 *)Data_custom_val(v))
 
-#define Blst_p1_val(v) ((blst_p1 *)Data_custom_val(v))
+#define Blst_p1_val(v) ((blst_p1 *)Bytes_val(v))
 
 #define Blst_p1_affine_val(v) ((blst_p1_affine *)Data_custom_val(v))
 

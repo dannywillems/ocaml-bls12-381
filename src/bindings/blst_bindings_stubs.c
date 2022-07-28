@@ -385,29 +385,11 @@ CAMLprim value caml_blst_fp12_in_group_stubs(value x) {
   CAMLreturn(Val_int(r));
 }
 
-static struct custom_operations blst_p1_ops = {"blst_p1",
-                                               custom_finalize_default,
-                                               custom_compare_default,
-                                               custom_hash_default,
-                                               custom_serialize_default,
-                                               custom_deserialize_default,
-                                               custom_compare_ext_default,
-                                               custom_fixed_length_default};
-
 static struct custom_operations blst_p1_affine_ops = {
     "blst_p1_affine",           custom_finalize_default,
     custom_compare_default,     custom_hash_default,
     custom_serialize_default,   custom_deserialize_default,
     custom_compare_ext_default, custom_fixed_length_default};
-
-CAMLprim value allocate_p1_stubs(value unit) {
-  CAMLparam1(unit);
-  CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_p1_ops, sizeof(blst_p1), 0, 1);
-  blst_p1 *tmp = Blst_p1_val(block);
-  memset(tmp, 0, sizeof(blst_p1));
-  CAMLreturn(block);
-}
 
 CAMLprim value allocate_p1_affine_stubs(value unit) {
   CAMLparam1(unit);
