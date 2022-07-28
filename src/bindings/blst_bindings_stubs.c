@@ -561,7 +561,7 @@ CAMLprim value caml_blst_p1_memcpy_stubs(value dst, value src) {
 CAMLprim value caml_blst_p1_set_coordinates_stubs(value buffer, value x,
                                                   value y) {
   CAMLparam3(buffer, x, y);
-  blst_p1 *buffer_c = Blst_p1_val(buffer);
+  blst_p1_affine *buffer_c = Blst_p1_affine_val(buffer);
   blst_fp *x_c = Blst_fp_val(x);
   blst_fp *y_c = Blst_fp_val(y);
   blst_p1_set_coordinates(buffer_c, x_c, y_c);
@@ -709,7 +709,7 @@ CAMLprim value caml_blst_p2_memcpy_stubs(value dst, value src) {
 CAMLprim value caml_blst_p2_set_coordinates_stubs(value buffer, value x,
                                                   value y) {
   CAMLparam3(buffer, x, y);
-  blst_p2 *buffer_c = Blst_p2_val(buffer);
+  blst_p2_affine *buffer_c = Blst_p2_affine_val(buffer);
   blst_fp2 *x_c = Blst_fp2_val(x);
   blst_fp2 *y_c = Blst_fp2_val(y);
   blst_p2_set_coordinates(buffer_c, x_c, y_c);

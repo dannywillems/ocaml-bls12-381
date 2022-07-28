@@ -54,7 +54,7 @@ size_t blst_p1_affine_sizeof();
 // blst_p1
 size_t blst_p1_sizeof();
 
-void blst_p1_set_coordinates(blst_p1 *buffer_c, blst_fp *x_c, blst_fp *y_c);
+void blst_p1_set_coordinates(blst_p1_affine *buffer_c, blst_fp *x_c, blst_fp *y_c);
 
 // blst_p2_affine
 size_t blst_p2_affine_sizeof();
@@ -62,6 +62,6 @@ size_t blst_p2_affine_sizeof();
 // blst_p2
 size_t blst_p2_sizeof();
 
-void blst_p2_set_coordinates(blst_p2 *buffer_c, blst_fp2 *x_c, blst_fp2 *y_c);
+void blst_p2_set_coordinates(blst_p2_affine *buffer_c, blst_fp2 *x_c, blst_fp2 *y_c);
 
 #endif

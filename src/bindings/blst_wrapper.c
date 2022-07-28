@@ -209,7 +209,7 @@ size_t blst_p1_sizeof() { return sizeof(blst_p1); }
 
 size_t blst_p1_affine_sizeof() { return sizeof(blst_p1_affine); }
 
-void blst_p1_set_coordinates(blst_p1 *buffer_c, blst_fp *x_c, blst_fp *y_c) {
+void blst_p1_set_coordinates(blst_p1_affine *buffer_c, blst_fp *x_c, blst_fp *y_c) {
   buffer_c->x = *x_c;
   buffer_c->y = *y_c;
 }
@@ -218,7 +218,7 @@ size_t blst_p2_sizeof() { return sizeof(blst_p2); }
 
 size_t blst_p2_affine_sizeof() { return sizeof(blst_p2_affine); }
 
-void blst_p2_set_coordinates(blst_p2 *buffer_c, blst_fp2 *x_c, blst_fp2 *y_c) {
+void blst_p2_set_coordinates(blst_p2_affine *buffer_c, blst_fp2 *x_c, blst_fp2 *y_c) {
   byte out[96];
 
   blst_lendian_from_fp(out, &x_c->fp[0]);
