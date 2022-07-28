@@ -29,7 +29,7 @@ static struct custom_operations blst_fr_ops = {"blst_fr",
                                                custom_compare_ext_default,
                                                custom_fixed_length_default};
 
-#define Blst_scalar_val(v) ((blst_scalar *)Data_custom_val(v))
+#define Blst_scalar_val(v) ((blst_scalar *)Bytes_val(v))
 
 #define Blst_fp_val(v) ((blst_fp *)Data_custom_val(v))
 

@@ -25,9 +25,9 @@
 module Stubs = struct
   type fr
 
-  type scalar
+  type scalar = Bytes.t
 
-  external allocate_scalar : unit -> scalar = "allocate_scalar_stubs"
+  let allocate_scalar : unit -> scalar = fun () -> Bytes.create 32
 
   external callocate_fr : unit -> fr = "callocate_fr_stubs"
 

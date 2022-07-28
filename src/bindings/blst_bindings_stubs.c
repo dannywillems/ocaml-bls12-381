@@ -34,24 +34,6 @@
 #define Is_none(v) ((v) == Val_none)
 #define Is_some(v) Is_block(v)
 
-static struct custom_operations blst_scalar_ops = {"blst_scalar",
-                                                   custom_finalize_default,
-                                                   custom_compare_default,
-                                                   custom_hash_default,
-                                                   custom_serialize_default,
-                                                   custom_deserialize_default,
-                                                   custom_compare_ext_default,
-                                                   custom_fixed_length_default};
-
-CAMLprim value allocate_scalar_stubs(value unit) {
-  CAMLparam1(unit);
-  CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_scalar_ops, sizeof(blst_scalar), 0, 1);
-  blst_scalar *c = Blst_scalar_val(block);
-  memset(c, 0, sizeof(blst_scalar));
-  CAMLreturn(block);
-}
-
 CAMLprim value caml_blst_fr_from_lendian_stubs(value x, value b) {
   CAMLparam2(x, b);
   blst_fr *x_c = Blst_fr_val(x);
