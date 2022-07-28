@@ -93,22 +93,6 @@ CAMLprim value caml_blst_fr_is_one_stubs(value x) {
   CAMLreturn(Val_bool(blst_fr_is_one(x_c)));
 }
 
-CAMLprim value callocate_fr_stubs(value unit) {
-  CAMLparam1(unit);
-  CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_fr_ops, sizeof(blst_fr), 0, 1);
-  blst_fr *c = Blst_fr_val(block);
-  memset(c, 0, sizeof(blst_fr));
-  CAMLreturn(block);
-}
-
-CAMLprim value mallocate_fr_stubs(value unit) {
-  CAMLparam1(unit);
-  CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_fr_ops, sizeof(blst_fr), 0, 1);
-  CAMLreturn(block);
-}
-
 CAMLprim value caml_blst_fr_add_stubs(value ret, value p1, value p2) {
   CAMLparam3(ret, p1, p2);
   blst_fr_add(Blst_fr_val(ret), Blst_fr_val(p1), Blst_fr_val(p2));

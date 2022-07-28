@@ -23,15 +23,19 @@
 (*****************************************************************************)
 
 module Stubs = struct
-  type fr
+  type fr = Bytes.t
 
   type scalar = Bytes.t
 
-  let allocate_scalar : unit -> scalar = fun () -> Bytes.create 32
+  let size_fr = 32
 
-  external callocate_fr : unit -> fr = "callocate_fr_stubs"
+  let size_scalar = 32
 
-  external mallocate_fr : unit -> fr = "mallocate_fr_stubs"
+  let allocate_scalar : unit -> scalar = fun () -> Bytes.create size_scalar
+
+  let mallocate_fr : unit -> fr = fun () -> Bytes.create size_fr
+
+  let callocate_fr : unit -> fr = fun () -> Bytes.make size_fr '\000'
 
   external scalar_of_fr : scalar -> fr -> int = "caml_blst_scalar_from_fr_stubs"
 
