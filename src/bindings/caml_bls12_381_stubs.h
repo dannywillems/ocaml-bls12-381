@@ -24,7 +24,7 @@
 
 #define Blst_p1_val(v) ((blst_p1 *)Bytes_val(v))
 
-#define Blst_p1_affine_val(v) ((blst_p1_affine *)Data_custom_val(v))
+#define Blst_p1_affine_val(v) ((blst_p1_affine *)Bytes_val(v))
 
 #define Blst_p1_affine_array_val(v) ((blst_p1_affine *)Data_custom_val(v))
 

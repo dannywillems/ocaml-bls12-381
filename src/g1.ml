@@ -26,7 +26,9 @@
 module Stubs = struct
   type affine_array
 
-  type affine
+  type affine = Bytes.t
+
+  let size_affine = 96
 
   type jacobian = Bytes.t
 
@@ -41,7 +43,8 @@ module Stubs = struct
     affine_array -> jacobian array -> int -> int
     = "caml_blst_p1_affine_array_set_p1_points_stubs"
 
-  external allocate_g1_affine : unit -> affine = "allocate_p1_affine_stubs"
+  let allocate_g1_affine : unit -> affine =
+   fun () -> Bytes.make size_affine '\000'
 
   external from_affine : jacobian -> affine -> int
     = "caml_blst_p1_from_affine_stubs"
