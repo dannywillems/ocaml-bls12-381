@@ -41,9 +41,13 @@ static struct custom_operations blst_fr_ops = {"blst_fr",
 
 #define Blst_p1_affine_val(v) ((blst_p1_affine *)Data_custom_val(v))
 
+#define Blst_p1_affine_array_val(v) ((blst_p1_affine *)Data_custom_val(v))
+
 #define Blst_p2_val(v) ((blst_p2 *)Data_custom_val(v))
 
 #define Blst_p2_affine_val(v) ((blst_p2_affine *)Data_custom_val(v))
+
+#define Blst_p2_affine_array_val(v) ((blst_p2_affine *)Data_custom_val(v))
 
 #define Blst_pairing_val(v) (*(blst_pairing **)Data_custom_val(v))
 

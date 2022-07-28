@@ -1110,7 +1110,7 @@ CAMLprim value caml_blst_p1_affine_array_set_p1_points_stubs(value buffer,
                                                              value l, value n) {
   CAMLparam3(buffer, l, n);
   int n_c = Int_val(n);
-  blst_p1_affine *buffer_c = Blst_p1_affine_val(buffer);
+  blst_p1_affine *buffer_c = Blst_p1_affine_array_val(buffer);
 
   for (int i = 0; i < n_c; i++) {
     blst_p1 *p = Blst_p1_val(Field(l, i));
@@ -1125,7 +1125,7 @@ CAMLprim value caml_blst_p1_affine_array_get_stubs(value buffer, value list,
                                                    value i) {
   CAMLparam3(buffer, list, i);
   blst_p1 *buffer_c = Blst_p1_val(buffer);
-  blst_p1_affine *list_c = Blst_p1_affine_val(list);
+  blst_p1_affine *list_c = Blst_p1_affine_array_val(list);
   int i_c = Int_val(i);
 
   blst_p1_from_affine(buffer_c, list_c + i_c);
@@ -1136,7 +1136,7 @@ CAMLprim value caml_blst_g1_pippenger_contiguous_affine_array_stubs(
     value buffer, value affine_list, value scalars, value start, value len) {
   CAMLparam5(buffer, affine_list, scalars, start, len);
   size_t start_c = ctypes_size_t_val(start);
-  const blst_p1_affine *pts_c = Blst_p1_affine_val(affine_list) + start_c;
+  const blst_p1_affine *pts_c = Blst_p1_affine_array_val(affine_list) + start_c;
   size_t len_c = ctypes_size_t_val(len);
 
   byte *scalars_bs = (byte *)calloc(len_c * 32, sizeof(byte));
@@ -1183,7 +1183,7 @@ CAMLprim value caml_blst_p2_affine_array_set_p2_points_stubs(value buffer,
                                                              value l, value n) {
   CAMLparam3(buffer, l, n);
   int n_c = Int_val(n);
-  blst_p2_affine *buffer_c = Blst_p2_affine_val(buffer);
+  blst_p2_affine *buffer_c = Blst_p2_affine_array_val(buffer);
 
   for (int i = 0; i < n_c; i++) {
     blst_p2 *p = Blst_p2_val(Field(l, i));
@@ -1198,7 +1198,7 @@ CAMLprim value caml_blst_p2_affine_array_get_stubs(value buffer, value list,
                                                    value i) {
   CAMLparam3(buffer, list, i);
   blst_p2 *buffer_c = Blst_p2_val(buffer);
-  blst_p2_affine *list_c = Blst_p2_affine_val(list);
+  blst_p2_affine *list_c = Blst_p2_affine_array_val(list);
   int i_c = Int_val(i);
 
   blst_p2_from_affine(buffer_c, list_c + i_c);
@@ -1209,7 +1209,7 @@ CAMLprim value caml_blst_g2_pippenger_contiguous_affine_array_stubs(
     value buffer, value affine_list, value scalars, value start, value len) {
   CAMLparam5(buffer, affine_list, scalars, start, len);
   size_t start_c = ctypes_size_t_val(start);
-  const blst_p2_affine *pts_c = Blst_p2_affine_val(affine_list) + start_c;
+  const blst_p2_affine *pts_c = Blst_p2_affine_array_val(affine_list) + start_c;
   size_t len_c = ctypes_size_t_val(len);
 
   byte *scalars_bs = (byte *)calloc(len_c * 32, sizeof(byte));
