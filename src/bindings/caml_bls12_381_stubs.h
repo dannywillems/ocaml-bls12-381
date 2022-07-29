@@ -5,6 +5,7 @@
 #include "blst_misc.h"
 #include <caml/custom.h>
 #include <caml/mlvalues.h>
+#include <caml/bigarray.h>
 
 #define CAML_BLS12_381_OUTPUT_SUCCESS Val_int(0)
 
@@ -26,7 +27,7 @@
 
 #define Blst_p1_affine_val(v) ((blst_p1_affine *)Bytes_val(v))
 
-#define Blst_p1_affine_array_val(v) ((blst_p1_affine *)Data_custom_val(v))
+#define Blst_p1_affine_array_val(v) ((blst_p1_affine *)Caml_ba_data_val(v))
 
 #define Blst_p2_val(v) ((blst_p2 *)Data_custom_val(v))
 
