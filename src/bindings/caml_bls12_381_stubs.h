@@ -31,7 +31,7 @@
 
 #define Blst_p2_val(v) ((blst_p2 *)Bytes_val(v))
 
-#define Blst_p2_affine_val(v) ((blst_p2_affine *)Data_custom_val(v))
+#define Blst_p2_affine_val(v) ((blst_p2_affine *)Bytes_val(v))
 
 #define Blst_p2_affine_array_val(v) ((blst_p2_affine *)Data_custom_val(v))
 
