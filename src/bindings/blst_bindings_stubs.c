@@ -1049,21 +1049,6 @@ CAMLprim value caml_blst_g1_pippenger_contiguous_affine_array_stubs(
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
-static struct custom_operations blst_p2_affine_array_ops = {
-    "blst_p2_affine_array",     custom_finalize_default,
-    custom_compare_default,     custom_hash_default,
-    custom_serialize_default,   custom_deserialize_default,
-    custom_compare_ext_default, custom_fixed_length_default};
-
-CAMLprim value allocate_p2_affine_array_stubs(value n) {
-  CAMLparam1(n);
-  int n_c = Int_val(n);
-  CAMLlocal1(block);
-  block = caml_alloc_custom(&blst_p2_affine_array_ops,
-                            sizeof(blst_p2_affine) * n_c, 0, 1);
-  CAMLreturn(block);
-}
-
 CAMLprim value caml_blst_p2_affine_array_set_p2_points_stubs(value buffer,
                                                              value l, value n) {
   CAMLparam3(buffer, l, n);

@@ -33,7 +33,7 @@
 
 #define Blst_p2_affine_val(v) ((blst_p2_affine *)Bytes_val(v))
 
-#define Blst_p2_affine_array_val(v) ((blst_p2_affine *)Data_custom_val(v))
+#define Blst_p2_affine_array_val(v) ((blst_p2_affine *)Caml_ba_data_val(v))
 
 #define Blst_pairing_val(v) (*(blst_pairing **)Data_custom_val(v))
 

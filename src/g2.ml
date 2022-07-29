@@ -27,7 +27,7 @@ module Stubs = struct
 
   let size_affine = 192
 
-  type affine_array
+  type affine_array = Bigstringaf.t
 
   type jacobian = Bytes.t
 
@@ -38,8 +38,8 @@ module Stubs = struct
   let allocate_g2_affine : unit -> affine =
    fun () -> Bytes.make size_affine '\000'
 
-  external allocate_g2_affine_contiguous_array : int -> affine_array
-    = "allocate_p2_affine_array_stubs"
+  let allocate_g2_affine_contiguous_array : int -> affine_array =
+   fun l -> Bigstringaf.create (l * size_affine)
 
   external p2_affine_array_set_p2_points :
     affine_array -> jacobian array -> int -> int
