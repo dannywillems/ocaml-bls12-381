@@ -161,6 +161,11 @@ build-ocaml-4.14-debian-10:
   <<: *build_definition_debian
   image: ocaml/opam:debian-10-ocaml-4.14
 
+build-ocaml-5.0-debian-10:
+  <<: *build_definition_debian
+  image: ocaml/opam:debian-10-ocaml-5.0
+  allow_failure: true
+
 build-ocaml-4.08-debian-11:
   <<: *build_definition_debian
   image: ocaml/opam:debian-11-ocaml-4.08
@@ -188,6 +193,11 @@ build-ocaml-4.13-debian-11:
 build-ocaml-4.14-debian-11:
   <<: *build_definition_debian
   image: ocaml/opam:debian-11-ocaml-4.14
+
+build-ocaml-5.0-debian-11:
+  <<: *build_definition_debian
+  image: ocaml/opam:debian-11-ocaml-5.0
+  allow_failure: true
 
 # Build and use cache. Useful for other jobs not related to testing.
 # Does not run any test
@@ -300,6 +310,11 @@ build-ocaml-4.14-alpine-3.14:
   <<: *build_definition_alpine
   image: ocaml/opam:alpine-3.14-ocaml-4.14
 
+build-ocaml-5.0-alpine-3.14:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.14-ocaml-5.0
+  allow_failure: true
+
 build-ocaml-4.08-alpine-3.15:
   <<: *build_definition_alpine
   image: ocaml/opam:alpine-3.15-ocaml-4.08
@@ -327,6 +342,11 @@ build-ocaml-4.13-alpine-3.15:
 build-ocaml-4.14-alpine-3.15:
   <<: *build_definition_alpine
   image: ocaml/opam:alpine-3.15-ocaml-4.14
+
+build-ocaml-5.0-alpine-3.15:
+  <<: *build_definition_alpine
+  image: ocaml/opam:alpine-3.15-ocaml-5.0
+  allow_failure: true
 
 opam-install-and-remove:
   stage: install
