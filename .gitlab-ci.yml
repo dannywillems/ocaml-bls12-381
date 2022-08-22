@@ -2,7 +2,7 @@
 # _opam and _build directory.
 variables:
   IMAGE_WITH_CACHE: "ocaml/opam:debian-testing-opam"
-  OCAML_COMPILER: "4.13.0"
+  OCAML_COMPILER: "4.14.0"
   # A workaround against a bug in gitlab-runner's default
   # unzipping implementation, which partially breaks caching for the dune _build cache.
   # See https://gitlab.com/gitlab-org/gitlab-runner/-/issues/27496 for more details.
