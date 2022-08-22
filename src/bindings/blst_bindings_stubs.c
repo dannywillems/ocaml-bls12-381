@@ -1,6 +1,5 @@
 #include "blst.h"
 #include "blst_misc.h"
-#define CAML_NAME_SPACE
 #include "caml_bls12_381_stubs.h"
 #include "ocaml_integers.h"
 #include <caml/alloc.h>
