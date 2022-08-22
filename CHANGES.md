@@ -3,6 +3,7 @@
 #### API changes
 
 - G1/G2: add `compressed_size_in_bytes`
+- Remove Poseidon, Poseidon128, Rescue and signature to move into independent repositories
 
 ### 4.0.0
 
