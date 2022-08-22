@@ -1,14 +1,9 @@
 (tests
  (names test_fr test_g1 test_g1_fft test_g2 test_g2_fft test_pairing
-   test_random_state test_hash_to_curve test_signature
-   test_aggregated_signature test_poseidon128 test_rescue test_fq12 test_gt
-   test_fr_montgomery test_anemoi)
+   test_random_state test_hash_to_curve test_fq12 test_gt test_fr_montgomery)
  (modules test_fr test_g1 test_g1_fft test_g2 test_g2_fft test_pairing
-   test_ec_make test_random_state test_hash_to_curve test_signature
-   test_poseidon128 test_poseidon poseidon128_ark poseidon128_mds
-   poseidon252_ark poseidon252_mds test_aggregated_signature test_rescue
-   rescue_ark rescue_mds utils test_fq12 test_gt test_fr_montgomery
-   test_anemoi)
+   test_ec_make test_random_state test_hash_to_curve utils test_fq12 test_gt
+   test_fr_montgomery)
  (package bls12-381)
  (modes native js)
  (deps
@@ -108,50 +103,6 @@
   (run node -- preload.js %{test})))
 
 ;; needs dep
-
-(rule
- (alias runtest-js)
- (deps
-  (source_tree test_vectors)
-  preload.js
-  blst.js
-  blst.wasm
-  (:test test_signature.bc.js))
- (action
-  (run node -- preload.js %{test})))
-
-(rule
- (alias runtest-js)
- (deps
-  (source_tree test_vectors)
-  preload.js
-  blst.js
-  blst.wasm
-  (:test test_aggregated_signature.bc.js))
- (action
-  (run node -- preload.js %{test})))
-
-(rule
- (alias runtest-js)
- (deps
-  (source_tree test_vectors)
-  preload.js
-  blst.js
-  blst.wasm
-  (:test test_poseidon128.bc.js))
- (action
-  (run node -- preload.js %{test})))
-
-(rule
- (alias runtest-js)
- (deps
-  (source_tree test_vectors)
-  preload.js
-  blst.js
-  blst.wasm
-  (:test test_rescue.bc.js))
- (action
-  (run node -- preload.js %{test})))
 
 (rule
  (alias runtest-js)

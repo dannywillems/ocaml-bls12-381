@@ -8,20 +8,6 @@ This library provides a fast implementation of:
   and the pippenger algorithm for fast multi scalar exponentiation.
 - operations over the target group of the pairing (GT), written additively.
 - pairing from G1 x G2 to GT
-- BLS signatures described in [this
-  specification](https://tools.ietf.org/pdf/draft-irtf-cfrg-bls-signature-04.pdf).
-  Both instantiations, i.e. the one minimizing the public key size and the one
-  minimizing the signature size, are provided.
-- an instantiation of
-  [Poseidon](https://eprint.iacr.org/2019/458.pdf) providing a security of
-  128 bits. See [the
-  documentation](https://dannywillems.gitlab.io/ocaml-bls12-381/bls12-381/Bls12_381/Poseidon128/index.html)
-  for more information on the used parameters.
-- an instantiation of
-  [Rescue](https://eprint.iacr.org/2019/426.pdf) providing a security of
-  128 bits. See [the
-  documentation](https://dannywillems.gitlab.io/ocaml-bls12-381/bls12-381/Bls12_381/Rescue/index.html)
-  for more information on the used parameters.
 
 ## Encoding
 

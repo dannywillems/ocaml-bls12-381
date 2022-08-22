@@ -1,16 +1,5 @@
 (copy_files ../common/{fft.ml,fft.mli})
 
-(copy_files
-  primitives/poseidon128/{caml_poseidon128_stubs.c,caml_poseidon128_stubs.js,poseidon128.h,poseidon128.c})
-
-(copy_files primitives/anemoi/{caml_anemoi_stubs.c,anemoi.h,anemoi.c})
-
-(copy_files
-  primitives/poseidon/{caml_poseidon_stubs.c,caml_poseidon_stubs.js,poseidon.h,poseidon.c})
-
-(copy_files
-  primitives/rescue/{caml_rescue_stubs.c,caml_rescue_stubs.js,rescue.h,rescue.c})
-
 (copy_files primitives/fft/{fft.c,fft.h,caml_fft_stubs.c,caml_fft_stubs.js})
 
 (copy_files bindings/{blst_bindings_stubs.c,blst_bindings_stubs.js})
@@ -62,9 +51,8 @@
   (progn
    (run cp -f bindings/blst_extended.c libblst/src/)
    (run emcc -Os -o blst.js -I libblst/src/ libblst/src/server.c
-     %{dep:blst_wrapper.c} %{dep:poseidon128.c} %{dep:rescue.c}
-     -DENABLE_EMSCRIPTEN_STUBS -DENABLE_MODULE_RECOVERY -s
-     ALLOW_MEMORY_GROWTH=1 -s WASM=1 -s MALLOC=emmalloc -s EXPORT_ES6=0 -s
+     %{dep:blst_wrapper.c} -DENABLE_EMSCRIPTEN_STUBS -DENABLE_MODULE_RECOVERY
+     -s ALLOW_MEMORY_GROWTH=1 -s WASM=1 -s MALLOC=emmalloc -s EXPORT_ES6=0 -s
      FILESYSTEM=0 -s MODULARIZE=1 -s EXPORT_NAME='_BLS12381' -s
      EXPORTED_FUNCTIONS=@needed-wasm-names --no-entry))))
 
@@ -79,16 +67,10 @@
   g2
   gt
   pairing
-  signature
   ;; private
   fq
   fq2
-  fft
-  poseidon128
-  poseidon
-  poseidon_utils
-  rescue
-  anemoi)
+  fft)
  (instrumentation
   (backend bisect_ppx))
  (private_modules fq fq2 fft)
@@ -97,15 +79,13 @@
  (foreign_archives blst)
  (js_of_ocaml
   (javascript_files runtime_helper.js blst_bindings_stubs.js
-    caml_poseidon128_stubs.js caml_rescue_stubs.js caml_fft_stubs.js))
+    caml_fft_stubs.js))
  (foreign_stubs
   (language c)
   ;; For pippenger binding, avoid warnings related to const usage
   (flags
    (:include c_flags_blst.sexp))
-  (names blst_wrapper blst_bindings_stubs caml_poseidon128_stubs poseidon128
-    anemoi caml_anemoi_stubs poseidon caml_poseidon_stubs rescue
-    caml_rescue_stubs fft caml_fft_stubs)))
+  (names blst_wrapper blst_bindings_stubs fft caml_fft_stubs)))
 
 (executable
  (name gen_wasm_needed_names)
@@ -116,8 +96,7 @@
  (target needed-wasm-names)
  (mode promote)
  (deps
-  (:files blst_bindings_stubs.js caml_poseidon128_stubs.js
-    caml_rescue_stubs.js caml_fft_stubs.js))
+  (:files blst_bindings_stubs.js caml_fft_stubs.js))
  (action
   (with-outputs-to
    %{target}

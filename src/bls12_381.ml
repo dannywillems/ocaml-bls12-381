@@ -208,11 +208,6 @@ module G2 = G2
 module GT = Gt
 module Fq12 = Fq12
 module Pairing = Pairing
-module Signature = Signature
-module Poseidon128 = Poseidon128
-module Poseidon = Poseidon
-module Rescue = Rescue
-module Anemoi = Anemoi
 
 external built_with_blst_portable_stubs : unit -> bool
   = "caml_built_with_blst_portable_stubs"
