@@ -27,11 +27,13 @@
 
 // From ocaml/ocaml
 // https://github.com/ocaml/ocaml/blob/aca84729327d327eaf6e82f3ae15d0a63953288e/runtime/caml/mlvalues.h#L401
+#if OCAML_VERSION < 412000
 #define Val_none Val_int(0)
 #define Some_val(v) Field(v, 0)
 #define Tag_some 0
 #define Is_none(v) ((v) == Val_none)
 #define Is_some(v) Is_block(v)
+#endif
 
 static struct custom_operations blst_scalar_ops = {"blst_scalar",
                                                    custom_finalize_default,
