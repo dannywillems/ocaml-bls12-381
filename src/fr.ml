@@ -144,7 +144,7 @@ module Fr = struct
     ignore @@ Stubs.fr_to_bytes_le buffer_bytes x ;
     buffer_bytes
 
-  let size_in_memory = Obj.reachable_words (Obj.magic one) * 8
+  let size_in_memory = Obj.reachable_words (Obj.repr one) * 8
 
   let eq x y = Stubs.eq x y
 

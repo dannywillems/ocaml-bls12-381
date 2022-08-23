@@ -16,4 +16,4 @@ let () =
   Printf.printf
     "[s]g1 = %s\n"
     Hex.(show (of_bytes Bls12_381.G1.(to_bytes (mul g1 s)))) ;
-  Printf.printf "Reachable words: %d\n" Obj.(reachable_words (magic g1))
+  Printf.printf "Reachable words: %d\n" Obj.(reachable_words (repr g1))

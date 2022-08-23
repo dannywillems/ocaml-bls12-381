@@ -201,7 +201,7 @@ module G1 = struct
     in
     of_bytes_exn bytes
 
-  let size_in_memory = Obj.reachable_words (Obj.magic one) * 8
+  let size_in_memory = Obj.reachable_words (Obj.repr one) * 8
 
   let of_compressed_bytes_opt bs =
     let buffer_affine = Stubs.allocate_g1_affine () in

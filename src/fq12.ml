@@ -93,7 +93,7 @@ module Fq12 = struct
 
   let zero = Stubs.allocate_fq12 ()
 
-  let size_in_memory = Obj.reachable_words (Obj.magic one) * 8
+  let size_in_memory = Obj.reachable_words (Obj.repr one) * 8
 
   let eq x y =
     let res = Stubs.equal x y in

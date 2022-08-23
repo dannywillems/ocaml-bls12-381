@@ -214,7 +214,7 @@ module G2 = struct
     in
     of_compressed_bytes_exn bytes
 
-  let size_in_memory = Obj.reachable_words (Obj.magic one) * 8
+  let size_in_memory = Obj.reachable_words (Obj.repr one) * 8
 
   let to_bytes p =
     let buffer = Bytes.make size_in_bytes '\000' in
