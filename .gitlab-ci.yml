@@ -232,6 +232,13 @@ build:
     # For benchmark repository. Not included in opam deps
     - opam install "core_bench<=v0.14.1" -y
     - dune build
+    # For doc
+    - opam install odoc
+    - dune build @doc
+    - cp -r _build/default/_doc/_html _odoc/
+  artifacts:
+    paths:
+      - _odoc
   rules:
     - when: always
 
@@ -400,21 +407,6 @@ opam-install-and-remove-local-switch:
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/blst_misc.h
     - ls $OPAM_SWITCH_PREFIX/lib/bls12-381/caml_bls12_381_stubs.h
     - opam remove -a -y bls12-381.dev
-  rules:
-    - when: always
-
-doc:
-  <<: *job_with_cache
-  stage: doc
-  before_script:
-    - eval $(opam env)
-    - opam install odoc -y
-  script:
-    - dune build @doc
-    - cp -r _build/default/_doc/_html _odoc/
-  artifacts:
-    paths:
-      - _odoc
   rules:
     - when: always
 
