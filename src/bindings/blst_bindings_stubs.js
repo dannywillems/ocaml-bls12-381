@@ -190,11 +190,10 @@ function caml_blst_scalar_of_bytes_stubs(ret, p1) {
   return 0;
 }
 
-//Provides: caml_blst_check_scalar_stubs
+//Provides: caml_blst_check_bytes_stubs
 //Requires: wasm_call
-//Requires: Blst_scalar_val
-function caml_blst_check_scalar_stubs(p1) {
-  var r = wasm_call('_blst_scalar_fr_check', Blst_scalar_val(p1));
+function caml_blst_check_bytes_stubs(vbs) {
+  var r = wasm_call('_blst_scalar_fr_check', vbs);
   return r ? 1 : 0;
 }
 

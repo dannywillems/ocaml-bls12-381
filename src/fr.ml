@@ -49,7 +49,7 @@ module Stubs = struct
   external scalar_to_bytes_le : Bytes.t -> scalar -> int
     = "caml_blst_scalar_to_bytes_stubs"
 
-  external check_scalar : scalar -> bool = "caml_blst_check_scalar_stubs"
+  external check_bytes : Bytes.t -> bool = "caml_blst_check_bytes_stubs"
 
   external add : fr -> fr -> fr -> int = "caml_blst_fr_add_stubs"
 
@@ -126,11 +126,7 @@ module Fr = struct
     | Some buffer -> buffer
 
   let check_bytes bs =
-    if Bytes.length bs = size_in_bytes then (
-      let buffer_scalar = Stubs.allocate_scalar () in
-      ignore @@ Stubs.scalar_of_bytes_le buffer_scalar bs ;
-      Stubs.check_scalar buffer_scalar)
-    else false
+    if Bytes.length bs = size_in_bytes then Stubs.check_bytes bs else false
 
   let zero = of_bytes_exn (Bytes.make size_in_bytes '\000')
 

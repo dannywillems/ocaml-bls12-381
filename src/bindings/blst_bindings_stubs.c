@@ -188,9 +188,9 @@ CAMLprim value caml_blst_scalar_of_bytes_stubs(value ret, value p1) {
   CAMLreturn(CAML_BLS12_381_OUTPUT_SUCCESS);
 }
 
-CAMLprim value caml_blst_check_scalar_stubs(value p1) {
-  CAMLparam1(p1);
-  bool r = blst_scalar_fr_check(Blst_scalar_val(p1));
+CAMLprim value caml_blst_check_bytes_stubs(value vbs) {
+  CAMLparam1(vbs);
+  bool r = blst_scalar_fr_check((const blst_scalar *)Bytes_val(vbs));
   CAMLreturn(Val_bool(r));
 }
 
