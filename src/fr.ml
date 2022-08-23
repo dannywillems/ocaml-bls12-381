@@ -81,22 +81,6 @@ module Stubs = struct
 
   external inner_product : fr -> fr array -> fr array -> int -> int
     = "caml_blst_fr_inner_product_stubs"
-
-  external of_montgomery_le :
-    fr ->
-    Unsigned.UInt64.t ->
-    Unsigned.UInt64.t ->
-    Unsigned.UInt64.t ->
-    Unsigned.UInt64.t ->
-    unit = "caml_blst_fr_of_montgomery_le_stubs"
-
-  external to_montgomery_le :
-    Unsigned.UInt64.t ->
-    Unsigned.UInt64.t ->
-    Unsigned.UInt64.t ->
-    Unsigned.UInt64.t ->
-    fr ->
-    unit = "caml_blst_fr_to_montgomery_le_stubs"
 end
 
 (* module = Blst_bindings.r (Blst_stubs) *)
@@ -396,19 +380,6 @@ module Fr = struct
     | Some x -> x
 
   let of_int x = of_z (Z.of_int x)
-
-  let to_montgomery_le x =
-    let x0 = Unsigned.UInt64.of_int 0 in
-    let x1 = Unsigned.UInt64.of_int 0 in
-    let x2 = Unsigned.UInt64.of_int 0 in
-    let x3 = Unsigned.UInt64.of_int 0 in
-    Stubs.to_montgomery_le x0 x1 x2 x3 x ;
-    (x0, x1, x2, x3)
-
-  let of_montgomery_le (x0, x1, x2, x3) =
-    let x = copy zero in
-    Stubs.of_montgomery_le x x0 x1 x2 x3 ;
-    x
 end
 
 include Fr
