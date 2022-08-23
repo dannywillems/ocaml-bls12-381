@@ -233,7 +233,7 @@ build:
     - opam install "core_bench<=v0.14.1" -y
     - dune build
     # For doc
-    - opam install odoc
+    - opam install odoc -y
     - dune build @doc
     - cp -r _build/default/_doc/_html _odoc/
   artifacts:
