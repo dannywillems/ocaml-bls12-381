@@ -10,3 +10,4 @@ node_modules
 package-lock.json
 *.~undo-tree~
 src/c_flags_blst.sexp
+dist
