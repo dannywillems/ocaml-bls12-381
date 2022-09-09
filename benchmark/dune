@@ -7,4 +7,4 @@
  (names bench_g1 bench_g1_bulk bench_g2 bench_g2_bulk bench_fr bench_fr_bulk
    bench_fq12 bench_pairing bench_pairing_slow bench_fft bench_fft_g1
    bench_fft_g2 bench_fft_great_domain)
- (libraries bls12-381 core core_bench))
+ (libraries bls12-381 core core_bench core_unix.command_unix))

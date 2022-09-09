@@ -72,4 +72,4 @@ let t11 =
 
 let command = Bench.make_command [t1; t2; t3; t4; t5; t6; t7; t8; t9; t10; t11]
 
-let () = Core.Command.run command
+let () = Command_unix.run command

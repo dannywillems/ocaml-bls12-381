@@ -75,7 +75,7 @@ bisect-ppx-report html
 Install `core_bench`:
 
 ```
-opam install core_bench
+opam install core_bench core_unix
 ```
 
 See files listed in the directory `benchmark` and execute it with `dune exec`. For instance:

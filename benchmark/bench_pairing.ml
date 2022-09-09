@@ -63,4 +63,4 @@ let t5 =
       ignore @@ Bls12_381.Pairing.(final_exponentiation_exn (miller_loop p)))
 
 let () =
-  Core.Command.run (Bench.make_command ([t1; t2; t3; t5] @ miller_loop_benches))
+  Command_unix.run (Bench.make_command ([t1; t2; t3; t5] @ miller_loop_benches))

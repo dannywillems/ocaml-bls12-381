@@ -133,4 +133,4 @@ end
 
 let () =
   let commands = List.concat [MakeBenchBlst.get_benches ()] in
-  Core.Command.run (Core_bench.Bench.make_command commands)
+  Command_unix.run (Core_bench.Bench.make_command commands)
