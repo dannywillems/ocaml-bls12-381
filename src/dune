@@ -45,6 +45,7 @@
  (deps
   (source_tree libblst)
   needed-wasm-names
+  bindings/blst_extended.c
   (glob_files *.h))
  (targets blst.wasm blst.js)
  (action
